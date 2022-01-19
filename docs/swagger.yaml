@@ -1,0 +1,135 @@
+basePath: /content
+definitions:
+  RewardType:
+    properties:
+      active:
+        type: boolean
+      amount:
+        type: integer
+      building_block:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost
+info:
+  contact: {}
+  description: RoRewards Building Block API Documentation.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Rewards Building Block API
+  version: 0.0.1
+paths:
+  /admin/reward_types:
+    get:
+      description: Retrieves  all reward types
+      operationId: AdminGetRewardTypes
+      parameters:
+      - description: Coma separated IDs of the desired records
+        in: query
+        name: ids
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardType'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new reward type
+      operationId: AdminCreateRewardType
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/reward_types/{id}:
+    delete:
+      description: Deletes a reward type with the specified id
+      operationId: AdminDeleteRewardType
+      responses:
+        "200":
+          description: ""
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a reward type by id
+      operationId: AdminRewardTypes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward type with the specified id
+      operationId: AdminUpdateRewardType
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /version:
+    get:
+      description: Gives the service version.
+      operationId: Version
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: ""
+      tags:
+      - Client
+schemes:
+- https
+securityDefinitions:
+  AdminGroupAuth:
+    in: header
+    name: GROUP
+    type: apiKey
+  AdminUserAuth:
+    in: header (add Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+  UserAuth:
+    in: header (add Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
