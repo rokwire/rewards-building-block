@@ -85,6 +85,12 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
 
+	adminSubRouter.HandleFunc("/reward_pools", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPools)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_pools", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardPool)).Methods("POST")
+	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPool)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardPool)).Methods("PUT")
+	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardPool)).Methods("DELETE")
+
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 

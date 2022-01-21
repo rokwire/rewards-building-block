@@ -112,15 +112,99 @@ func (sa *Adapter) UpdateRewardType(id string, item model.RewardType) (*model.Re
 	return &item, nil
 }
 
-// DeleteRewardTypes deletes a reward type
-func (sa *Adapter) DeleteRewardTypes(id string) error {
+// DeleteRewardType deletes a reward type
+func (sa *Adapter) DeleteRewardType(id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	_, err := sa.db.rewardTypes.DeleteOne(filter, nil)
 	if err != nil {
-		log.Printf("storage.DeleteRewardTypes error: %s", err)
-		return fmt.Errorf("storage.DeleteRewardTypes error: %s", err)
+		log.Printf("storage.DeleteRewardType error: %s", err)
+		return fmt.Errorf("storage.DeleteRewardType error: %s", err)
+	}
+
+	return nil
+}
+
+// GetRewardPools Gets all reward pools
+func (sa *Adapter) GetRewardPools(ids []string) ([]model.RewardPool, error) {
+	filter := bson.D{}
+	if len(ids) > 0 {
+		filter = bson.D{
+			primitive.E{Key: "_id", Value: bson.M{"$in": ids}},
+		}
+	}
+
+	var result []model.RewardPool
+	err := sa.db.rewardTypes.Find(filter, &result, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardPools error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardPools error: %s", err)
+	}
+	return result, nil
+}
+
+// GetRewardPool Gets a reward pool by id
+func (sa *Adapter) GetRewardPool(id string) (*model.RewardPool, error) {
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	var result []model.RewardPool
+	err := sa.db.rewardPools.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardPool error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardPool error: %s", err)
+	}
+	return &result[0], nil
+}
+
+// CreateRewardPool creates a new reward pool
+func (sa *Adapter) CreateRewardPool(item model.RewardPool) (*model.RewardPool, error) {
+	item.ID = uuid.NewString()
+	_, err := sa.db.rewardPools.InsertOne(&item)
+	if err != nil {
+		log.Printf("storage.CreateRewardPool error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardPool error: %s", err)
+	}
+	return &item, nil
+}
+
+// UpdateRewardPool updates a reward pool
+func (sa *Adapter) UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error) {
+	jsonID := item.ID
+	if jsonID != id {
+		return nil, fmt.Errorf("storage.UpdateRewardPool attempt to override another object")
+	}
+
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+			primitive.E{Key: "name", Value: item.Name},
+			primitive.E{Key: "amount", Value: item.Amount},
+			primitive.E{Key: "active", Value: item.Active},
+			primitive.E{Key: "data", Value: item.Data},
+		},
+		},
+	}
+	_, err := sa.db.rewardPools.UpdateOne(filter, update, nil)
+	if err != nil {
+		log.Printf("storage.UpdateRewardPool error: %s", err)
+		return nil, fmt.Errorf("storage.UpdateRewardPool error: %s", err)
+	}
+	return &item, nil
+}
+
+// DeleteRewardPool deletes a reward pool. Don't delete if it's in use!
+func (sa *Adapter) DeleteRewardPool(id string) error {
+	// TBD check and deny if the reward type is in use!!!
+
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	_, err := sa.db.rewardPools.DeleteOne(filter, nil)
+	if err != nil {
+		log.Printf("storage.DeleteRewardPool error: %s", err)
+		return fmt.Errorf("storage.DeleteRewardPool error: %s", err)
 	}
 
 	return nil

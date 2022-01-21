@@ -37,6 +37,7 @@ type database struct {
 	dbClient *mongo.Client
 
 	rewardTypes *collectionWrapper
+	rewardPools *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -69,11 +70,18 @@ func (m *database) start() error {
 		return err
 	}
 
+	rewardPools := &collectionWrapper{database: m, coll: db.Collection("reward_pools")}
+	err = m.applyRewardPoolsChecks(rewardPools)
+	if err != nil {
+		return err
+	}
+
 	//asign the db, db client and the collections
 	m.db = db
 	m.dbClient = client
 
 	m.rewardTypes = rewardTypes
+	m.rewardPools = rewardPools
 
 	return nil
 }
@@ -112,5 +120,62 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 	}
 
 	log.Println("reward_types checks passed")
+	return nil
+}
+
+func (m *database) applyRewardPoolsChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_pools checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["code_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "code_1", Value: 1},
+			}, true)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["building_block_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "building_block", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["active_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "active", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_pools checks passed")
 	return nil
 }

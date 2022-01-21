@@ -40,5 +40,27 @@ func (app *Application) updateRewardType(id string, item model.RewardType) (*mod
 }
 
 func (app *Application) deleteGetRewardTypes(id string) error {
-	return app.storage.DeleteRewardTypes(id)
+	return app.storage.DeleteRewardType(id)
+}
+
+// Reward pools
+
+func (app *Application) getRewardPools(ids []string) ([]model.RewardPool, error) {
+	return app.storage.GetRewardPools(ids)
+}
+
+func (app *Application) getRewardPool(id string) (*model.RewardPool, error) {
+	return app.storage.GetRewardPool(id)
+}
+
+func (app *Application) createRewardPool(item model.RewardPool) (*model.RewardPool, error) {
+	return app.storage.CreateRewardPool(item)
+}
+
+func (app *Application) updateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error) {
+	return app.storage.UpdateRewardPool(id, item)
+}
+
+func (app *Application) deleteGetRewardPool(id string) error {
+	return app.storage.DeleteRewardPool(id)
 }

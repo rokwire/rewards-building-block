@@ -28,6 +28,137 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/reward_pool": {
+            "post": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Create a new reward pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminCreateRewardPool",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardPool"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/reward_pool/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Updates a reward pool with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminUpdateRewardPool",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardPool"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Deletes a reward pool with the specified id",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminDeleteRewardPool",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/admin/reward_pools": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves  all reward types",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardPools",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Coma separated IDs of the desired records",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RewardPool"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/reward_pools/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves a reward pool by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminRewardPool",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardPool"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/reward_types": {
             "get": {
                 "security": [
@@ -174,6 +305,35 @@ var doc = `{
         }
     },
     "definitions": {
+        "RewardPool": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "data": {
+                    "$ref": "#/definitions/model.JsonData"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "RewardType": {
             "type": "object",
             "properties": {
@@ -202,6 +362,10 @@ var doc = `{
                     "type": "string"
                 }
             }
+        },
+        "model.JsonData": {
+            "type": "object",
+            "additionalProperties": true
         }
     },
     "securityDefinitions": {

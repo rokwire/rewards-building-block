@@ -29,7 +29,13 @@ type Services interface {
 	GetRewardType(id string) (*model.RewardType, error)
 	CreateRewardType(item model.RewardType) (*model.RewardType, error)
 	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardTypes(id string) error
+	DeleteRewardType(id string) error
+
+	GetRewardPools(ids []string) ([]model.RewardPool, error)
+	GetRewardPool(id string) (*model.RewardPool, error)
+	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
+	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
+	DeleteRewardPool(id string) error
 }
 
 type servicesImpl struct {
@@ -56,7 +62,27 @@ func (s *servicesImpl) UpdateRewardType(id string, item model.RewardType) (*mode
 	return s.app.updateRewardType(id, item)
 }
 
-func (s *servicesImpl) DeleteRewardTypes(id string) error {
+func (s *servicesImpl) DeleteRewardType(id string) error {
+	return s.app.deleteGetRewardTypes(id)
+}
+
+func (s *servicesImpl) GetRewardPools(ids []string) ([]model.RewardPool, error) {
+	return s.app.getRewardPools(ids)
+}
+
+func (s *servicesImpl) GetRewardPool(id string) (*model.RewardPool, error) {
+	return s.app.getRewardPool(id)
+}
+
+func (s *servicesImpl) CreateRewardPool(item model.RewardPool) (*model.RewardPool, error) {
+	return s.app.createRewardPool(item)
+}
+
+func (s *servicesImpl) UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error) {
+	return s.app.updateRewardPool(id, item)
+}
+
+func (s *servicesImpl) DeleteRewardPool(id string) error {
 	return s.app.deleteGetRewardTypes(id)
 }
 
@@ -66,5 +92,11 @@ type Storage interface {
 	GetRewardType(id string) (*model.RewardType, error)
 	CreateRewardType(item model.RewardType) (*model.RewardType, error)
 	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardTypes(id string) error
+	DeleteRewardType(id string) error
+
+	GetRewardPools(ids []string) ([]model.RewardPool, error)
+	GetRewardPool(id string) (*model.RewardPool, error)
+	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
+	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
+	DeleteRewardPool(id string) error
 }
