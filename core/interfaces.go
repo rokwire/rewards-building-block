@@ -99,4 +99,8 @@ type Storage interface {
 	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
 	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
 	DeleteRewardPool(id string) error
+
+	GetRewardHistoryEntries(userID string, rewardType string) ([]model.RewardHistoryEntry, error)
+	GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error)
+	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 }

@@ -36,8 +36,9 @@ type database struct {
 	db       *mongo.Database
 	dbClient *mongo.Client
 
-	rewardTypes *collectionWrapper
-	rewardPools *collectionWrapper
+	rewardTypes   *collectionWrapper
+	rewardPools   *collectionWrapper
+	rewardHistory *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -76,12 +77,19 @@ func (m *database) start() error {
 		return err
 	}
 
+	rewardHistory := &collectionWrapper{database: m, coll: db.Collection("reward_history")}
+	err = m.applyRewardHistoryChecks(rewardHistory)
+	if err != nil {
+		return err
+	}
+
 	//asign the db, db client and the collections
 	m.db = db
 	m.dbClient = client
 
 	m.rewardTypes = rewardTypes
 	m.rewardPools = rewardPools
+	m.rewardHistory = rewardHistory
 
 	return nil
 }
@@ -139,7 +147,7 @@ func (m *database) applyRewardPoolsChecks(posts *collectionWrapper) error {
 	if indexMapping["code_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
-				primitive.E{Key: "code_1", Value: 1},
+				primitive.E{Key: "code", Value: 1},
 			}, true)
 		if err != nil {
 			return err
@@ -177,5 +185,52 @@ func (m *database) applyRewardPoolsChecks(posts *collectionWrapper) error {
 	}
 
 	log.Println("reward_pools checks passed")
+	return nil
+}
+
+func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_history checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["user_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "user_id", Value: 1},
+			}, true)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["pool_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "pool_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_history checks passed")
 	return nil
 }

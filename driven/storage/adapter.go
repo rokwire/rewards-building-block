@@ -22,6 +22,7 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"rewards/core/model"
 	"strconv"
@@ -208,6 +209,53 @@ func (sa *Adapter) DeleteRewardPool(id string) error {
 	}
 
 	return nil
+}
+
+// GetRewardHistoryEntries Gets all reward history entries
+func (sa *Adapter) GetRewardHistoryEntries(userID string, rewardType string) ([]model.RewardHistoryEntry, error) {
+	filter := bson.D{
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "type", Value: rewardType},
+	}
+
+	var result []model.RewardHistoryEntry
+	err := sa.db.rewardHistory.Find(filter, &result, &options.FindOptions{
+		Sort: bson.D{{"date_created", -1}},
+	})
+	if err != nil {
+		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+	}
+	return result, nil
+}
+
+// GetRewardHistoryEntry Gets a reward history entry by id
+func (sa *Adapter) GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error) {
+	filter := bson.D{
+		primitive.E{Key: "_id", Value: id},
+		primitive.E{Key: "user_id", Value: userID},
+	}
+	var result []model.RewardHistoryEntry
+	err := sa.db.rewardHistory.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardHistoryEntry error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardHistoryEntry error: %s", err)
+	}
+	return &result[0], nil
+}
+
+// CreateRewardHistoryEntry creates a new reward history entry
+func (sa *Adapter) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+	item.ID = uuid.NewString()
+	_, err := sa.db.rewardHistory.InsertOne(&item)
+	if err != nil {
+		log.Printf("storage.CreateRewardHistoryEntry error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardHistoryEntry error: %s", err)
+	}
+	return &item, nil
 }
 
 // Event
