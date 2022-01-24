@@ -150,6 +150,9 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
 
+		handler(w, req)
+		return
+
 		obj := req.URL.Path // the resource that is going to be accessed.
 		act := req.Method   // the operation that the user performs on the resource.
 

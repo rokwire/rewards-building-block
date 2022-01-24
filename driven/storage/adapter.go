@@ -88,7 +88,10 @@ func (sa *Adapter) GetRewardType(id string) (*model.RewardType, error) {
 
 // CreateRewardType creates a new reward type
 func (sa *Adapter) CreateRewardType(item model.RewardType) (*model.RewardType, error) {
+	now := time.Now().UTC()
 	item.ID = uuid.NewString()
+	item.DateCreated = now
+	item.DateUpdated = now
 	_, err := sa.db.rewardTypes.InsertOne(&item)
 	if err != nil {
 		log.Printf("storage.GetRewardTypes error: %s", err)
@@ -104,12 +107,27 @@ func (sa *Adapter) UpdateRewardType(id string, item model.RewardType) (*model.Re
 		return nil, fmt.Errorf("storage.UpdateRewardType attempt to override another object")
 	}
 
+	now := time.Now().UTC()
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	err := sa.db.rewardTypes.ReplaceOne(filter, item, nil)
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "name", Value: item.Name},
+			primitive.E{Key: "display_name", Value: item.DisplayName},
+			primitive.E{Key: "building_block", Value: item.BuildingBlock},
+			primitive.E{Key: "amount", Value: item.Amount},
+			primitive.E{Key: "active", Value: item.Active},
+			primitive.E{Key: "date_updated", Value: now},
+		},
+		},
+	}
+	_, err := sa.db.rewardPools.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("storage.UpdateRewardType error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardType error: %s", err)
 	}
+
+	item.DateUpdated = now
+
 	return &item, nil
 }
 
@@ -118,7 +136,7 @@ func (sa *Adapter) DeleteRewardType(id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	_, err := sa.db.rewardTypes.DeleteOne(filter, nil)
+	_, err := sa.db.rewardPools.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardType error: %s", err)
 		return fmt.Errorf("storage.DeleteRewardType error: %s", err)
@@ -137,7 +155,7 @@ func (sa *Adapter) GetRewardPools(ids []string) ([]model.RewardPool, error) {
 	}
 
 	var result []model.RewardPool
-	err := sa.db.rewardTypes.Find(filter, &result, nil)
+	err := sa.db.rewardPools.Find(filter, &result, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardPools error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardPools error: %s", err)
@@ -162,7 +180,10 @@ func (sa *Adapter) GetRewardPool(id string) (*model.RewardPool, error) {
 
 // CreateRewardPool creates a new reward pool
 func (sa *Adapter) CreateRewardPool(item model.RewardPool) (*model.RewardPool, error) {
+	now := time.Now().UTC()
 	item.ID = uuid.NewString()
+	item.DateCreated = now
+	item.DateUpdated = now
 	_, err := sa.db.rewardPools.InsertOne(&item)
 	if err != nil {
 		log.Printf("storage.CreateRewardPool error: %s", err)
@@ -178,10 +199,11 @@ func (sa *Adapter) UpdateRewardPool(id string, item model.RewardPool) (*model.Re
 		return nil, fmt.Errorf("storage.UpdateRewardPool attempt to override another object")
 	}
 
+	now := time.Now().UTC()
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+			primitive.E{Key: "date_updated", Value: now},
 			primitive.E{Key: "name", Value: item.Name},
 			primitive.E{Key: "amount", Value: item.Amount},
 			primitive.E{Key: "active", Value: item.Active},
@@ -194,6 +216,9 @@ func (sa *Adapter) UpdateRewardPool(id string, item model.RewardPool) (*model.Re
 		log.Printf("storage.UpdateRewardPool error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardPool error: %s", err)
 	}
+
+	item.DateUpdated = now
+
 	return &item, nil
 }
 
@@ -249,7 +274,10 @@ func (sa *Adapter) GetRewardHistoryEntry(userID, id string) (*model.RewardHistor
 
 // CreateRewardHistoryEntry creates a new reward history entry
 func (sa *Adapter) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+	now := time.Now().UTC()
 	item.ID = uuid.NewString()
+	item.DateCreated = now
+	item.DateUpdated = now
 	_, err := sa.db.rewardHistory.InsertOne(&item)
 	if err != nil {
 		log.Printf("storage.CreateRewardHistoryEntry error: %s", err)
