@@ -18,6 +18,9 @@
 package rest
 
 import (
+	"encoding/json"
+	"github.com/rokmetro/auth-library/tokenauth"
+	"log"
 	"net/http"
 	"rewards/core"
 )
@@ -55,6 +58,34 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 	return InternalApisHandler{app: app}
 }
 
+// GetUserBalance Retrieves balance for each user's wallet
+// @Description Retrieves balance for each user's wallet
+// @Tags Client
+// @ID GetUserBalance
+// @Success 200
+// @Security UserAuth
+// @Router /user/balance [get]
+func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	resData, err := h.app.Services.GetUserBalance(userClaims.Subject)
+	if err != nil {
+		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
 // GetWalletBalance Retrieves  the wallet balance
 // @Description Retrieves  the user balance
 // @Tags Client
@@ -68,14 +99,14 @@ func (h *ApisHandler) GetWalletBalance(w http.ResponseWriter, r *http.Request) {
 	//w.Write(data)
 }
 
-// GetUserHistory Retrieves the user history
+// GetWalletHistory Retrieves the user history
 // @Description Retrieves the user history
 // @Tags Client
-// @ID GetUserHistory
+// @ID GetWalletHistory
 // @Success 200
 // @Security UserAuth
 // @Router /wallet/{reward_type}/history [get]
-func (h *ApisHandler) GetUserHistory(w http.ResponseWriter, r *http.Request) {
+func (h *ApisHandler) GetWalletHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	//w.Write(data)

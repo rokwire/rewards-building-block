@@ -68,3 +68,7 @@ func (app *Application) updateRewardPool(id string, item model.RewardPool) (*mod
 func (app *Application) deleteGetRewardPool(id string) error {
 	return app.storage.DeleteRewardPool(id)
 }
+
+func (app *Application) getUserBalance(userID string) ([]model.WalletBalance, error){
+	return app.storage.GetUserBalance(userID)
+}

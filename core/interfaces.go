@@ -38,6 +38,8 @@ type Services interface {
 	DeleteRewardPool(id string) error
 
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
+
+	GetUserBalance(userID string) ([]model.WalletBalance, error)
 }
 
 type servicesImpl struct {
@@ -92,6 +94,10 @@ func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (
 	return s.app.createRewardHistoryEntry(item)
 }
 
+func (s *servicesImpl) GetUserBalance(userID string) ([]model.WalletBalance, error){
+	return s.app.getUserBalance(userID)
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	GetRewardTypes(ids []string) ([]model.RewardType, error)
@@ -109,4 +115,7 @@ type Storage interface {
 	GetRewardHistoryEntries(userID string, rewardType string) ([]model.RewardHistoryEntry, error)
 	GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error)
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
+
+	// User APIs
+	GetUserBalance(userID string) ([]model.WalletBalance, error)
 }

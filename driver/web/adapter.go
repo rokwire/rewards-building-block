@@ -19,6 +19,7 @@ package web
 
 import (
 	"fmt"
+	"github.com/rokmetro/auth-library/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -56,7 +57,7 @@ type Adapter struct {
 // @schemes https
 
 // @securityDefinitions.apikey InternalApiAuth
-// @in header (add
+// @in header (add INTERNAL-API-KEY with correct value as a header)
 // @name Authorization
 
 // @securityDefinitions.apikey AdminUserAuth
@@ -78,6 +79,9 @@ func (we Adapter) Start() {
 	contentRouter.HandleFunc("/doc", we.serveDoc)
 	contentRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
+	// Internal APIs called from other BBs
+	contentRouter.HandleFunc("/int/reward_history", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateRewardHistoryEntry)).Methods("POST")
+
 	// handle student guide admin apis
 	adminSubRouter := contentRouter.PathPrefix("/admin").Subrouter()
 	adminSubRouter.HandleFunc("/reward_types", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardTypes)).Methods("GET")
@@ -91,6 +95,11 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPool)).Methods("GET")
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardPool)).Methods("PUT")
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardPool)).Methods("DELETE")
+
+	// Client APIs
+	contentRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
+	contentRouter.HandleFunc("/wallet/{code}/balance", we.adminAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
+	contentRouter.HandleFunc("/wallet/{code}/history", we.adminAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -130,7 +139,7 @@ func (we Adapter) apiKeyOrTokenWrapFunc(handler apiKeysAuthFunc) http.HandlerFun
 	}
 }
 
-type userAuthFunc = func(http.ResponseWriter, *http.Request)
+type userAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 
 func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -138,7 +147,7 @@ func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 
 		coreAuth, claims := we.auth.coreAuth.Check(req)
 		if coreAuth && claims != nil && !claims.Anonymous {
-			handler(w, req)
+			handler(claims, w, req)
 			return
 		}
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -153,10 +162,10 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 
 		// Debug only
 		// TMP
-		/*
+		///*
 		handler(w, req)
 		return
-		*/
+		//*/
 
 		obj := req.URL.Path // the resource that is going to be accessed.
 		act := req.Method   // the operation that the user performs on the resource.

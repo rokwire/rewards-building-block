@@ -286,6 +286,21 @@ func (sa *Adapter) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*mod
 	return &item, nil
 }
 
+func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error){
+	pipeline := []bson.M{
+		{"$match": bson.M{"user_id": userID}},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum":"$amount"},},},
+	}
+
+	var result []model.WalletBalance
+	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+	}
+	return result, nil
+}
+
 // Event
 
 func (m *database) onDataChanged(changeDoc map[string]interface{}) {

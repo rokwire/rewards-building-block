@@ -205,7 +205,7 @@ func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "user_id", Value: 1},
-			}, true)
+			}, false)
 		if err != nil {
 			return err
 		}
