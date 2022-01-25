@@ -49,3 +49,34 @@ func NewApisHandler(app *core.Application) ApisHandler {
 func NewAdminApisHandler(app *core.Application) AdminApisHandler {
 	return AdminApisHandler{app: app}
 }
+
+// NewInternalApisHandler creates new rest Handler instance
+func NewInternalApisHandler(app *core.Application) InternalApisHandler {
+	return InternalApisHandler{app: app}
+}
+
+// GetWalletBalance Retrieves  the wallet balance
+// @Description Retrieves  the user balance
+// @Tags Client
+// @ID GetUserBalance
+// @Success 200
+// @Security UserAuth
+// @Router /wallet/{reward_type}/balance [get]
+func (h *ApisHandler) GetWalletBalance(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	//w.Write(data)
+}
+
+// GetUserHistory Retrieves the user history
+// @Description Retrieves the user history
+// @Tags Client
+// @ID GetUserHistory
+// @Success 200
+// @Security UserAuth
+// @Router /wallet/{reward_type}/history [get]
+func (h *ApisHandler) GetUserHistory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	//w.Write(data)
+}

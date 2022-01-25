@@ -39,8 +39,9 @@ type Adapter struct {
 	auth          *Auth
 	authorization *casbin.Enforcer
 
-	apisHandler      rest.ApisHandler
-	adminApisHandler rest.AdminApisHandler
+	apisHandler         rest.ApisHandler
+	adminApisHandler    rest.AdminApisHandler
+	internalApisHandler rest.InternalApisHandler
 
 	app *core.Application
 }
@@ -54,8 +55,8 @@ type Adapter struct {
 // @BasePath /content
 // @schemes https
 
-// @securityDefinitions.apikey UserAuth
-// @in header (add Bearer prefix to the Authorization value)
+// @securityDefinitions.apikey InternalApiAuth
+// @in header (add
 // @name Authorization
 
 // @securityDefinitions.apikey AdminUserAuth
@@ -150,8 +151,12 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
 
+		// Debug only
+		// TMP
+		/*
 		handler(w, req)
 		return
+		*/
 
 		obj := req.URL.Path // the resource that is going to be accessed.
 		act := req.Method   // the operation that the user performs on the resource.
@@ -180,6 +185,22 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	}
 }
 
+type internalAPIKeyAuthFunc = func(http.ResponseWriter, *http.Request)
+
+func (we Adapter) internalAPIKeyAuthWrapFunc(handler internalAPIKeyAuthFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		utils.LogRequest(req)
+
+		apiKeyAuthenticated := we.auth.internalAuth.check(w, req)
+
+		if apiKeyAuthenticated {
+			handler(w, req)
+		} else {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		}
+	}
+}
+
 // NewWebAdapter creates new WebAdapter instance
 func NewWebAdapter(host string, port string, app *core.Application, config model.Config) Adapter {
 	auth := NewAuth(app, config)
@@ -187,7 +208,17 @@ func NewWebAdapter(host string, port string, app *core.Application, config model
 
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
-	return Adapter{host: host, port: port, auth: auth, authorization: authorization, apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app}
+	internalApisHandler := rest.NewInternalApisHandler(app)
+	return Adapter{
+		host:                host,
+		port:                port,
+		auth:                auth,
+		authorization:       authorization,
+		apisHandler:         apisHandler,
+		adminApisHandler:    adminApisHandler,
+		internalApisHandler: internalApisHandler,
+		app:                 app,
+	}
 }
 
 // AppListener implements core.ApplicationListener interface

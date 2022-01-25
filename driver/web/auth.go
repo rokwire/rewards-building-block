@@ -28,7 +28,8 @@ import (
 
 // Auth handler
 type Auth struct {
-	coreAuth *web.CoreAuth
+	internalAuth *InternalAuth
+	coreAuth     *web.CoreAuth
 }
 
 func (auth *Auth) clientIDCheck(w http.ResponseWriter, r *http.Request) bool {
@@ -46,7 +47,42 @@ func (auth *Auth) clientIDCheck(w http.ResponseWriter, r *http.Request) bool {
 // NewAuth creates new auth handler
 func NewAuth(app *core.Application, config model.Config) *Auth {
 	coreAuth := web.NewCoreAuth(app, config)
-
-	auth := Auth{coreAuth: coreAuth}
+	internalAuth := newInternalAuth(config)
+	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth}
 	return &auth
+}
+
+// InternalAuth handling the internal calls fromother BBs
+type InternalAuth struct {
+	internalAPIKey string
+}
+
+func newInternalAuth(config model.Config) *InternalAuth {
+	auth := InternalAuth{internalAPIKey: config.InternalApiKey}
+	return &auth
+}
+
+func (auth *InternalAuth) check(w http.ResponseWriter, r *http.Request) bool {
+	apiKey := r.Header.Get("INTERNAL-API-KEY")
+	//check if there is api key in the header
+	if len(apiKey) == 0 {
+		//no key, so return 400
+		log.Println(fmt.Sprintf("400 - Bad Request"))
+
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+		return false
+	}
+
+	exist := auth.internalAPIKey == apiKey
+
+	if !exist {
+		//not exist, so return 401
+		log.Println(fmt.Sprintf("401 - Unauthorized for key %s", apiKey))
+
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+		return false
+	}
+	return true
 }

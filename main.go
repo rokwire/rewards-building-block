@@ -42,6 +42,8 @@ func main() {
 
 	port := getEnvKey("PORT", true)
 
+	internalApiKey := getEnvKey("INTERNAL_API_KEY", true)
+
 	//mongoDB adapter
 	mongoDBAuth := getEnvKey("MONGO_AUTH", true)
 	mongoDBName := getEnvKey("MONGO_DATABASE", true)
@@ -65,6 +67,7 @@ func main() {
 	rewardsServiceURL := getEnvKey("REWARDS_SERVICE_URL", true)
 
 	config := model.Config{
+		InternalApiKey:          internalApiKey,
 		CoreServiceRegLoaderURL: coreServiceRegLoaderURL,
 		ContentServiceURL:       rewardsServiceURL,
 	}

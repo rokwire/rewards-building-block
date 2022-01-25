@@ -36,6 +36,8 @@ type Services interface {
 	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
 	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
 	DeleteRewardPool(id string) error
+
+	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 }
 
 type servicesImpl struct {
@@ -84,6 +86,10 @@ func (s *servicesImpl) UpdateRewardPool(id string, item model.RewardPool) (*mode
 
 func (s *servicesImpl) DeleteRewardPool(id string) error {
 	return s.app.deleteGetRewardTypes(id)
+}
+
+func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error){
+	return s.app.createRewardHistoryEntry(item)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc

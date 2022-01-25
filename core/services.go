@@ -43,6 +43,10 @@ func (app *Application) deleteGetRewardTypes(id string) error {
 	return app.storage.DeleteRewardType(id)
 }
 
+func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+	return app.storage.CreateRewardHistoryEntry(item)
+}
+
 // Reward pools
 
 func (app *Application) getRewardPools(ids []string) ([]model.RewardPool, error) {
