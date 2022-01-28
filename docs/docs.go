@@ -286,6 +286,50 @@ var doc = `{
                 }
             }
         },
+        "/int/reward_history": {
+            "post": {
+                "security": [
+                    {
+                        "InternalApiAuth": []
+                    }
+                ],
+                "description": "Create a new reward history entry from another BB",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "InternalCreateRewardHistoryEntry",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardHistoryEntry"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/balance": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves balance for each user's wallet",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserBalance",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/version": {
             "get": {
                 "description": "Gives the service version.",
@@ -302,9 +346,77 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/wallet/{code}/balance": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves  the user balance",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetWalletBalance",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/wallet/{code}/history": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves the user history",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetWalletHistory",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "RewardHistoryEntry": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Do we need it here?",
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "RewardPool": {
             "type": "object",
             "properties": {
@@ -314,11 +426,8 @@ var doc = `{
                 "amount": {
                     "type": "integer"
                 },
-                "code": {
-                    "type": "string"
-                },
                 "data": {
-                    "$ref": "#/definitions/model.JsonData"
+                    "$ref": "#/definitions/model.JSONData"
                 },
                 "date_created": {
                     "type": "string"
@@ -332,7 +441,8 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "type": {
+                "reward_code": {
+                    "description": "illini_cash",
                     "type": "string"
                 }
             }
@@ -344,9 +454,11 @@ var doc = `{
                     "type": "boolean"
                 },
                 "amount": {
+                    "description": "5",
                     "type": "integer"
                 },
                 "building_block": {
+                    "description": "\"content\"",
                     "type": "string"
                 },
                 "date_created": {
@@ -356,17 +468,23 @@ var doc = `{
                     "type": "string"
                 },
                 "display_name": {
+                    "description": "Win five point by five readings",
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
                 "name": {
+                    "description": "\"win_five_point_by_five_readings\"",
+                    "type": "string"
+                },
+                "reward_code": {
+                    "description": "illini_cash",
                     "type": "string"
                 }
             }
         },
-        "model.JsonData": {
+        "model.JSONData": {
             "type": "object",
             "additionalProperties": true
         }
@@ -382,10 +500,10 @@ var doc = `{
             "name": "Authorization",
             "in": "header (add Bearer prefix to the Authorization value)"
         },
-        "UserAuth": {
+        "InternalApiAuth": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header (add Bearer prefix to the Authorization value)"
+            "in": "header (add INTERNAL-API-KEY with correct value as a header)"
         }
     }
 }`

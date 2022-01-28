@@ -69,6 +69,14 @@ func (app *Application) deleteGetRewardPool(id string) error {
 	return app.storage.DeleteRewardPool(id)
 }
 
-func (app *Application) getUserBalance(userID string) ([]model.WalletBalance, error){
+func (app *Application) getUserBalance(userID string) ([]model.WalletBalance, error) {
 	return app.storage.GetUserBalance(userID)
+}
+
+func (app *Application) getWalletBalance(userID string, code string) (*model.WalletBalance, error) {
+	return app.storage.GetWalletBalance(userID, code)
+}
+
+func (app *Application) getWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
+	return app.storage.GetRewardHistoryEntries(userID, code)
 }

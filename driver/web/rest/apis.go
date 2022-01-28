@@ -19,7 +19,8 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/rokmetro/auth-library/tokenauth"
+	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -80,7 +81,6 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
@@ -89,14 +89,37 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 // GetWalletBalance Retrieves  the wallet balance
 // @Description Retrieves  the user balance
 // @Tags Client
-// @ID GetUserBalance
+// @ID GetWalletBalance
 // @Success 200
 // @Security UserAuth
-// @Router /wallet/{reward_type}/balance [get]
-func (h *ApisHandler) GetWalletBalance(w http.ResponseWriter, r *http.Request) {
+// @Router /wallet/{code}/balance [get]
+func (h *ApisHandler) GetWalletBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	code := vars["code"]
+
+	if len(code) == 0 {
+		log.Printf("Error on apis.getWalletBalance(%s): missing code param", userClaims.Subject)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.GetWalletBalance(userClaims.Subject, code)
+	if err != nil {
+		log.Printf("Error on apis.getWalletBalance(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on apis.getWalletBalance(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	//w.Write(data)
+	w.Write(data)
 }
 
 // GetWalletHistory Retrieves the user history
@@ -105,9 +128,32 @@ func (h *ApisHandler) GetWalletBalance(w http.ResponseWriter, r *http.Request) {
 // @ID GetWalletHistory
 // @Success 200
 // @Security UserAuth
-// @Router /wallet/{reward_type}/history [get]
-func (h *ApisHandler) GetWalletHistory(w http.ResponseWriter, r *http.Request) {
+// @Router /wallet/{code}/history [get]
+func (h *ApisHandler) GetWalletHistory(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	code := vars["code"]
+
+	if len(code) == 0 {
+		log.Printf("Error on apis.GetWalletHistory(%s): missing code param", userClaims.Subject)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.Subject, code)
+	if err != nil {
+		log.Printf("Error on apis.GetWalletHistory(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on apis.GetWalletHistory(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	//w.Write(data)
+	w.Write(data)
 }

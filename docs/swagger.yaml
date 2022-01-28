@@ -1,15 +1,33 @@
 basePath: /content
 definitions:
+  RewardHistoryEntry:
+    properties:
+      amount:
+        type: integer
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      name:
+        description: Do we need it here?
+        type: string
+      pool_id:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
   RewardPool:
     properties:
       active:
         type: boolean
       amount:
         type: integer
-      code:
-        type: string
       data:
-        $ref: '#/definitions/model.JsonData'
+        $ref: '#/definitions/model.JSONData'
       date_created:
         type: string
       date_updated:
@@ -18,7 +36,8 @@ definitions:
         type: string
       name:
         type: string
-      type:
+      reward_code:
+        description: illini_cash
         type: string
     type: object
   RewardType:
@@ -26,21 +45,28 @@ definitions:
       active:
         type: boolean
       amount:
+        description: "5"
         type: integer
       building_block:
+        description: '"content"'
         type: string
       date_created:
         type: string
       date_updated:
         type: string
       display_name:
+        description: Win five point by five readings
         type: string
       id:
         type: string
       name:
+        description: '"win_five_point_by_five_readings"'
+        type: string
+      reward_code:
+        description: illini_cash
         type: string
     type: object
-  model.JsonData:
+  model.JSONData:
     additionalProperties: true
     type: object
 host: localhost
@@ -209,6 +235,32 @@ paths:
       - AdminUserAuth: []
       tags:
       - Admin
+  /int/reward_history:
+    post:
+      consumes:
+      - application/json
+      description: Create a new reward history entry from another BB
+      operationId: InternalCreateRewardHistoryEntry
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardHistoryEntry'
+      security:
+      - InternalApiAuth: []
+      tags:
+      - Admin
+  /user/balance:
+    get:
+      description: Retrieves balance for each user's wallet
+      operationId: GetUserBalance
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /version:
     get:
       description: Gives the service version.
@@ -218,6 +270,28 @@ paths:
       responses:
         "200":
           description: ""
+      tags:
+      - Client
+  /wallet/{code}/balance:
+    get:
+      description: Retrieves  the user balance
+      operationId: GetWalletBalance
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /wallet/{code}/history:
+    get:
+      description: Retrieves the user history
+      operationId: GetWalletHistory
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
       tags:
       - Client
 schemes:
@@ -231,8 +305,8 @@ securityDefinitions:
     in: header (add Bearer prefix to the Authorization value)
     name: Authorization
     type: apiKey
-  UserAuth:
-    in: header (add Bearer prefix to the Authorization value)
+  InternalApiAuth:
+    in: header (add INTERNAL-API-KEY with correct value as a header)
     name: Authorization
     type: apiKey
 swagger: "2.0"

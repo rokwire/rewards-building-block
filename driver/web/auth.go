@@ -58,7 +58,7 @@ type InternalAuth struct {
 }
 
 func newInternalAuth(config model.Config) *InternalAuth {
-	auth := InternalAuth{internalAPIKey: config.InternalApiKey}
+	auth := InternalAuth{internalAPIKey: config.InternalAPIKey}
 	return &auth
 }
 

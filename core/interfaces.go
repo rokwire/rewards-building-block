@@ -40,6 +40,8 @@ type Services interface {
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
 	GetUserBalance(userID string) ([]model.WalletBalance, error)
+	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
+	GetWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error)
 }
 
 type servicesImpl struct {
@@ -90,12 +92,20 @@ func (s *servicesImpl) DeleteRewardPool(id string) error {
 	return s.app.deleteGetRewardTypes(id)
 }
 
-func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error){
+func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
 	return s.app.createRewardHistoryEntry(item)
 }
 
-func (s *servicesImpl) GetUserBalance(userID string) ([]model.WalletBalance, error){
+func (s *servicesImpl) GetUserBalance(userID string) ([]model.WalletBalance, error) {
 	return s.app.getUserBalance(userID)
+}
+
+func (s *servicesImpl) GetWalletBalance(userID string, code string) (*model.WalletBalance, error) {
+	return s.app.getWalletBalance(userID, code)
+}
+
+func (s *servicesImpl) GetWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
+	return s.app.getWalletHistoryEntries(userID, code)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -112,10 +122,11 @@ type Storage interface {
 	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
 	DeleteRewardPool(id string) error
 
-	GetRewardHistoryEntries(userID string, rewardType string) ([]model.RewardHistoryEntry, error)
+	GetRewardHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error)
 	GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error)
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
 	// User APIs
 	GetUserBalance(userID string) ([]model.WalletBalance, error)
+	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
 }

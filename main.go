@@ -42,7 +42,7 @@ func main() {
 
 	port := getEnvKey("PORT", true)
 
-	internalApiKey := getEnvKey("INTERNAL_API_KEY", true)
+	internalAPIKey := getEnvKey("INTERNAL_API_KEY", true)
 
 	//mongoDB adapter
 	mongoDBAuth := getEnvKey("MONGO_AUTH", true)
@@ -63,13 +63,13 @@ func main() {
 
 	// web adapter
 	host := getEnvKey("HOST", true)
-	coreServiceRegLoaderURL := getEnvKey("CORE_SERVICE_REG_LOADER_URL", true)
+	coreBBHost := getEnvKey("CORE_BB_HOST", true)
 	rewardsServiceURL := getEnvKey("REWARDS_SERVICE_URL", true)
 
 	config := model.Config{
-		InternalApiKey:          internalApiKey,
-		CoreServiceRegLoaderURL: coreServiceRegLoaderURL,
-		ContentServiceURL:       rewardsServiceURL,
+		InternalAPIKey:    internalAPIKey,
+		CoreBBHost:        coreBBHost,
+		ContentServiceURL: rewardsServiceURL,
 	}
 
 	webAdapter := driver.NewWebAdapter(host, port, application, config)

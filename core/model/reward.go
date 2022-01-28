@@ -20,7 +20,7 @@ type RewardPool struct {
 	ID          string    `json:"id" bson:"_id"`
 	RewardCode  string    `json:"reward_code" bson:"reward_code"` // illini_cash
 	Name        string    `json:"name" bson:"name"`
-	Data        JsonData  `json:"data" bson:"data"`
+	Data        JSONData  `json:"data" bson:"data"`
 	Amount      int64     `json:"amount" bson:"amount"`
 	Active      bool      `json:"active" bson:"active"`
 	DateCreated time.Time `json:"date_created" bson:"date_created"`

@@ -19,7 +19,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/rokmetro/auth-library/tokenauth"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -98,8 +98,8 @@ func (we Adapter) Start() {
 
 	// Client APIs
 	contentRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
-	contentRouter.HandleFunc("/wallet/{code}/balance", we.adminAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
-	contentRouter.HandleFunc("/wallet/{code}/history", we.adminAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("POST")
+	contentRouter.HandleFunc("/wallet/{code}/balance", we.userAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
+	contentRouter.HandleFunc("/wallet/{code}/history", we.userAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }

@@ -237,10 +237,10 @@ func (sa *Adapter) DeleteRewardPool(id string) error {
 }
 
 // GetRewardHistoryEntries Gets all reward history entries
-func (sa *Adapter) GetRewardHistoryEntries(userID string, rewardType string) ([]model.RewardHistoryEntry, error) {
+func (sa *Adapter) GetRewardHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
 	filter := bson.D{
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "type", Value: rewardType},
+		primitive.E{Key: "code", Value: code},
 	}
 
 	var result []model.RewardHistoryEntry
@@ -286,10 +286,11 @@ func (sa *Adapter) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*mod
 	return &item, nil
 }
 
-func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error){
+// GetUserBalance Gets all balances for the user id
+func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error) {
 	pipeline := []bson.M{
 		{"$match": bson.M{"user_id": userID}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum":"$amount"},},},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
 	}
 
 	var result []model.WalletBalance
@@ -299,6 +300,27 @@ func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error){
 		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
 	}
 	return result, nil
+}
+
+// GetWalletBalance gets wallet balance by user id and wallet code
+func (sa *Adapter) GetWalletBalance(userID string, code string) (*model.WalletBalance, error) {
+	pipeline := []bson.M{
+		{"$match": bson.M{"user_id": userID, "code": code}},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+	}
+
+	var result []model.WalletBalance
+	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+	}
+
+	if len(result) > 0 {
+		return &result[0], nil
+	}
+
+	return nil, nil
 }
 
 // Event
