@@ -49,7 +49,7 @@ type Adapter struct {
 
 // @title Rewards Building Block API
 // @description RoRewards Building Block API Documentation.
-// @version 0.0.1
+// @version 0.0.3
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost
@@ -161,13 +161,6 @@ type adminAuthFunc = func(http.ResponseWriter, *http.Request)
 func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
-
-		// Debug only
-		// TMP
-		///*
-		handler(w, req)
-		return
-		//*/
 
 		obj := req.URL.Path // the resource that is going to be accessed.
 		act := req.Method   // the operation that the user performs on the resource.

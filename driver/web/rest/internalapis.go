@@ -16,7 +16,7 @@ type InternalApisHandler struct {
 
 // CreateRewardHistoryEntry Create a new reward history entry from another BB
 // @Description Create a new reward history entry from another BB
-// @Tags Admin
+// @Tags Internal
 // @ID InternalCreateRewardHistoryEntry
 // @Accept json
 // @Success 200 {object} model.RewardHistoryEntry

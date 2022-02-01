@@ -298,7 +298,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin"
+                    "Internal"
                 ],
                 "operationId": "InternalCreateRewardHistoryEntry",
                 "responses": {
@@ -519,7 +519,7 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "0.0.1",
+	Version:     "0.0.3",
 	Host:        "localhost",
 	BasePath:    "/content",
 	Schemes:     []string{"https"},
