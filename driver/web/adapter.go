@@ -73,17 +73,24 @@ func (we Adapter) Start() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
+	subrouter := router.PathPrefix("/rewards").Subrouter()
+	subrouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
+	subrouter.HandleFunc("/doc", we.serveDoc)
+	subrouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+
 	// handle apis
-	contentRouter := router.PathPrefix("/rewards/api").Subrouter()
-	contentRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
-	contentRouter.HandleFunc("/doc", we.serveDoc)
-	contentRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+	apiRouter := subrouter.PathPrefix("/api").Subrouter()
 
 	// Internal APIs called from other BBs
-	contentRouter.HandleFunc("/int/reward_history", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateRewardHistoryEntry)).Methods("POST")
+	apiRouter.HandleFunc("/int/reward_history", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateRewardHistoryEntry)).Methods("POST")
+
+	// Client APIs
+	apiRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
+	apiRouter.HandleFunc("/wallet/{code}/balance", we.userAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
+	apiRouter.HandleFunc("/wallet/{code}/history", we.userAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("GET")
 
 	// handle student guide admin apis
-	adminSubRouter := contentRouter.PathPrefix("/admin").Subrouter()
+	adminSubRouter := apiRouter.PathPrefix("/admin").Subrouter()
 	adminSubRouter.HandleFunc("/reward_types", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardTypes)).Methods("GET")
 	adminSubRouter.HandleFunc("/reward_types", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardType)).Methods("POST")
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardType)).Methods("GET")
@@ -95,11 +102,6 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPool)).Methods("GET")
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardPool)).Methods("PUT")
 	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardPool)).Methods("DELETE")
-
-	// Client APIs
-	contentRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
-	contentRouter.HandleFunc("/wallet/{code}/balance", we.userAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
-	contentRouter.HandleFunc("/wallet/{code}/history", we.userAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
