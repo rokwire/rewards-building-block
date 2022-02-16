@@ -112,6 +112,7 @@ func (s *servicesImpl) GetWalletHistoryEntries(userID string, code string) ([]mo
 type Storage interface {
 	GetRewardTypes(ids []string) ([]model.RewardType, error)
 	GetRewardType(id string) (*model.RewardType, error)
+	GetRewardTypeByType(rewardType string) (*model.RewardType, error)
 	CreateRewardType(item model.RewardType) (*model.RewardType, error)
 	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
 	DeleteRewardType(id string) error

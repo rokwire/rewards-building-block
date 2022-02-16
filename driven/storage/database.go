@@ -107,16 +107,6 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		}
 	}
 
-	if indexMapping["name_1"] == nil {
-		err := posts.AddIndex(
-			bson.D{
-				primitive.E{Key: "name", Value: 1},
-			}, true)
-		if err != nil {
-			return err
-		}
-	}
-
 	if indexMapping["building_block_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
@@ -126,6 +116,17 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 			return err
 		}
 	}
+
+	if indexMapping["reward_type_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "reward_type", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 
 	log.Println("reward_types checks passed")
 	return nil

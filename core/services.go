@@ -17,7 +17,11 @@
 
 package core
 
-import "rewards/core/model"
+import (
+	"fmt"
+	"log"
+	"rewards/core/model"
+)
 
 func (app *Application) getVersion() string {
 	return app.version
@@ -44,7 +48,23 @@ func (app *Application) deleteGetRewardTypes(id string) error {
 }
 
 func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
-	return app.storage.CreateRewardHistoryEntry(item)
+	if item.RewardType != "" && item.UserID != ""{
+		rewardType, err := app.storage.GetRewardTypeByType(item.RewardType)
+		if err != nil{
+			log.Printf("Error Application.createRewardHistoryEntry(): %s", err)
+			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): %s", err)
+		}
+
+		if rewardType == nil{
+			log.Printf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
+			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
+		}
+
+		item.Amount = rewardType.Amount
+
+		return app.storage.CreateRewardHistoryEntry(item)
+	}
+	return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): missing data. data dump: $+v", item)
 }
 
 // Reward pools

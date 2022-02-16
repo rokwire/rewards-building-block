@@ -86,6 +86,21 @@ func (sa *Adapter) GetRewardType(id string) (*model.RewardType, error) {
 	return &result[0], nil
 }
 
+// GetRewardTypeByType Gets a reward type by type
+func (sa *Adapter) GetRewardTypeByType(rewardType string) (*model.RewardType, error) {
+	filter := bson.D{primitive.E{Key: "reward_type", Value: rewardType}}
+	var result []model.RewardType
+	err := sa.db.rewardTypes.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardTypeByType error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardTypeByType error: %s", err)
+	}
+	return &result[0], nil
+}
+
 // CreateRewardType creates a new reward type
 func (sa *Adapter) CreateRewardType(item model.RewardType) (*model.RewardType, error) {
 	now := time.Now().UTC()

@@ -14,6 +14,13 @@ type InternalApisHandler struct {
 	app *core.Application
 }
 
+// createRewardHistoryEntryBody wrapper
+type createRewardHistoryEntryBody struct {
+	UserID     string `json:"user_id"`
+	RewardType string `json:"reward_type"`
+	Description string `json:"description"`
+} //@name createRewardHistoryEntryBody
+
 // CreateRewardHistoryEntry Create a new reward history entry from another BB
 // @Description Create a new reward history entry from another BB
 // @Tags Internal
@@ -31,7 +38,7 @@ func (h InternalApisHandler) CreateRewardHistoryEntry(w http.ResponseWriter, r *
 		return
 	}
 
-	var item model.RewardHistoryEntry
+	var item createRewardHistoryEntryBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
@@ -39,7 +46,11 @@ func (h InternalApisHandler) CreateRewardHistoryEntry(w http.ResponseWriter, r *
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardHistoryEntry(item)
+	createdItem, err := h.app.Services.CreateRewardHistoryEntry(model.RewardHistoryEntry{
+		UserID:     item.UserID,
+		RewardType: item.RewardType,
+		Description: item.Description,
+	})
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
