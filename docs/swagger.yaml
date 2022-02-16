@@ -8,14 +8,11 @@ definitions:
         type: string
       date_updated:
         type: string
+      description:
+        type: string
       id:
         type: string
-      name:
-        description: Do we need it here?
-        type: string
-      pool_id:
-        type: string
-      type:
+      reward_type:
         type: string
       user_id:
         type: string
@@ -62,7 +59,7 @@ definitions:
       name:
         description: '"win_five_point_by_five_readings"'
         type: string
-      reward_code:
+      reward_type:
         description: illini_cash
         type: string
     type: object

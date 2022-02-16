@@ -127,7 +127,6 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		}
 	}
 
-
 	log.Println("reward_types checks passed")
 	return nil
 }

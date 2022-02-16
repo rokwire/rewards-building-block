@@ -48,14 +48,14 @@ func (app *Application) deleteGetRewardTypes(id string) error {
 }
 
 func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
-	if item.RewardType != "" && item.UserID != ""{
+	if item.RewardType != "" && item.UserID != "" {
 		rewardType, err := app.storage.GetRewardTypeByType(item.RewardType)
-		if err != nil{
+		if err != nil {
 			log.Printf("Error Application.createRewardHistoryEntry(): %s", err)
 			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): %s", err)
 		}
 
-		if rewardType == nil{
+		if rewardType == nil {
 			log.Printf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
 			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
 		}
@@ -64,7 +64,7 @@ func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) 
 
 		return app.storage.CreateRewardHistoryEntry(item)
 	}
-	return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): missing data. data dump: $+v", item)
+	return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): missing data. data dump: %+v", item)
 }
 
 // Reward pools
