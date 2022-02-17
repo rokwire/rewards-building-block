@@ -74,7 +74,7 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-	if resData == nil{
+	if resData == nil {
 		resData = &model.WalletBalance{
 			Amount: 0,
 		}

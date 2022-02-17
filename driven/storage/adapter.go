@@ -63,7 +63,7 @@ func (sa *Adapter) GetRewardTypes() ([]model.RewardType, error) {
 		log.Printf("storage.GetRewardTypes error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardTypes error: %s", err)
 	}
-	if result == nil{
+	if result == nil {
 		result = []model.RewardType{}
 	}
 	return result, nil
@@ -262,7 +262,7 @@ func (sa *Adapter) GetRewardHistoryEntries(userID string) ([]model.RewardHistory
 		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
 	}
-	if result == nil{
+	if result == nil {
 		result = []model.RewardHistoryEntry{}
 	}
 	return result, nil
@@ -342,7 +342,8 @@ func (sa *Adapter) GetWalletBalance(userID string, code string) (*model.WalletBa
 	return nil, nil
 }
 
-func (sa *Adapter) SetApplication(app *core.Application){
+// SetApplication sets the upper layer application for sending collection changed callbacks
+func (sa *Adapter) SetApplication(app *core.Application) {
 	sa.db.application = app
 }
 
@@ -366,4 +367,3 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 		}
 	}
 }
-

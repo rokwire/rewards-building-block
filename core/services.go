@@ -45,7 +45,7 @@ func (app *Application) getRewardType(id string) (*model.RewardType, error) {
 }
 
 func (app *Application) createRewardType(item model.RewardType) (*model.RewardType, error) {
-	return  app.storage.CreateRewardType(item)
+	return app.storage.CreateRewardType(item)
 }
 
 func (app *Application) updateRewardType(id string, item model.RewardType) (*model.RewardType, error) {
@@ -131,7 +131,7 @@ func (app *Application) getWalletHistoryEntries(userID string) ([]model.RewardHi
 	return history, nil
 }
 
-
-func (app *Application) OnRewardTypesChanged(){
+// OnRewardTypesChanged callback that indicates the reward types collection is changed
+func (app *Application) OnRewardTypesChanged() {
 	app.cacheAdapter.SetRewardTypes(nil) // invalidate
 }
