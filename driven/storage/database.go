@@ -22,6 +22,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"rewards/core"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,6 +30,8 @@ import (
 )
 
 type database struct {
+	application *core.Application
+
 	mongoDBAuth  string
 	mongoDBName  string
 	mongoTimeout time.Duration
@@ -70,6 +73,7 @@ func (m *database) start() error {
 	if err != nil {
 		return err
 	}
+	go rewardTypes.Watch(nil)
 
 	rewardPools := &collectionWrapper{database: m, coll: db.Collection("reward_pools")}
 	err = m.applyRewardPoolsChecks(rewardPools)

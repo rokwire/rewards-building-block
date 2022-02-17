@@ -6,7 +6,6 @@ import "time"
 type RewardType struct {
 	ID            string    `json:"id" bson:"_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"`       // illini_cash
-	Name          string    `json:"name" bson:"name"`                     // "win_five_point_by_five_readings"
 	DisplayName   string    `json:"display_name" bson:"display_name"`     // Win five point by five readings
 	BuildingBlock string    `json:"building_block" bson:"building_block"` // "content"
 	Amount        int64     `json:"amount" bson:"amount"`                 // 5
@@ -36,4 +35,5 @@ type RewardHistoryEntry struct {
 	Description string    `json:"description" bson:"description"`
 	DateCreated time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
+	DisplayName *string   `json:"display_name,omitempty" bson:"display_name,omitempty"`
 } // @name RewardHistoryEntry

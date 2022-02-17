@@ -18,24 +18,15 @@ type AdminApisHandler struct {
 
 // GetRewardTypes Retrieves  all reward types
 // @Description Retrieves  all reward types
-// @Param ids query string false "Coma separated IDs of the desired records"
 // @Tags Admin
 // @ID AdminGetRewardTypes
 // @Success 200 {array} model.RewardType
 // @Security AdminUserAuth
 // @Router /admin/reward_types [get]
 func (h AdminApisHandler) GetRewardTypes(w http.ResponseWriter, r *http.Request) {
-
-	IDs := []string{}
-	IDskeys, ok := r.URL.Query()["ids"]
-	if ok && len(IDskeys[0]) > 0 {
-		extIDs := IDskeys[0]
-		IDs = strings.Split(extIDs, ",")
-	}
-
-	resData, err := h.app.Services.GetRewardTypes(IDs)
+	resData, err := h.app.Services.GetRewardTypes()
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardTypes(%s): %s", IDs, err)
+		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

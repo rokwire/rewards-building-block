@@ -171,14 +171,6 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardTypes",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Coma separated IDs of the desired records",
-                        "name": "ids",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -330,6 +322,25 @@ var doc = `{
                 }
             }
         },
+        "/user/history": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves the wallet history",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserHistory",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/version": {
             "get": {
                 "description": "Gives the service version.",
@@ -340,44 +351,6 @@ var doc = `{
                     "Client"
                 ],
                 "operationId": "Version",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/wallet/{code}/balance": {
-            "get": {
-                "security": [
-                    {
-                        "UserAuth": []
-                    }
-                ],
-                "description": "Retrieves  the user balance",
-                "tags": [
-                    "Client"
-                ],
-                "operationId": "GetWalletBalance",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/wallet/{code}/history": {
-            "get": {
-                "security": [
-                    {
-                        "UserAuth": []
-                    }
-                ],
-                "description": "Retrieves the user history",
-                "tags": [
-                    "Client"
-                ],
-                "operationId": "GetWalletHistory",
                 "responses": {
                     "200": {
                         "description": ""
@@ -400,6 +373,9 @@ var doc = `{
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "display_name": {
                     "type": "string"
                 },
                 "id": {
@@ -468,10 +444,6 @@ var doc = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "description": "\"win_five_point_by_five_readings\"",
                     "type": "string"
                 },
                 "reward_type": {

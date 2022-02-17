@@ -27,8 +27,17 @@ func (app *Application) getVersion() string {
 	return app.version
 }
 
-func (app *Application) getRewardTypes(ids []string) ([]model.RewardType, error) {
-	return app.storage.GetRewardTypes(ids)
+func (app *Application) getRewardTypes() ([]model.RewardType, error) {
+	types := app.cacheAdapter.GetRewardTypes()
+	if types != nil {
+		return types, nil
+	}
+
+	storedTypes, err := app.storage.GetRewardTypes()
+	if err == nil && storedTypes != nil {
+		app.cacheAdapter.SetRewardTypes(storedTypes)
+	}
+	return storedTypes, err
 }
 
 func (app *Application) getRewardType(id string) (*model.RewardType, error) {
@@ -36,7 +45,7 @@ func (app *Application) getRewardType(id string) (*model.RewardType, error) {
 }
 
 func (app *Application) createRewardType(item model.RewardType) (*model.RewardType, error) {
-	return app.storage.CreateRewardType(item)
+	return  app.storage.CreateRewardType(item)
 }
 
 func (app *Application) updateRewardType(id string, item model.RewardType) (*model.RewardType, error) {
@@ -89,7 +98,7 @@ func (app *Application) deleteGetRewardPool(id string) error {
 	return app.storage.DeleteRewardPool(id)
 }
 
-func (app *Application) getUserBalance(userID string) ([]model.WalletBalance, error) {
+func (app *Application) getUserBalance(userID string) (*model.WalletBalance, error) {
 	return app.storage.GetUserBalance(userID)
 }
 
@@ -97,6 +106,32 @@ func (app *Application) getWalletBalance(userID string, code string) (*model.Wal
 	return app.storage.GetWalletBalance(userID, code)
 }
 
-func (app *Application) getWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
-	return app.storage.GetRewardHistoryEntries(userID, code)
+func (app *Application) getWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error) {
+	history, err := app.storage.GetRewardHistoryEntries(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	rewardTypes, err := app.Services.GetRewardTypes()
+	if err != nil {
+		log.Printf("Error on apis.GetRewardTypes(): %s", err)
+	} else {
+		if len(rewardTypes) > 0 && len(history) > 0 {
+			mapping := map[string]model.RewardType{}
+			for _, rewardType := range rewardTypes {
+				mapping[rewardType.RewardType] = rewardType
+			}
+			for i, historyItem := range history {
+				displayName := mapping[historyItem.RewardType].DisplayName
+				history[i].DisplayName = &displayName
+			}
+		}
+	}
+
+	return history, nil
+}
+
+
+func (app *Application) OnRewardTypesChanged(){
+	app.cacheAdapter.SetRewardTypes(nil) // invalidate
 }

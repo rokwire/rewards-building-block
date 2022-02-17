@@ -24,6 +24,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"rewards/core"
 	"rewards/core/model"
 	"strconv"
 	"time"
@@ -54,19 +55,16 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 }
 
 // GetRewardTypes Gets all reward types
-func (sa *Adapter) GetRewardTypes(ids []string) ([]model.RewardType, error) {
+func (sa *Adapter) GetRewardTypes() ([]model.RewardType, error) {
 	filter := bson.D{}
-	if len(ids) > 0 {
-		filter = bson.D{
-			primitive.E{Key: "_id", Value: bson.M{"$in": ids}},
-		}
-	}
-
 	var result []model.RewardType
 	err := sa.db.rewardTypes.Find(filter, &result, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardTypes error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardTypes error: %s", err)
+	}
+	if result == nil{
+		result = []model.RewardType{}
 	}
 	return result, nil
 }
@@ -126,7 +124,6 @@ func (sa *Adapter) UpdateRewardType(id string, item model.RewardType) (*model.Re
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "name", Value: item.Name},
 			primitive.E{Key: "display_name", Value: item.DisplayName},
 			primitive.E{Key: "building_block", Value: item.BuildingBlock},
 			primitive.E{Key: "amount", Value: item.Amount},
@@ -252,10 +249,9 @@ func (sa *Adapter) DeleteRewardPool(id string) error {
 }
 
 // GetRewardHistoryEntries Gets all reward history entries
-func (sa *Adapter) GetRewardHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
+func (sa *Adapter) GetRewardHistoryEntries(userID string) ([]model.RewardHistoryEntry, error) {
 	filter := bson.D{
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "code", Value: code},
 	}
 
 	var result []model.RewardHistoryEntry
@@ -265,6 +261,9 @@ func (sa *Adapter) GetRewardHistoryEntries(userID string, code string) ([]model.
 	if err != nil {
 		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+	}
+	if result == nil{
+		result = []model.RewardHistoryEntry{}
 	}
 	return result, nil
 }
@@ -302,7 +301,7 @@ func (sa *Adapter) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*mod
 }
 
 // GetUserBalance Gets all balances for the user id
-func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error) {
+func (sa *Adapter) GetUserBalance(userID string) (*model.WalletBalance, error) {
 	pipeline := []bson.M{
 		{"$match": bson.M{"user_id": userID}},
 		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
@@ -314,7 +313,12 @@ func (sa *Adapter) GetUserBalance(userID string) ([]model.WalletBalance, error) 
 		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
 	}
-	return result, nil
+	if len(result) > 0 {
+		return &result[0], nil
+	}
+	return &model.WalletBalance{
+		Amount: 0,
+	}, nil
 }
 
 // GetWalletBalance gets wallet balance by user id and wallet code
@@ -338,6 +342,10 @@ func (sa *Adapter) GetWalletBalance(userID string, code string) (*model.WalletBa
 	return nil, nil
 }
 
+func (sa *Adapter) SetApplication(app *core.Application){
+	sa.db.application = app
+}
+
 // Event
 
 func (m *database) onDataChanged(changeDoc map[string]interface{}) {
@@ -352,9 +360,10 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 	nsMap := ns.(map[string]interface{})
 	coll := nsMap["coll"]
 
-	if "configs" == coll {
-		log.Println("configs collection changed")
-	} else {
-		log.Println("other collection changed")
+	if "reward_types" == coll {
+		if m.application != nil {
+			m.application.OnRewardTypesChanged()
+		}
 	}
 }
+

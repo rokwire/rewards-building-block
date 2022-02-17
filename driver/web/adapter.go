@@ -86,8 +86,9 @@ func (we Adapter) Start() {
 
 	// Client APIs
 	apiRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
-	apiRouter.HandleFunc("/wallet/{code}/balance", we.userAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
-	apiRouter.HandleFunc("/wallet/{code}/history", we.userAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("GET")
+	apiRouter.HandleFunc("/user/history", we.userAuthWrapFunc(we.apisHandler.GetUserHistory)).Methods("GET")
+	//apiRouter.HandleFunc("/wallet/{code}/balance", we.userAuthWrapFunc(we.apisHandler.GetWalletBalance)).Methods("GET")
+	//apiRouter.HandleFunc("/wallet/{code}/history", we.userAuthWrapFunc(we.apisHandler.GetWalletHistory)).Methods("GET")
 
 	// handle student guide admin apis
 	adminSubRouter := apiRouter.PathPrefix("/admin").Subrouter()

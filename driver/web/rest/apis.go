@@ -19,11 +19,11 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
+	"rewards/core/model"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb
@@ -74,6 +74,12 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 		return
 	}
 
+	if resData == nil{
+		resData = &model.WalletBalance{
+			Amount: 0,
+		}
+	}
+
 	data, err := json.Marshal(resData)
 	if err != nil {
 		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
@@ -86,6 +92,34 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 	w.Write(data)
 }
 
+// GetUserHistory Retrieves the wallet history
+// @Description Retrieves the wallet history
+// @Tags Client
+// @ID GetUserHistory
+// @Success 200
+// @Security UserAuth
+// @Router /user/history [get]
+func (h *ApisHandler) GetUserHistory(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.Subject)
+	if err != nil {
+		log.Printf("Error on apis.GetUserHistory(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on apis.GetUserHistory(%s): %s", userClaims.Subject, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+/*
 // GetWalletBalance Retrieves  the wallet balance
 // @Description Retrieves  the user balance
 // @Tags Client
@@ -139,7 +173,7 @@ func (h *ApisHandler) GetWalletHistory(userClaims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.Subject, code)
+	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetWalletHistory(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -156,4 +190,4 @@ func (h *ApisHandler) GetWalletHistory(userClaims *tokenauth.Claims, w http.Resp
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
-}
+}*/

@@ -34,6 +34,7 @@ type Application struct {
 
 // Start starts the core part of the application
 func (app *Application) Start() {
+	app.storage.SetApplication(app)
 }
 
 // NewApplication creates new Application

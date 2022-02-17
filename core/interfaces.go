@@ -25,7 +25,7 @@ import (
 type Services interface {
 	GetVersion() string
 
-	GetRewardTypes(ids []string) ([]model.RewardType, error)
+	GetRewardTypes() ([]model.RewardType, error)
 	GetRewardType(id string) (*model.RewardType, error)
 	CreateRewardType(item model.RewardType) (*model.RewardType, error)
 	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
@@ -39,9 +39,9 @@ type Services interface {
 
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
-	GetUserBalance(userID string) ([]model.WalletBalance, error)
+	GetUserBalance(userID string) (*model.WalletBalance, error)
 	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
-	GetWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error)
+	GetWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error)
 }
 
 type servicesImpl struct {
@@ -52,8 +52,8 @@ func (s *servicesImpl) GetVersion() string {
 	return s.app.getVersion()
 }
 
-func (s *servicesImpl) GetRewardTypes(ids []string) ([]model.RewardType, error) {
-	return s.app.getRewardTypes(ids)
+func (s *servicesImpl) GetRewardTypes() ([]model.RewardType, error) {
+	return s.app.getRewardTypes()
 }
 
 func (s *servicesImpl) GetRewardType(id string) (*model.RewardType, error) {
@@ -96,7 +96,7 @@ func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (
 	return s.app.createRewardHistoryEntry(item)
 }
 
-func (s *servicesImpl) GetUserBalance(userID string) ([]model.WalletBalance, error) {
+func (s *servicesImpl) GetUserBalance(userID string) (*model.WalletBalance, error) {
 	return s.app.getUserBalance(userID)
 }
 
@@ -104,13 +104,13 @@ func (s *servicesImpl) GetWalletBalance(userID string, code string) (*model.Wall
 	return s.app.getWalletBalance(userID, code)
 }
 
-func (s *servicesImpl) GetWalletHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error) {
-	return s.app.getWalletHistoryEntries(userID, code)
+func (s *servicesImpl) GetWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error) {
+	return s.app.getWalletHistoryEntries(userID)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
-	GetRewardTypes(ids []string) ([]model.RewardType, error)
+	GetRewardTypes() ([]model.RewardType, error)
 	GetRewardType(id string) (*model.RewardType, error)
 	GetRewardTypeByType(rewardType string) (*model.RewardType, error)
 	CreateRewardType(item model.RewardType) (*model.RewardType, error)
@@ -123,11 +123,13 @@ type Storage interface {
 	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
 	DeleteRewardPool(id string) error
 
-	GetRewardHistoryEntries(userID string, code string) ([]model.RewardHistoryEntry, error)
+	GetRewardHistoryEntries(userID string) ([]model.RewardHistoryEntry, error)
 	GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error)
 	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
 	// User APIs
-	GetUserBalance(userID string) ([]model.WalletBalance, error)
+	GetUserBalance(userID string) (*model.WalletBalance, error)
 	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
+
+	SetApplication(app *Application)
 }
