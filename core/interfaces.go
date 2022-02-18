@@ -19,6 +19,7 @@ package core
 
 import (
 	"rewards/core/model"
+	"rewards/driven/storage"
 )
 
 // Services exposes APIs for the driver adapters
@@ -131,5 +132,5 @@ type Storage interface {
 	GetUserBalance(userID string) (*model.WalletBalance, error)
 	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
 
-	SetApplication(app *Application)
+	SetListener(listener storage.Listener)
 }

@@ -24,7 +24,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"rewards/core"
 	"rewards/core/model"
 	"strconv"
 	"time"
@@ -342,9 +341,9 @@ func (sa *Adapter) GetWalletBalance(userID string, code string) (*model.WalletBa
 	return nil, nil
 }
 
-// SetApplication sets the upper layer application for sending collection changed callbacks
-func (sa *Adapter) SetApplication(app *core.Application) {
-	sa.db.application = app
+// SetListener sets the upper layer storage listener for sending collection changed callbacks
+func (sa *Adapter) SetListener(listener Listener) {
+	sa.db.listener = listener
 }
 
 // Event
@@ -362,8 +361,8 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 	coll := nsMap["coll"]
 
 	if "reward_types" == coll {
-		if m.application != nil {
-			m.application.OnRewardTypesChanged()
+		if m.listener != nil {
+			m.listener.OnRewardTypesChanged()
 		}
 	}
 }

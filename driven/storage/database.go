@@ -22,15 +22,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
-	"rewards/core"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Listener listens for storage updates
+type Listener interface {
+	OnRewardTypesChanged()
+}
+
 type database struct {
-	application *core.Application
+	listener Listener
 
 	mongoDBAuth  string
 	mongoDBName  string
