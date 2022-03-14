@@ -67,7 +67,7 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 // @Security UserAuth
 // @Router /user/balance [get]
 func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetUserBalance(userClaims.Subject)
+	resData, err := h.app.Services.GetUserBalance(userClaims.OrgID, userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -100,7 +100,7 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 // @Security UserAuth
 // @Router /user/history [get]
 func (h *ApisHandler) GetUserHistory(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.Subject)
+	resData, err := h.app.Services.GetWalletHistoryEntries(userClaims.OrgID, userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetUserHistory(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

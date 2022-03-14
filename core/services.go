@@ -27,38 +27,38 @@ func (app *Application) getVersion() string {
 	return app.version
 }
 
-func (app *Application) getRewardTypes() ([]model.RewardType, error) {
+func (app *Application) getRewardTypes(orgID string) ([]model.RewardType, error) {
 	types := app.cacheAdapter.GetRewardTypes()
 	if types != nil {
 		return types, nil
 	}
 
-	storedTypes, err := app.storage.GetRewardTypes()
+	storedTypes, err := app.storage.GetRewardTypes(orgID)
 	if err == nil && storedTypes != nil {
 		app.cacheAdapter.SetRewardTypes(storedTypes)
 	}
 	return storedTypes, err
 }
 
-func (app *Application) getRewardType(id string) (*model.RewardType, error) {
-	return app.storage.GetRewardType(id)
+func (app *Application) getRewardType(orgID string, id string) (*model.RewardType, error) {
+	return app.storage.GetRewardType(orgID, id)
 }
 
-func (app *Application) createRewardType(item model.RewardType) (*model.RewardType, error) {
-	return app.storage.CreateRewardType(item)
+func (app *Application) createRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
+	return app.storage.CreateRewardType(orgID, item)
 }
 
-func (app *Application) updateRewardType(id string, item model.RewardType) (*model.RewardType, error) {
-	return app.storage.UpdateRewardType(id, item)
+func (app *Application) updateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+	return app.storage.UpdateRewardType(orgID, id, item)
 }
 
-func (app *Application) deleteGetRewardTypes(id string) error {
-	return app.storage.DeleteRewardType(id)
+func (app *Application) deleteRewardTypes(orgID string, id string) error {
+	return app.storage.DeleteRewardType(orgID, id)
 }
 
-func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+func (app *Application) createRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
 	if item.RewardType != "" && item.UserID != "" {
-		rewardType, err := app.storage.GetRewardTypeByType(item.RewardType)
+		rewardType, err := app.storage.GetRewardTypeByType(orgID, item.RewardType)
 		if err != nil {
 			log.Printf("Error Application.createRewardHistoryEntry(): %s", err)
 			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): %s", err)
@@ -69,50 +69,50 @@ func (app *Application) createRewardHistoryEntry(item model.RewardHistoryEntry) 
 			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
 		}
 
-		item.Amount = rewardType.Amount
+		//item.Amount = rewardType.Amount
 
-		return app.storage.CreateRewardHistoryEntry(item)
+		return app.storage.CreateRewardHistoryEntry(orgID, item)
 	}
 	return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): missing data. data dump: %+v", item)
 }
 
 // Reward pools
 
-func (app *Application) getRewardPools(ids []string) ([]model.RewardPool, error) {
-	return app.storage.GetRewardPools(ids)
+func (app *Application) getRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error) {
+	return app.storage.GetRewardInventories(orgID, ids, rewardType)
 }
 
-func (app *Application) getRewardPool(id string) (*model.RewardPool, error) {
-	return app.storage.GetRewardPool(id)
+func (app *Application) getRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
+	return app.storage.GetRewardInventory(orgID, id)
 }
 
-func (app *Application) createRewardPool(item model.RewardPool) (*model.RewardPool, error) {
-	return app.storage.CreateRewardPool(item)
+func (app *Application) createRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return app.storage.CreateRewardInventory(orgID, item)
 }
 
-func (app *Application) updateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error) {
-	return app.storage.UpdateRewardPool(id, item)
+func (app *Application) updateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return app.storage.UpdateRewardInventory(orgID, id, item)
 }
 
-func (app *Application) deleteGetRewardPool(id string) error {
-	return app.storage.DeleteRewardPool(id)
+func (app *Application) deleteGetRewardInventory(orgID string, id string) error {
+	return app.storage.DeleteRewardInventory(orgID, id)
 }
 
-func (app *Application) getUserBalance(userID string) (*model.WalletBalance, error) {
-	return app.storage.GetUserBalance(userID)
+func (app *Application) getUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
+	return app.storage.GetUserBalance(orgID, userID)
 }
 
-func (app *Application) getWalletBalance(userID string, code string) (*model.WalletBalance, error) {
-	return app.storage.GetWalletBalance(userID, code)
+func (app *Application) getWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error) {
+	return app.storage.GetWalletBalance(orgID, userID, code)
 }
 
-func (app *Application) getWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error) {
-	history, err := app.storage.GetRewardHistoryEntries(userID)
+func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error) {
+	history, err := app.storage.GetRewardHistoryEntries(orgID, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	rewardTypes, err := app.Services.GetRewardTypes()
+	rewardTypes, err := app.Services.GetRewardTypes(orgID)
 	if err != nil {
 		log.Printf("Error on apis.GetRewardTypes(): %s", err)
 	} else {

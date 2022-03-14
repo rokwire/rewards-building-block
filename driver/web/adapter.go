@@ -98,11 +98,11 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
 
-	adminSubRouter.HandleFunc("/reward_pools", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPools)).Methods("GET")
-	adminSubRouter.HandleFunc("/reward_pools", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardPool)).Methods("POST")
-	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardPool)).Methods("GET")
-	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardPool)).Methods("PUT")
-	adminSubRouter.HandleFunc("/reward_pools/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardPool)).Methods("DELETE")
+	adminSubRouter.HandleFunc("/reward_inventories", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventories)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_inventories", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardInventory)).Methods("POST")
+	adminSubRouter.HandleFunc("/reward_inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventory)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardInventory)).Methods("PUT")
+	adminSubRouter.HandleFunc("/reward_inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardInventory)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -157,7 +157,7 @@ func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 	}
 }
 
-type adminAuthFunc = func(http.ResponseWriter, *http.Request)
+type adminAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 
 func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -178,7 +178,7 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 				}
 			}
 			if HasAccess {
-				handler(w, req)
+				handler(claims, w, req)
 				return
 			}
 			log.Printf("Access control error - Core Subject: %s is trying to apply %s operation for %s\n", claims.Subject, act, obj)

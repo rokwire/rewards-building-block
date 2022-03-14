@@ -16,6 +16,7 @@ type InternalApisHandler struct {
 
 // createRewardHistoryEntryBody wrapper
 type createRewardHistoryEntryBody struct {
+	OrgID       string `json:"org_id"`
 	UserID      string `json:"user_id"`
 	RewardType  string `json:"reward_type"`
 	Description string `json:"description"`
@@ -46,7 +47,7 @@ func (h InternalApisHandler) CreateRewardHistoryEntry(w http.ResponseWriter, r *
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardHistoryEntry(model.RewardHistoryEntry{
+	createdItem, err := h.app.Services.CreateRewardHistoryEntry(item.OrgID, model.RewardHistoryEntry{
 		UserID:      item.UserID,
 		RewardType:  item.RewardType,
 		Description: item.Description,

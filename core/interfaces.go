@@ -26,23 +26,23 @@ import (
 type Services interface {
 	GetVersion() string
 
-	GetRewardTypes() ([]model.RewardType, error)
-	GetRewardType(id string) (*model.RewardType, error)
-	CreateRewardType(item model.RewardType) (*model.RewardType, error)
-	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardType(id string) error
+	GetRewardTypes(orgID string) ([]model.RewardType, error)
+	GetRewardType(orgID string, id string) (*model.RewardType, error)
+	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
+	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
+	DeleteRewardType(orgID string, id string) error
 
-	GetRewardPools(ids []string) ([]model.RewardPool, error)
-	GetRewardPool(id string) (*model.RewardPool, error)
-	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
-	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
-	DeleteRewardPool(id string) error
+	GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error)
+	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
+	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
+	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
+	DeleteRewardInventory(orgID string, id string) error
 
-	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
+	CreateRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
-	GetUserBalance(userID string) (*model.WalletBalance, error)
-	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
-	GetWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error)
+	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
+	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
+	GetWalletHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error)
 }
 
 type servicesImpl struct {
@@ -53,84 +53,84 @@ func (s *servicesImpl) GetVersion() string {
 	return s.app.getVersion()
 }
 
-func (s *servicesImpl) GetRewardTypes() ([]model.RewardType, error) {
-	return s.app.getRewardTypes()
+func (s *servicesImpl) GetRewardTypes(orgID string) ([]model.RewardType, error) {
+	return s.app.getRewardTypes(orgID)
 }
 
-func (s *servicesImpl) GetRewardType(id string) (*model.RewardType, error) {
-	return s.app.getRewardType(id)
+func (s *servicesImpl) GetRewardType(orgID string, id string) (*model.RewardType, error) {
+	return s.app.getRewardType(orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardType(item model.RewardType) (*model.RewardType, error) {
-	return s.app.createRewardType(item)
+func (s *servicesImpl) CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
+	return s.app.createRewardType(orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error) {
-	return s.app.updateRewardType(id, item)
+func (s *servicesImpl) UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+	return s.app.updateRewardType(orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardType(id string) error {
-	return s.app.deleteGetRewardTypes(id)
+func (s *servicesImpl) DeleteRewardType(orgID string, id string) error {
+	return s.app.deleteRewardTypes(orgID, id)
 }
 
-func (s *servicesImpl) GetRewardPools(ids []string) ([]model.RewardPool, error) {
-	return s.app.getRewardPools(ids)
+func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error) {
+	return s.app.getRewardInventories(orgID, ids, rewardType)
 }
 
-func (s *servicesImpl) GetRewardPool(id string) (*model.RewardPool, error) {
-	return s.app.getRewardPool(id)
+func (s *servicesImpl) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
+	return s.app.getRewardInventory(orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardPool(item model.RewardPool) (*model.RewardPool, error) {
-	return s.app.createRewardPool(item)
+func (s *servicesImpl) CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return s.app.createRewardInventory(orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error) {
-	return s.app.updateRewardPool(id, item)
+func (s *servicesImpl) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return s.app.updateRewardInventory(orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardPool(id string) error {
-	return s.app.deleteGetRewardTypes(id)
+func (s *servicesImpl) DeleteRewardInventory(orgID string, id string) error {
+	return s.app.deleteRewardTypes(orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
-	return s.app.createRewardHistoryEntry(item)
+func (s *servicesImpl) CreateRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+	return s.app.createRewardHistoryEntry(orgID, item)
 }
 
-func (s *servicesImpl) GetUserBalance(userID string) (*model.WalletBalance, error) {
-	return s.app.getUserBalance(userID)
+func (s *servicesImpl) GetUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
+	return s.app.getUserBalance(orgID, userID)
 }
 
-func (s *servicesImpl) GetWalletBalance(userID string, code string) (*model.WalletBalance, error) {
-	return s.app.getWalletBalance(userID, code)
+func (s *servicesImpl) GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error) {
+	return s.app.getWalletBalance(orgID, userID, code)
 }
 
-func (s *servicesImpl) GetWalletHistoryEntries(userID string) ([]model.RewardHistoryEntry, error) {
-	return s.app.getWalletHistoryEntries(userID)
+func (s *servicesImpl) GetWalletHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error) {
+	return s.app.getWalletHistoryEntries(orgID, userID)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
-	GetRewardTypes() ([]model.RewardType, error)
-	GetRewardType(id string) (*model.RewardType, error)
-	GetRewardTypeByType(rewardType string) (*model.RewardType, error)
-	CreateRewardType(item model.RewardType) (*model.RewardType, error)
-	UpdateRewardType(id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardType(id string) error
+	GetRewardTypes(orgID string) ([]model.RewardType, error)
+	GetRewardType(orgID string, id string) (*model.RewardType, error)
+	GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error)
+	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
+	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
+	DeleteRewardType(orgID string, id string) error
 
-	GetRewardPools(ids []string) ([]model.RewardPool, error)
-	GetRewardPool(id string) (*model.RewardPool, error)
-	CreateRewardPool(item model.RewardPool) (*model.RewardPool, error)
-	UpdateRewardPool(id string, item model.RewardPool) (*model.RewardPool, error)
-	DeleteRewardPool(id string) error
+	GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error)
+	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
+	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
+	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
+	DeleteRewardInventory(orgID string, id string) error
 
-	GetRewardHistoryEntries(userID string) ([]model.RewardHistoryEntry, error)
-	GetRewardHistoryEntry(userID, id string) (*model.RewardHistoryEntry, error)
-	CreateRewardHistoryEntry(item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
+	GetRewardHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error)
+	GetRewardHistoryEntry(orgID string, userID, id string) (*model.RewardHistoryEntry, error)
+	CreateRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error)
 
 	// User APIs
-	GetUserBalance(userID string) (*model.WalletBalance, error)
-	GetWalletBalance(userID string, code string) (*model.WalletBalance, error)
+	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
+	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
 
 	SetListener(listener storage.Listener)
 }
