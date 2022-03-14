@@ -56,24 +56,24 @@ func (app *Application) deleteRewardTypes(orgID string, id string) error {
 	return app.storage.DeleteRewardType(orgID, id)
 }
 
-func (app *Application) createRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+func (app *Application) createReward(orgID string, item model.Reward) (*model.Reward, error) {
 	if item.RewardType != "" && item.UserID != "" {
 		rewardType, err := app.storage.GetRewardTypeByType(orgID, item.RewardType)
 		if err != nil {
-			log.Printf("Error Application.createRewardHistoryEntry(): %s", err)
-			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): %s", err)
+			log.Printf("Error Application.createReward(): %s", err)
+			return nil, fmt.Errorf("Error Application.createReward(): %s", err)
 		}
 
 		if rewardType == nil {
-			log.Printf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
-			return nil, fmt.Errorf("Error Application.createRewardHistoryEntry() unable to find reward type '%s'", item.RewardType)
+			log.Printf("Error Application.createReward() unable to find reward type '%s'", item.RewardType)
+			return nil, fmt.Errorf("Error Application.createReward() unable to find reward type '%s'", item.RewardType)
 		}
 
 		//item.Amount = rewardType.Amount
 
-		return app.storage.CreateRewardHistoryEntry(orgID, item)
+		return app.storage.CreateReward(orgID, item)
 	}
-	return nil, fmt.Errorf("Error Application.createRewardHistoryEntry(): missing data. data dump: %+v", item)
+	return nil, fmt.Errorf("Error Application.createReward(): missing data. data dump: %+v", item)
 }
 
 // Reward pools
@@ -106,7 +106,7 @@ func (app *Application) getWalletBalance(orgID string, userID string, code strin
 	return app.storage.GetWalletBalance(orgID, userID, code)
 }
 
-func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error) {
+func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
 	history, err := app.storage.GetRewardHistoryEntries(orgID, userID)
 	if err != nil {
 		return nil, err
@@ -120,10 +120,6 @@ func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]
 			mapping := map[string]model.RewardType{}
 			for _, rewardType := range rewardTypes {
 				mapping[rewardType.RewardType] = rewardType
-			}
-			for i, historyItem := range history {
-				displayName := mapping[historyItem.RewardType].DisplayName
-				history[i].DisplayName = &displayName
 			}
 		}
 	}

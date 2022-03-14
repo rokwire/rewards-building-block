@@ -292,7 +292,7 @@ var doc = `{
                 "tags": [
                     "Internal"
                 ],
-                "operationId": "InternalCreateRewardHistoryEntry",
+                "operationId": "InternalCreateReward",
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -22,19 +22,19 @@ type createRewardHistoryEntryBody struct {
 	Description string `json:"description"`
 } //@name createRewardHistoryEntryBody
 
-// CreateRewardHistoryEntry Create a new reward history entry from another BB
+// CreateReward Create a new reward history entry from another BB
 // @Description Create a new reward history entry from another BB
 // @Tags Internal
-// @ID InternalCreateRewardHistoryEntry
+// @ID InternalCreateReward
 // @Accept json
-// @Success 200 {object} model.RewardHistoryEntry
+// @Success 200 {object} model.Reward
 // @Security InternalApiAuth
 // @Router /int/reward_history [post]
-func (h InternalApisHandler) CreateRewardHistoryEntry(w http.ResponseWriter, r *http.Request) {
+func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
+		log.Printf("Error on adminapis.CreateReward: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -42,25 +42,25 @@ func (h InternalApisHandler) CreateRewardHistoryEntry(w http.ResponseWriter, r *
 	var item createRewardHistoryEntryBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
+		log.Printf("Error on adminapis.CreateReward: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardHistoryEntry(item.OrgID, model.RewardHistoryEntry{
+	createdItem, err := h.app.Services.CreateReward(item.OrgID, model.Reward{
 		UserID:      item.UserID,
 		RewardType:  item.RewardType,
 		Description: item.Description,
 	})
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
+		log.Printf("Error on adminapis.CreateReward: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	jsonData, err := json.Marshal(createdItem)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardHistoryEntry: %s", err)
+		log.Printf("Error on adminapis.CreateReward: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

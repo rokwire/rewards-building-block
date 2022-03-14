@@ -235,6 +235,8 @@ func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.Rew
 			primitive.E{Key: "date_updated", Value: now},
 			primitive.E{Key: "amount", Value: item.Amount},
 			primitive.E{Key: "in_stock", Value: item.InStock},
+			primitive.E{Key: "depleted", Value: item.Depleted},
+			primitive.E{Key: "description", Value: item.Description},
 		},
 		},
 	}
@@ -264,12 +266,12 @@ func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 }
 
 // GetRewardHistoryEntries Gets all reward history entries
-func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model.RewardHistoryEntry, error) {
+func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "user_id", Value: userID},
 	}
 
-	var result []model.RewardHistoryEntry
+	var result []model.Reward
 	err := sa.db.rewardHistory.Find(filter, &result, &options.FindOptions{
 		Sort: bson.D{{"date_created", -1}},
 	})
@@ -278,18 +280,18 @@ func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model
 		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
 	}
 	if result == nil {
-		result = []model.RewardHistoryEntry{}
+		result = []model.Reward{}
 	}
 	return result, nil
 }
 
 // GetRewardHistoryEntry Gets a reward history entry by id
-func (sa *Adapter) GetRewardHistoryEntry(orgID string, userID, id string) (*model.RewardHistoryEntry, error) {
+func (sa *Adapter) GetRewardHistoryEntry(orgID string, userID, id string) (*model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "user_id", Value: userID},
 	}
-	var result []model.RewardHistoryEntry
+	var result []model.Reward
 	err := sa.db.rewardHistory.Find(filter, &result, nil)
 	if err != nil {
 		return nil, err
@@ -301,16 +303,16 @@ func (sa *Adapter) GetRewardHistoryEntry(orgID string, userID, id string) (*mode
 	return &result[0], nil
 }
 
-// CreateRewardHistoryEntry creates a new reward history entry
-func (sa *Adapter) CreateRewardHistoryEntry(orgID string, item model.RewardHistoryEntry) (*model.RewardHistoryEntry, error) {
+// CreateReward creates a new reward history entry
+func (sa *Adapter) CreateReward(orgID string, item model.Reward) (*model.Reward, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	_, err := sa.db.rewardHistory.InsertOne(&item)
 	if err != nil {
-		log.Printf("storage.CreateRewardHistoryEntry error: %s", err)
-		return nil, fmt.Errorf("storage.CreateRewardHistoryEntry error: %s", err)
+		log.Printf("storage.CreateReward error: %s", err)
+		return nil, fmt.Errorf("storage.CreateReward error: %s", err)
 	}
 	return &item, nil
 }

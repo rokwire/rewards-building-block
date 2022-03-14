@@ -21,12 +21,13 @@ type RewardInventory struct {
 	Amount      int64     `json:"amount" bson:"amount"`
 	InStock     bool      `json:"in_stock" bson:"in_stock"`
 	Depleted    bool      `json:"depleted" bson:"depleted"`
+	Description string    `json:"description" bson:"description"`
 	DateCreated time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
 } // @name RewardInventory
 
-// RewardHistoryEntry wraps the history entry
-type RewardHistoryEntry struct {
+// Reward wraps the history entry
+type Reward struct {
 	ID          string    `json:"id" bson:"_id"`
 	OrgID       string    `json:"org_id" bson:"org_id"`
 	UserID      string    `json:"user_id" bson:"user_id"`
@@ -35,5 +36,4 @@ type RewardHistoryEntry struct {
 	Description string    `json:"description" bson:"description"`
 	DateCreated time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
-	DisplayName *string   `json:"display_name,omitempty" bson:"display_name,omitempty"`
-} // @name RewardHistoryEntry
+} // @name Reward
