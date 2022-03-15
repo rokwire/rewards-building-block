@@ -44,6 +44,7 @@ type database struct {
 	dbClient *mongo.Client
 
 	rewardTypes       *collectionWrapper
+	rewardOperations  *collectionWrapper
 	rewardInventories *collectionWrapper
 	rewardHistory     *collectionWrapper
 }
@@ -79,6 +80,12 @@ func (m *database) start() error {
 	}
 	go rewardTypes.Watch(nil)
 
+	rewardOperations := &collectionWrapper{database: m, coll: db.Collection("reward_operations")}
+	err = m.applyRewardOperationsChecks(rewardTypes)
+	if err != nil {
+		return err
+	}
+
 	rewardInventories := &collectionWrapper{database: m, coll: db.Collection("reward_inventories")}
 	err = m.applyRewardInventoriesChecks(rewardInventories)
 	if err != nil {
@@ -98,6 +105,7 @@ func (m *database) start() error {
 	m.rewardTypes = rewardTypes
 	m.rewardInventories = rewardInventories
 	m.rewardHistory = rewardHistory
+	m.rewardOperations = rewardOperations
 
 	return nil
 }
@@ -136,6 +144,53 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 	}
 
 	log.Println("reward_types checks passed")
+	return nil
+}
+
+func (m *database) applyRewardOperationsChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_operations checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["code_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "code", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["building_block_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "building_block", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["reward_type_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "reward_type", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_operations checks passed")
 	return nil
 }
 

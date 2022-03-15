@@ -19,6 +19,7 @@ type createRewardHistoryEntryBody struct {
 	OrgID       string `json:"org_id"`
 	UserID      string `json:"user_id"`
 	RewardType  string `json:"reward_type"`
+	Amount      int64  `json:"amount"`
 	Description string `json:"description"`
 } //@name createRewardHistoryEntryBody
 
@@ -34,15 +35,15 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateReward: %s", err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		log.Printf("Error on adminapis.CreateUserReward: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var item createRewardHistoryEntryBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateReward: %s", err)
+		log.Printf("Error on adminapis.CreateUserReward: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -51,17 +52,18 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		UserID:      item.UserID,
 		RewardType:  item.RewardType,
 		Description: item.Description,
+		Amount:      item.Amount,
 	})
 	if err != nil {
-		log.Printf("Error on adminapis.CreateReward: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("Error on adminapis.CreateUserReward: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	jsonData, err := json.Marshal(createdItem)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateReward: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("Error on adminapis.CreateUserReward: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

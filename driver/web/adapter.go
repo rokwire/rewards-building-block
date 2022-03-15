@@ -82,7 +82,7 @@ func (we Adapter) Start() {
 	apiRouter := subrouter.PathPrefix("/api").Subrouter()
 
 	// Internal APIs called from other BBs
-	apiRouter.HandleFunc("/int/reward_history", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateReward)).Methods("POST")
+	apiRouter.HandleFunc("/int/reward", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateReward)).Methods("POST")
 
 	// Client APIs
 	apiRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")

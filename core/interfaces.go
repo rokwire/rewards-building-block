@@ -118,15 +118,25 @@ type Storage interface {
 	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
 	DeleteRewardType(orgID string, id string) error
 
+	GetRewardOperations(orgID string) ([]model.RewardOperation, error)
+	GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error)
+	GetRewardOperationByCode(orgID string, rewardType string) (*model.RewardOperation, error)
+	CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error)
+	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
+	DeleteRewardOperation(orgID string, id string) error
+
 	GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
-	GetRewardHistoryEntries(orgID string, userID string) ([]model.Reward, error)
-	GetRewardHistoryEntry(orgID string, userID, id string) (*model.Reward, error)
-	CreateReward(orgID string, item model.Reward) (*model.Reward, error)
+	GetUserRewards(orgID string, userID string) ([]model.Reward, error)
+	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)
+	CreateUserReward(orgID string, item model.Reward) (*model.Reward, error)
+
+	// Quantities
+	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error)
 
 	// User APIs
 	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)

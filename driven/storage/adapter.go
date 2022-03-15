@@ -82,8 +82,8 @@ func (sa *Adapter) GetRewardType(orgID string, id string) (*model.RewardType, er
 		return nil, err
 	}
 	if result == nil || len(result) == 0 {
-		log.Printf("storage.UpdateRewardType error: %s", err)
-		return nil, fmt.Errorf("storage.UpdateRewardType error: %s", err)
+		log.Printf("storage.GetRewardType error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardType error: %s", err)
 	}
 	return &result[0], nil
 }
@@ -115,8 +115,8 @@ func (sa *Adapter) CreateRewardType(orgID string, item model.RewardType) (*model
 	item.DateUpdated = now
 	_, err := sa.db.rewardTypes.InsertOne(&item)
 	if err != nil {
-		log.Printf("storage.GetRewardTypes error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardTypes error: %s", err)
+		log.Printf("storage.CreateRewardType error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardType error: %s", err)
 	}
 	return &item, nil
 }
@@ -137,6 +137,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "display_name", Value: item.DisplayName},
 			primitive.E{Key: "active", Value: item.Active},
+			primitive.E{Key: "description", Value: item.Description},
 			primitive.E{Key: "date_updated", Value: now},
 		},
 		},
@@ -161,6 +162,119 @@ func (sa *Adapter) DeleteRewardType(orgID string, id string) error {
 	if err != nil {
 		log.Printf("storage.DeleteRewardType error: %s", err)
 		return fmt.Errorf("storage.DeleteRewardType error: %s", err)
+	}
+
+	return nil
+}
+
+// GetRewardOperations Gets all reward operations
+func (sa *Adapter) GetRewardOperations(orgID string) ([]model.RewardOperation, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+	}
+	var result []model.RewardOperation
+	err := sa.db.rewardOperations.Find(filter, &result, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardOperations error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardOperations error: %s", err)
+	}
+	if result == nil {
+		result = []model.RewardOperation{}
+	}
+	return result, nil
+}
+
+// GetRewardOperationByID Gets a reward operation by id
+func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
+	}
+	var result []model.RewardOperation
+	err := sa.db.rewardOperations.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardOperationByID error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardOperationByID error: %s", err)
+	}
+	return &result[0], nil
+}
+
+// GetRewardOperationByCode Gets a reward type by code
+func (sa *Adapter) GetRewardOperationByCode(orgID string, rewardCode string) (*model.RewardOperation, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "code", Value: rewardCode},
+	}
+	var result []model.RewardOperation
+	err := sa.db.rewardOperations.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardOperationByCode error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardOperationByCode error: %s", err)
+	}
+	return &result[0], nil
+}
+
+// CreateRewardOperation creates a new reward operation
+func (sa *Adapter) CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+	now := time.Now().UTC()
+	item.ID = uuid.NewString()
+	item.OrgID = orgID
+	item.DateCreated = now
+	item.DateUpdated = now
+	_, err := sa.db.rewardOperations.InsertOne(&item)
+	if err != nil {
+		log.Printf("storage.CreateRewardOperation error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardOperation error: %s", err)
+	}
+	return &item, nil
+}
+
+// UpdateRewardOperation updates a reward operation
+func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+	jsonID := item.ID
+	if jsonID != id {
+		return nil, fmt.Errorf("storage.UpdateRewardOperation attempt to override another object")
+	}
+
+	now := time.Now().UTC()
+	filter := bson.D{
+		primitive.E{Key: "_id", Value: id},
+		primitive.E{Key: "org_id", Value: orgID},
+	}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "amount", Value: item.Amount},
+			primitive.E{Key: "description", Value: item.Description},
+			primitive.E{Key: "date_updated", Value: now},
+		},
+		},
+	}
+	_, err := sa.db.rewardOperations.UpdateOne(filter, update, nil)
+	if err != nil {
+		log.Printf("storage.UpdateRewardOperation error: %s", err)
+		return nil, fmt.Errorf("storage.UpdateRewardOperation error: %s", err)
+	}
+
+	item.DateUpdated = now
+
+	return &item, nil
+}
+
+// DeleteRewardOperation deletes a reward operation
+func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
+	// TBD check and deny if the reward type is in use!!!
+
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	_, err := sa.db.rewardOperations.DeleteOne(filter, nil)
+	if err != nil {
+		log.Printf("storage.DeleteRewardOperation error: %s", err)
+		return fmt.Errorf("storage.DeleteRewardOperation error: %s", err)
 	}
 
 	return nil
@@ -265,9 +379,10 @@ func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 	return nil
 }
 
-// GetRewardHistoryEntries Gets all reward history entries
-func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
+// GetUserRewards Gets all reward history entries
+func (sa *Adapter) GetUserRewards(orgID string, userID string) ([]model.Reward, error) {
 	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 	}
 
@@ -276,8 +391,8 @@ func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model
 		Sort: bson.D{{"date_created", -1}},
 	})
 	if err != nil {
-		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+		log.Printf("storage.GetUserRewards error: %s", err)
+		return nil, fmt.Errorf("storage.GetUserRewards error: %s", err)
 	}
 	if result == nil {
 		result = []model.Reward{}
@@ -285,8 +400,8 @@ func (sa *Adapter) GetRewardHistoryEntries(orgID string, userID string) ([]model
 	return result, nil
 }
 
-// GetRewardHistoryEntry Gets a reward history entry by id
-func (sa *Adapter) GetRewardHistoryEntry(orgID string, userID, id string) (*model.Reward, error) {
+// GetUserRewardByID Gets a reward history entry by id
+func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "user_id", Value: userID},
@@ -297,22 +412,23 @@ func (sa *Adapter) GetRewardHistoryEntry(orgID string, userID, id string) (*mode
 		return nil, err
 	}
 	if result == nil || len(result) == 0 {
-		log.Printf("storage.GetRewardHistoryEntry error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardHistoryEntry error: %s", err)
+		log.Printf("storage.GetUserRewardByID error: %s", err)
+		return nil, fmt.Errorf("storage.GetUserRewardByID error: %s", err)
 	}
 	return &result[0], nil
 }
 
-// CreateReward creates a new reward history entry
-func (sa *Adapter) CreateReward(orgID string, item model.Reward) (*model.Reward, error) {
+// CreateUserReward creates a new reward history entry
+func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Reward, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
+	item.OrgID = orgID
 	_, err := sa.db.rewardHistory.InsertOne(&item)
 	if err != nil {
-		log.Printf("storage.CreateReward error: %s", err)
-		return nil, fmt.Errorf("storage.CreateReward error: %s", err)
+		log.Printf("storage.CreateUserReward error: %s", err)
+		return nil, fmt.Errorf("storage.CreateUserReward error: %s", err)
 	}
 	return &item, nil
 }
@@ -327,8 +443,8 @@ func (sa *Adapter) GetUserBalance(orgID string, userID string) (*model.WalletBal
 	var result []model.WalletBalance
 	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+		log.Printf("storage.GetUserBalance error: %s", err)
+		return nil, fmt.Errorf("storage.GetUserBalance error: %s", err)
 	}
 	if len(result) > 0 {
 		return &result[0], nil
@@ -348,8 +464,8 @@ func (sa *Adapter) GetWalletBalance(orgID string, userID string, code string) (*
 	var result []model.WalletBalance
 	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardHistoryEntries error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardHistoryEntries error: %s", err)
+		log.Printf("storage.GetWalletBalance error: %s", err)
+		return nil, fmt.Errorf("storage.GetWalletBalance error: %s", err)
 	}
 
 	if len(result) > 0 {
@@ -357,6 +473,51 @@ func (sa *Adapter) GetWalletBalance(orgID string, userID string, code string) (*
 	}
 
 	return nil, nil
+}
+
+// GetRewardQuantity Gets reward quantities state for the current moment
+func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
+	pipeline := []bson.M{
+		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+	}
+
+	var inventoryAmount int64
+	var inventoryResult []struct {
+		Amount int64 `bson:"amount"`
+	}
+	err := sa.db.rewardInventories.Aggregate(pipeline, &inventoryResult, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardQuantity error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+	}
+	if len(inventoryResult) > 0 {
+		inventoryAmount = inventoryResult[0].Amount
+	}
+
+	pipeline = []bson.M{
+		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+	}
+
+	var rewardsAmount int64
+	var rewardsResult []struct {
+		Amount int64 `bson:"amount"`
+	}
+	err = sa.db.rewardHistory.Aggregate(pipeline, &rewardsResult, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardQuantity error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+	}
+	if len(rewardsResult) > 0 {
+		rewardsAmount = rewardsResult[0].Amount
+	}
+
+	return &model.RewardQuantity{
+		RewardType:         rewardType,
+		RewardableQuantity: inventoryAmount - rewardsAmount,
+		ClaimableQuantity:  0,
+	}, nil
 }
 
 // SetListener sets the upper layer storage listener for sending collection changed callbacks

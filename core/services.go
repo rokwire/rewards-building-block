@@ -69,9 +69,22 @@ func (app *Application) createReward(orgID string, item model.Reward) (*model.Re
 			return nil, fmt.Errorf("Error Application.createReward() unable to find reward type '%s'", item.RewardType)
 		}
 
-		//item.Amount = rewardType.Amount
+		if item.Amount <= 0 {
+			log.Printf("Error Application.createReward() amount is zero or a negative value")
+			return nil, fmt.Errorf("Error Application.createReward() amount is zero or a negative value")
+		}
 
-		return app.storage.CreateReward(orgID, item)
+		//TBD: Check for available quantity!!!
+		quantity, err := app.storage.GetRewardQuantity(orgID, item.RewardType)
+		if err != nil {
+			log.Printf("Error Application.createReward(): %s", err)
+			return nil, fmt.Errorf("Error Application.createReward(): %s", err)
+		}
+
+		if quantity.RewardableQuantity >= item.Amount {
+			return app.storage.CreateUserReward(orgID, item)
+		}
+		return nil, fmt.Errorf("error Application.createReward(): not enough available quantity")
 	}
 	return nil, fmt.Errorf("Error Application.createReward(): missing data. data dump: %+v", item)
 }
@@ -107,7 +120,7 @@ func (app *Application) getWalletBalance(orgID string, userID string, code strin
 }
 
 func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
-	history, err := app.storage.GetRewardHistoryEntries(orgID, userID)
+	history, err := app.storage.GetUserRewards(orgID, userID)
 	if err != nil {
 		return nil, err
 	}

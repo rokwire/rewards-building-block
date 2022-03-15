@@ -9,9 +9,23 @@ type RewardType struct {
 	RewardType  string    `json:"reward_type" bson:"reward_type"`   // tshirt
 	DisplayName string    `json:"display_name" bson:"display_name"` //
 	Active      bool      `json:"active" bson:"active"`
+	Description string    `json:"description" bson:"description"`
 	DateCreated time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
 } // @name RewardType
+
+// RewardOperation wraps reward operation (defines amount of reward, BB and the type)
+type RewardOperation struct {
+	ID            string    `json:"id" bson:"_id"`
+	OrgID         string    `json:"org_id" bson:"org_id"`
+	RewardType    string    `json:"reward_type" bson:"reward_type"` // tshirt
+	Code          string    `json:"code" bson:"code"`               //
+	BuildingBlock string    `json:"building_block" bson:"building_block"`
+	Amount        int64     `json:"amount" bson:"amount"`
+	Description   string    `json:"description" bson:"description"`
+	DateCreated   time.Time `json:"date_created" bson:"date_created"`
+	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
+} // @name RewardOperation
 
 // RewardInventory defines physical amount (availability) of a single award type
 type RewardInventory struct {
@@ -37,3 +51,10 @@ type Reward struct {
 	DateCreated time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
 } // @name Reward
+
+// RewardQuantity wraps current reward inventory state
+type RewardQuantity struct {
+	RewardType         string `json:"reward_type" bson:"reward_type"`
+	RewardableQuantity int64  `json:"rewardable_quantity" bson:"rewardable_quantity"`
+	ClaimableQuantity  int64  `json:"claimable_quantity" bson:"claimable_quantity"`
+}
