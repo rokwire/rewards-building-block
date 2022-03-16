@@ -203,10 +203,10 @@ func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.Rewar
 }
 
 // GetRewardOperationByCode Gets a reward type by code
-func (sa *Adapter) GetRewardOperationByCode(orgID string, rewardCode string) (*model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
-		primitive.E{Key: "code", Value: rewardCode},
+		primitive.E{Key: "code", Value: code},
 	}
 	var result []model.RewardOperation
 	err := sa.db.rewardOperations.Find(filter, &result, nil)

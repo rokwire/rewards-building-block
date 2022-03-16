@@ -28,6 +28,125 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/reward_operations": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves  all reward operations",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardOperations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RewardOperation"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Create a new operation",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminCreateRewardOperation",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardOperation"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/reward_operations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves a reward operation by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardOperation",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardOperation"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Updates a reward operation with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminUpdateRewardOperation",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardOperation"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Deletes a reward operation with the specified id",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminDeleteRewardOperation",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/admin/reward_pool": {
             "post": {
                 "security": [
@@ -35,19 +154,19 @@ var doc = `{
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Create a new reward pool",
+                "description": "Create a new reward inventory",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "AdminCreateRewardPool",
+                "operationId": "AdminCreateRewardInventory",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RewardPool"
+                            "$ref": "#/definitions/RewardInventory"
                         }
                     }
                 }
@@ -60,7 +179,7 @@ var doc = `{
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Updates a reward pool with the specified id",
+                "description": "Updates a reward inventory with the specified id",
                 "consumes": [
                     "application/json"
                 ],
@@ -70,12 +189,12 @@ var doc = `{
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "AdminUpdateRewardPool",
+                "operationId": "AdminUpdateRewardInventory",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RewardPool"
+                            "$ref": "#/definitions/RewardInventory"
                         }
                     }
                 }
@@ -86,11 +205,11 @@ var doc = `{
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Deletes a reward pool with the specified id",
+                "description": "Deletes a reward inventory with the specified id",
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "AdminDeleteRewardPool",
+                "operationId": "AdminDeleteRewardInventory",
                 "responses": {
                     "200": {
                         "description": ""
@@ -109,7 +228,7 @@ var doc = `{
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "AdminGetRewardPools",
+                "operationId": "AdminGetRewardInventories",
                 "parameters": [
                     {
                         "type": "string",
@@ -124,7 +243,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/RewardPool"
+                                "$ref": "#/definitions/RewardInventory"
                             }
                         }
                     }
@@ -138,7 +257,7 @@ var doc = `{
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Retrieves a reward pool by id",
+                "description": "Retrieves a reward inventory by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -148,12 +267,12 @@ var doc = `{
                 "tags": [
                     "Admin"
                 ],
-                "operationId": "AdminRewardPool",
+                "operationId": "AdminGetRewardInventory",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RewardPool"
+                            "$ref": "#/definitions/RewardInventory"
                         }
                     }
                 }
@@ -297,7 +416,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RewardHistoryEntry"
+                            "$ref": "#/definitions/Reward"
                         }
                     }
                 }
@@ -360,11 +479,106 @@ var doc = `{
         }
     },
     "definitions": {
-        "RewardHistoryEntry": {
+        "Reward": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "integer"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "reward_type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "RewardInventory": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "depleted": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "in_stock": {
+                    "type": "boolean"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "reward_type": {
+                    "description": "t-shirt",
+                    "type": "string"
+                }
+            }
+        },
+        "RewardOperation": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "building_block": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "reward_type": {
+                    "description": "tshirt",
+                    "type": "string"
+                }
+            }
+        },
+        "RewardType": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
                 },
                 "date_created": {
                     "type": "string"
@@ -381,80 +595,14 @@ var doc = `{
                 "id": {
                     "type": "string"
                 },
-                "reward_type": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "RewardPool": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "amount": {
-                    "type": "integer"
-                },
-                "data": {
-                    "$ref": "#/definitions/model.JSONData"
-                },
-                "date_created": {
-                    "type": "string"
-                },
-                "date_updated": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "reward_code": {
-                    "description": "illini_cash",
-                    "type": "string"
-                }
-            }
-        },
-        "RewardType": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "amount": {
-                    "description": "5",
-                    "type": "integer"
-                },
-                "building_block": {
-                    "description": "\"content\"",
-                    "type": "string"
-                },
-                "date_created": {
-                    "type": "string"
-                },
-                "date_updated": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "description": "Win five point by five readings",
-                    "type": "string"
-                },
-                "id": {
+                "org_id": {
                     "type": "string"
                 },
                 "reward_type": {
-                    "description": "illini_cash",
+                    "description": "tshirt",
                     "type": "string"
                 }
             }
-        },
-        "model.JSONData": {
-            "type": "object",
-            "additionalProperties": true
         }
     },
     "securityDefinitions": {

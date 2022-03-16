@@ -56,6 +56,30 @@ func (app *Application) deleteRewardTypes(orgID string, id string) error {
 	return app.storage.DeleteRewardType(orgID, id)
 }
 
+func (app *Application) getRewardOperations(orgID string) ([]model.RewardOperation, error) {
+	return app.storage.GetRewardOperations(orgID)
+}
+
+func (app *Application) getRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
+	return app.storage.GetRewardOperationByID(orgID, id)
+}
+
+func (app *Application) getRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
+	return app.storage.GetRewardOperationByCode(orgID, code)
+}
+
+func (app *Application) createRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return app.storage.CreateRewardOperation(orgID, item)
+}
+
+func (app *Application) updateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return app.storage.UpdateRewardOperation(orgID, id, item)
+}
+
+func (app *Application) deleteRewardOperation(orgID string, id string) error {
+	return app.storage.DeleteRewardOperation(orgID, id)
+}
+
 func (app *Application) createReward(orgID string, item model.Reward) (*model.Reward, error) {
 	if item.RewardType != "" && item.UserID != "" {
 		rewardType, err := app.storage.GetRewardTypeByType(orgID, item.RewardType)

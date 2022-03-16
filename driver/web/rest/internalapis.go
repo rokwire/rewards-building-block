@@ -16,11 +16,12 @@ type InternalApisHandler struct {
 
 // createRewardHistoryEntryBody wrapper
 type createRewardHistoryEntryBody struct {
-	OrgID       string `json:"org_id"`
-	UserID      string `json:"user_id"`
-	RewardType  string `json:"reward_type"`
-	Amount      int64  `json:"amount"`
-	Description string `json:"description"`
+	OrgID         string `json:"org_id"`
+	UserID        string `json:"user_id"`
+	RewardType    string `json:"reward_type"`
+	RewardCode    string `json:"reward_code"`
+	BuildingBlock string `json:"building_block"`
+	Description   string `json:"description"`
 } //@name createRewardHistoryEntryBody
 
 // CreateReward Create a new reward history entry from another BB
@@ -48,26 +49,39 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateReward(item.OrgID, model.Reward{
-		UserID:      item.UserID,
-		RewardType:  item.RewardType,
-		Description: item.Description,
-		Amount:      item.Amount,
-	})
+	operation, err := h.app.Services.GetRewardOperationByCode(item.OrgID, item.RewardCode)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateUserReward: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error on adminapis.GetRewardOperationByCode: Reward operation not found. Error: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	jsonData, err := json.Marshal(createdItem)
-	if err != nil {
-		log.Printf("Error on adminapis.CreateUserReward: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if operation != nil && item.BuildingBlock == operation.BuildingBlock && item.RewardType == operation.RewardType && operation.Amount > 0 {
+		createdItem, err := h.app.Services.CreateReward(item.OrgID, model.Reward{
+			UserID:      item.UserID,
+			RewardType:  item.RewardType,
+			Description: item.Description,
+			Amount:      operation.Amount,
+		})
+		if err != nil {
+			log.Printf("Error on adminapis.CreateUserReward: %s", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		jsonData, err := json.Marshal(createdItem)
+		if err != nil {
+			log.Printf("Error on adminapis.CreateUserReward: %s", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonData)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonData)
+	log.Printf("Error on adminapis.CreateUserReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero")
+	http.Error(w, "Error on adminapis.CreateUserReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero", http.StatusInternalServerError)
 }

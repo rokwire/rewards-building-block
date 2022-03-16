@@ -193,6 +193,182 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetRewardOperations Retrieves  all reward operations
+// @Description Retrieves  all reward operations
+// @Tags Admin
+// @ID AdminGetRewardOperations
+// @Success 200 {array} model.RewardOperation
+// @Security AdminUserAuth
+// @Router /admin/reward_operations [get]
+func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	resData, err := h.app.Services.GetRewardOperations(claims.OrgID)
+	if err != nil {
+		log.Printf("Error on adminapis.GetRewardOperations(): %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		resData = []model.RewardOperation{}
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.GetRewardOperations(): %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// GetRewardOperation Retrieves a reward operation by id
+// @Description Retrieves a reward operation by id
+// @Tags Admin
+// @ID AdminGetRewardOperation
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.RewardOperation
+// @Security AdminUserAuth
+// @Router /admin/reward_operations/{id} [get]
+func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resData, err := h.app.Services.GetRewardOperationByID(claims.OrgID, id)
+	if err != nil {
+		log.Printf("Error on adminapis.GetRewardOperation(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.GetRewardOperation(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// UpdateRewardOperation Updates a reward operation with the specified id
+// @Description Updates a reward operation with the specified id
+// @Tags Admin
+// @ID AdminUpdateRewardOperation
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.RewardOperation
+// @Security AdminUserAuth
+// @Router /admin/reward_operations/{id} [put]
+func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.RewardOperation
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.UpdateRewardOperation(claims.OrgID, id, item)
+	if err != nil {
+		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// CreateRewardOperation Create a new operation
+// @Description Create a new operation
+// @Tags Admin
+// @ID AdminCreateRewardOperation
+// @Accept json
+// @Success 200 {object} model.RewardOperation
+// @Security AdminUserAuth
+// @Router /admin/reward_operations [post]
+func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.RewardOperation
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	createdItem, err := h.app.Services.CreateRewardOperation(claims.OrgID, item)
+	if err != nil {
+		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(createdItem)
+	if err != nil {
+		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// DeleteRewardOperation Deletes a reward operation with the specified id
+// @Description Deletes a reward operation with the specified id
+// @Tags Admin
+// @ID AdminDeleteRewardOperation
+// @Success 200
+// @Security AdminUserAuth
+// @Router /admin/reward_operations/{id} [delete]
+func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := h.app.Services.DeleteRewardOperation(claims.OrgID, id)
+	if err != nil {
+		log.Printf("Error on adminapis.DeleteRewardOperation(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
 // GetRewardInventories Retrieves  all reward inventories
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"

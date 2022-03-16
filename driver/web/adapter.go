@@ -98,6 +98,12 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
 	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
 
+	adminSubRouter.HandleFunc("/reward_operations", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperations)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_operations", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardOperation)).Methods("POST")
+	adminSubRouter.HandleFunc("/reward_operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperation)).Methods("GET")
+	adminSubRouter.HandleFunc("/reward_operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardOperation)).Methods("PUT")
+	adminSubRouter.HandleFunc("/reward_operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardOperation)).Methods("DELETE")
+
 	adminSubRouter.HandleFunc("/reward_inventories", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventories)).Methods("GET")
 	adminSubRouter.HandleFunc("/reward_inventories", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardInventory)).Methods("POST")
 	adminSubRouter.HandleFunc("/reward_inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventory)).Methods("GET")
