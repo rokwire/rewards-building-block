@@ -81,7 +81,7 @@ func (m *database) start() error {
 	go rewardTypes.Watch(nil)
 
 	rewardOperations := &collectionWrapper{database: m, coll: db.Collection("reward_operations")}
-	err = m.applyRewardOperationsChecks(rewardTypes)
+	err = m.applyRewardOperationsChecks(rewardOperations)
 	if err != nil {
 		return err
 	}

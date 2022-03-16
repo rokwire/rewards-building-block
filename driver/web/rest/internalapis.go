@@ -19,7 +19,7 @@ type createRewardHistoryEntryBody struct {
 	OrgID         string `json:"org_id"`
 	UserID        string `json:"user_id"`
 	RewardType    string `json:"reward_type"`
-	RewardCode    string `json:"reward_code"`
+	RewardCode    string `json:"code"`
 	BuildingBlock string `json:"building_block"`
 	Description   string `json:"description"`
 } //@name createRewardHistoryEntryBody

@@ -214,8 +214,8 @@ func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.R
 		return nil, err
 	}
 	if result == nil || len(result) == 0 {
-		log.Printf("storage.GetRewardOperationByCode error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardOperationByCode error: %s", err)
+		log.Printf("storage.GetRewardOperationByCode error: unable to find reward operation with code: %s", code)
+		return nil, fmt.Errorf("storage.GetRewardOperationByCode error: unable to find reward operation with code: %s", code)
 	}
 	return &result[0], nil
 }
