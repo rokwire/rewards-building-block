@@ -162,6 +162,12 @@ type Storage interface {
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
+	GetRewardClaims(orgID string) ([]model.RewardClaim, error)
+	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
+	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
+	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
+	DeleteRewardClaim(orgID string, id string) error
+
 	GetUserRewards(orgID string, userID string) ([]model.Reward, error)
 	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)
 	CreateUserReward(orgID string, item model.Reward) (*model.Reward, error)

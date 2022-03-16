@@ -520,6 +520,100 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 	}, nil
 }
 
+// GetRewardClaims Gets all reward claims
+func (sa *Adapter) GetRewardClaims(orgID string) ([]model.RewardClaim, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+	}
+	var result []model.RewardClaim
+	err := sa.db.rewardClaims.Find(filter, &result, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardClaims error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardClaims error: %s", err)
+	}
+	if result == nil {
+		result = []model.RewardClaim{}
+	}
+	return result, nil
+}
+
+// GetRewardClaim Gets a reward claim by id
+func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
+	}
+	var result []model.RewardClaim
+	err := sa.db.rewardClaims.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || len(result) == 0 {
+		log.Printf("storage.GetRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardClaim error: %s", err)
+	}
+	return &result[0], nil
+}
+
+// CreateRewardClaim creates a new reward claim
+func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+	now := time.Now().UTC()
+	item.ID = uuid.NewString()
+	item.OrgID = orgID
+	item.DateCreated = now
+	item.DateUpdated = now
+	_, err := sa.db.rewardClaims.InsertOne(&item)
+	if err != nil {
+		log.Printf("storage.CreateRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardClaim error: %s", err)
+	}
+	return &item, nil
+}
+
+// UpdateRewardClaim updates a reward claim
+func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	jsonID := item.ID
+	if jsonID != id {
+		return nil, fmt.Errorf("storage.UpdateRewardClaim attempt to override another object")
+	}
+
+	now := time.Now().UTC()
+	filter := bson.D{
+		primitive.E{Key: "_id", Value: id},
+		primitive.E{Key: "org_id", Value: orgID},
+	}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "items", Value: item.Items},
+			primitive.E{Key: "description", Value: item.Description},
+			primitive.E{Key: "status", Value: item.Status},
+			primitive.E{Key: "date_updated", Value: now},
+		},
+		},
+	}
+	_, err := sa.db.rewardClaims.UpdateOne(filter, update, nil)
+	if err != nil {
+		log.Printf("storage.UpdateRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.UpdateRewardClaim error: %s", err)
+	}
+
+	item.DateUpdated = now
+
+	return &item, nil
+}
+
+// DeleteRewardClaim deletes a reward claim
+func (sa *Adapter) DeleteRewardClaim(orgID string, id string) error {
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	_, err := sa.db.rewardClaims.DeleteOne(filter, nil)
+	if err != nil {
+		log.Printf("storage.DeleteRewardClaim error: %s", err)
+		return fmt.Errorf("storage.DeleteRewardClaim error: %s", err)
+	}
+
+	return nil
+}
+
 // SetListener sets the upper layer storage listener for sending collection changed callbacks
 func (sa *Adapter) SetListener(listener Listener) {
 	sa.db.listener = listener

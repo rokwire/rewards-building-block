@@ -58,3 +58,21 @@ type RewardQuantity struct {
 	RewardableQuantity int64  `json:"rewardable_quantity" bson:"rewardable_quantity"`
 	ClaimableQuantity  int64  `json:"claimable_quantity" bson:"claimable_quantity"`
 }
+
+// RewardClaim wraps a claim that is made by a user
+type RewardClaim struct {
+	ID          string            `json:"id" bson:"_id"`
+	OrgID       string            `json:"org_id" bson:"org_id"`
+	UserID      string            `json:"user_id" bson:"user_id"`
+	Items       []RewardClaimItem `json:"items" bson:"items"`
+	Status      string            `json:"status" bson:"status"`
+	Description string            `json:"description" bson:"description"`
+	DateCreated time.Time         `json:"date_created" bson:"date_created"`
+	DateUpdated time.Time         `json:"date_updated" bson:"date_updated"`
+} // @name RewardClaim
+
+// RewardClaimItem wraps a claim  entry that consists reward type and amount
+type RewardClaimItem struct {
+	RewardType string `json:"reward_type" bson:"reward_type"`
+	Amount     int64  `json:"amount" bson:"amount"`
+} // @name RewardClaimItem

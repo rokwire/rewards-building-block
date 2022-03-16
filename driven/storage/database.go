@@ -47,6 +47,7 @@ type database struct {
 	rewardOperations  *collectionWrapper
 	rewardInventories *collectionWrapper
 	rewardHistory     *collectionWrapper
+	rewardClaims      *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -98,6 +99,12 @@ func (m *database) start() error {
 		return err
 	}
 
+	rewardClaims := &collectionWrapper{database: m, coll: db.Collection("reward_claims")}
+	err = m.applyRewardClaimsChecks(rewardClaims)
+	if err != nil {
+		return err
+	}
+
 	//asign the db, db client and the collections
 	m.db = db
 	m.dbClient = client
@@ -120,6 +127,16 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		for _, index := range indexes {
 			name := index["name"].(string)
 			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -157,6 +174,16 @@ func (m *database) applyRewardOperationsChecks(posts *collectionWrapper) error {
 		for _, index := range indexes {
 			name := index["name"].(string)
 			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -263,20 +290,20 @@ func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
 		}
 	}
 
-	if indexMapping["user_id_1"] == nil {
+	if indexMapping["org_id_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
-				primitive.E{Key: "user_id", Value: 1},
+				primitive.E{Key: "org_id", Value: 1},
 			}, false)
 		if err != nil {
 			return err
 		}
 	}
 
-	if indexMapping["pool_id_1"] == nil {
+	if indexMapping["user_id_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
-				primitive.E{Key: "pool_id", Value: 1},
+				primitive.E{Key: "user_id", Value: 1},
 			}, false)
 		if err != nil {
 			return err
@@ -294,5 +321,52 @@ func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
 	}
 
 	log.Println("reward_history checks passed")
+	return nil
+}
+
+func (m *database) applyRewardClaimsChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_claims checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["user_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "user_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_claims checks passed")
 	return nil
 }
