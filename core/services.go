@@ -184,6 +184,10 @@ func (app *Application) getWalletHistoryEntries(orgID string, userID string) ([]
 	return history, nil
 }
 
+func (app *Application) getRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
+	return app.storage.GetRewardQuantity(orgID, rewardType)
+}
+
 // OnRewardTypesChanged callback that indicates the reward types collection is changed
 func (app *Application) OnRewardTypesChanged() {
 	app.cacheAdapter.SetRewardTypes(nil) // invalidate

@@ -83,6 +83,7 @@ func (we Adapter) Start() {
 
 	// Internal APIs called from other BBs
 	apiRouter.HandleFunc("/int/reward", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateReward)).Methods("POST")
+	apiRouter.HandleFunc("/int/stats", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.GetRewardStats)).Methods("GET")
 
 	// Client APIs
 	apiRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")

@@ -36,7 +36,7 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateUserReward: %s", err)
+		log.Printf("Error on internalapis.CreateReward: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -44,14 +44,14 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 	var item createRewardHistoryEntryBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateUserReward: %s", err)
+		log.Printf("Error on internalapis.CreateReward: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	operation, err := h.app.Services.GetRewardOperationByCode(item.OrgID, item.RewardCode)
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardOperationByCode: Reward operation not found. Error: %s", err)
+		log.Printf("Error on internalapis.CreateReward: Reward operation not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -64,14 +64,14 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 			Amount:      operation.Amount,
 		})
 		if err != nil {
-			log.Printf("Error on adminapis.CreateUserReward: %s", err)
+			log.Printf("Error on internalapis.CreateReward: %s", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		jsonData, err := json.Marshal(createdItem)
 		if err != nil {
-			log.Printf("Error on adminapis.CreateUserReward: %s", err)
+			log.Printf("Error on internalapis.CreateReward: %s", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -82,6 +82,71 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	log.Printf("Error on adminapis.CreateUserReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero")
-	http.Error(w, "Error on adminapis.CreateUserReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero", http.StatusInternalServerError)
+	log.Printf("Error on internalapis.CreateReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero")
+	http.Error(w, "Error on internalapis.CreateReward: Unable to find reward operation for the described code, type and building block or the amount of the operation is zero", http.StatusInternalServerError)
+}
+
+// getRewardStatsBody wrapper
+type getRewardStatsBody struct {
+	OrgID string `json:"org_id"`
+} //@name getRewardStatsBody
+
+// GetRewardStats Gets reward quantity stats for the current moment
+// @Description Gets reward quantity stats for the current moment
+// @Tags Internal
+// @ID InternalGetRewardStats
+// @Accept json
+// @Success 200 {array} model.RewardQuantity
+// @Security InternalApiAuth
+// @Router /int/reward_history [post]
+func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Request) {
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on internalapis.GetRewardStats: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var item getRewardStatsBody
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on internalapis.GetRewardStats: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	types, err := h.app.Services.GetRewardTypes(item.OrgID)
+	if err != nil {
+		log.Printf("Error on internalapis.GetRewardStats: Reward types not found. Error: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result := []model.RewardQuantity{}
+	if len(types) > 0 {
+		for _, rewardType := range types {
+			quantity, err := h.app.Services.GetRewardQuantity(item.OrgID, rewardType.RewardType)
+			if err != nil {
+				log.Printf("Error on internalapis.GetRewardStats: %s", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			if quantity != nil {
+				result = append(result, *quantity)
+			}
+		}
+	}
+
+	jsonData, err := json.Marshal(result)
+	if err != nil {
+		log.Printf("Error on internalapis.GetRewardStats: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+	return
 }

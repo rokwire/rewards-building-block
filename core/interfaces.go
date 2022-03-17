@@ -56,6 +56,8 @@ type Services interface {
 	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
 	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
 	GetWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error)
+
+	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error)
 }
 
 type servicesImpl struct {
@@ -164,6 +166,10 @@ func (s *servicesImpl) GetWalletBalance(orgID string, userID string, code string
 
 func (s *servicesImpl) GetWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
 	return s.app.getWalletHistoryEntries(orgID, userID)
+}
+
+func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
+	return s.app.getRewardQuantity(orgID, rewardType)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc

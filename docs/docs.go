@@ -527,19 +527,22 @@ var doc = `{
                         "InternalApiAuth": []
                     }
                 ],
-                "description": "Create a new reward history entry from another BB",
+                "description": "Gets reward quantity stats for the current moment",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Internal"
                 ],
-                "operationId": "InternalCreateReward",
+                "operationId": "InternalGetRewardStats",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Reward"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.RewardQuantity"
+                            }
                         }
                     }
                 }
@@ -767,6 +770,20 @@ var doc = `{
                 "reward_type": {
                     "description": "tshirt",
                     "type": "string"
+                }
+            }
+        },
+        "model.RewardQuantity": {
+            "type": "object",
+            "properties": {
+                "claimable_quantity": {
+                    "type": "integer"
+                },
+                "reward_type": {
+                    "type": "string"
+                },
+                "rewardable_quantity": {
+                    "type": "integer"
                 }
             }
         }

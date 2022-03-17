@@ -113,6 +113,7 @@ func (m *database) start() error {
 	m.rewardInventories = rewardInventories
 	m.rewardHistory = rewardHistory
 	m.rewardOperations = rewardOperations
+	m.rewardClaims = rewardClaims
 
 	return nil
 }

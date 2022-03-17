@@ -111,6 +111,15 @@ definitions:
         description: tshirt
         type: string
     type: object
+  model.RewardQuantity:
+    properties:
+      claimable_quantity:
+        type: integer
+      reward_type:
+        type: string
+      rewardable_quantity:
+        type: integer
+    type: object
 host: localhost
 info:
   contact: {}
@@ -423,13 +432,15 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new reward history entry from another BB
-      operationId: InternalCreateReward
+      description: Gets reward quantity stats for the current moment
+      operationId: InternalGetRewardStats
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Reward'
+            items:
+              $ref: '#/definitions/model.RewardQuantity'
+            type: array
       security:
       - InternalApiAuth: []
       tags:

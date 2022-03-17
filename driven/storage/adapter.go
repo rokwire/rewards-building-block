@@ -500,6 +500,24 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
 	}
 
+	var inventoryInStockAmount int64
+	var inventoryInStockResult []struct {
+		Amount int64 `bson:"amount"`
+	}
+	err = sa.db.rewardInventories.Aggregate(pipeline, &inventoryInStockResult, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardQuantity error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+	}
+	if len(inventoryInStockResult) > 0 {
+		inventoryInStockAmount = inventoryInStockResult[0].Amount
+	}
+
+	pipeline = []bson.M{
+		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
+		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+	}
+
 	var rewardsAmount int64
 	var rewardsResult []struct {
 		Amount int64 `bson:"amount"`
@@ -513,10 +531,31 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 		rewardsAmount = rewardsResult[0].Amount
 	}
 
+	pipeline = []bson.M{
+		{"$unwind": bson.M{"path": "$items"}},
+		{"$match": bson.M{"org_id": orgID, "items.reward_type": rewardType}},
+		{"$group": bson.M{"_id": rewardType, "amount": bson.M{"$sum": "$items.amount"}}},
+	}
+
+	var claimsAmount int64
+	var claimsResult []struct {
+		Amount int64 `bson:"amount"`
+	}
+	err = sa.db.rewardClaims.Aggregate(pipeline, &claimsResult, nil)
+	if err != nil {
+		log.Printf("storage.GetRewardQuantity error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+	}
+	if len(claimsResult) > 0 {
+		claimsAmount = claimsResult[0].Amount
+	}
+
+	rewardableQuantity := inventoryAmount - rewardsAmount
+	claimableQuantity := inventoryInStockAmount - claimsAmount
 	return &model.RewardQuantity{
 		RewardType:         rewardType,
-		RewardableQuantity: inventoryAmount - rewardsAmount,
-		ClaimableQuantity:  0,
+		RewardableQuantity: rewardableQuantity,
+		ClaimableQuantity:  claimableQuantity,
 	}, nil
 }
 
