@@ -28,14 +28,268 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/reward_operations": {
+        "/admin/claims": {
             "get": {
                 "security": [
                     {
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Retrieves  all reward operations",
+                "description": "Retrieves  all reward claims",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardClaims",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Coma separated IDs of the desired records",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RewardClaim"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Create a new claim inventory",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminCreateRewardClaim",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/claims/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves a claim inventory by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardClaim",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardClaim"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Updates a reward claim with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminUpdateRewardClaim",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardClaim"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Deletes a reward claim with the specified id",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminDeleteRewardClaim",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/admin/inventories": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves  all reward types",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardInventories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Coma separated IDs of the desired records",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RewardInventory"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Create a new reward inventory",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminCreateRewardInventory",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/inventories/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves a reward inventory by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminGetRewardInventory",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Updates a reward inventory with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminUpdateRewardInventory",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Deletes a reward inventory with the specified id",
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "AdminDeleteRewardInventory",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/admin/operations": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Retrieves  all reward types",
                 "tags": [
                     "Admin"
                 ],
@@ -58,7 +312,7 @@ var doc = `{
                         "AdminUserAuth": []
                     }
                 ],
-                "description": "Create a new operation",
+                "description": "Create a new operation type",
                 "consumes": [
                     "application/json"
                 ],
@@ -76,7 +330,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/reward_operations/{id}": {
+        "/admin/operations/{id}": {
             "get": {
                 "security": [
                     {
@@ -147,138 +401,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/reward_pool": {
-            "post": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Create a new reward inventory",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminCreateRewardInventory",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/RewardInventory"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/reward_pool/{id}": {
-            "put": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Updates a reward inventory with the specified id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminUpdateRewardInventory",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/RewardInventory"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Deletes a reward inventory with the specified id",
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminDeleteRewardInventory",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/admin/reward_pools": {
-            "get": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Retrieves  all reward types",
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminGetRewardInventories",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Coma separated IDs of the desired records",
-                        "name": "ids",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/RewardInventory"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/reward_pools/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Retrieves a reward inventory by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminGetRewardInventory",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/RewardInventory"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/reward_types": {
+        "/admin/types": {
             "get": {
                 "security": [
                     {
@@ -326,7 +449,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/reward_types/{id}": {
+        "/admin/types/{id}": {
             "get": {
                 "security": [
                     {
@@ -504,6 +627,49 @@ var doc = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "RewardClaim": {
+            "type": "object",
+            "properties": {
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RewardClaimItem"
+                    }
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "RewardClaimItem": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "reward_type": {
                     "type": "string"
                 }
             }

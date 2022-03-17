@@ -45,6 +45,12 @@ type Services interface {
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
+	GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error)
+	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
+	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
+	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
+	DeleteRewardClaim(orgID string, id string) error
+
 	CreateReward(orgID string, item model.Reward) (*model.Reward, error)
 
 	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
@@ -128,6 +134,26 @@ func (s *servicesImpl) CreateReward(orgID string, item model.Reward) (*model.Rew
 	return s.app.createReward(orgID, item)
 }
 
+func (s *servicesImpl) GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error) {
+	return s.app.getRewardClaims(orgID, ids)
+}
+
+func (s *servicesImpl) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
+	return s.app.getRewardClaim(orgID, id)
+}
+
+func (s *servicesImpl) CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return s.app.createRewardClaim(orgID, item)
+}
+
+func (s *servicesImpl) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return s.app.updateRewardClaim(orgID, id, item)
+}
+
+func (s *servicesImpl) DeleteRewardClaim(orgID string, id string) error {
+	return s.app.deleteRewardClaim(orgID, id)
+}
+
 func (s *servicesImpl) GetUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
 	return s.app.getUserBalance(orgID, userID)
 }
@@ -162,7 +188,7 @@ type Storage interface {
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
-	GetRewardClaims(orgID string) ([]model.RewardClaim, error)
+	GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)

@@ -521,15 +521,15 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 }
 
 // GetRewardClaims Gets all reward claims
-func (sa *Adapter) GetRewardClaims(orgID string) ([]model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}
 	var result []model.RewardClaim
 	err := sa.db.rewardClaims.Find(filter, &result, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardClaims error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardClaims error: %s", err)
+		log.Printf("storage.getRewardClaims error: %s", err)
+		return nil, fmt.Errorf("storage.getRewardClaims error: %s", err)
 	}
 	if result == nil {
 		result = []model.RewardClaim{}
@@ -549,8 +549,8 @@ func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, 
 		return nil, err
 	}
 	if result == nil || len(result) == 0 {
-		log.Printf("storage.GetRewardClaim error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardClaim error: %s", err)
+		log.Printf("storage.getRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.getRewardClaim error: %s", err)
 	}
 	return &result[0], nil
 }
@@ -564,8 +564,8 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 	item.DateUpdated = now
 	_, err := sa.db.rewardClaims.InsertOne(&item)
 	if err != nil {
-		log.Printf("storage.CreateRewardClaim error: %s", err)
-		return nil, fmt.Errorf("storage.CreateRewardClaim error: %s", err)
+		log.Printf("storage.createRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.createRewardClaim error: %s", err)
 	}
 	return &item, nil
 }
@@ -574,7 +574,7 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	jsonID := item.ID
 	if jsonID != id {
-		return nil, fmt.Errorf("storage.UpdateRewardClaim attempt to override another object")
+		return nil, fmt.Errorf("storage.updateRewardClaim attempt to override another object")
 	}
 
 	now := time.Now().UTC()
@@ -593,8 +593,8 @@ func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardC
 	}
 	_, err := sa.db.rewardClaims.UpdateOne(filter, update, nil)
 	if err != nil {
-		log.Printf("storage.UpdateRewardClaim error: %s", err)
-		return nil, fmt.Errorf("storage.UpdateRewardClaim error: %s", err)
+		log.Printf("storage.updateRewardClaim error: %s", err)
+		return nil, fmt.Errorf("storage.updateRewardClaim error: %s", err)
 	}
 
 	item.DateUpdated = now
@@ -607,8 +607,8 @@ func (sa *Adapter) DeleteRewardClaim(orgID string, id string) error {
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	_, err := sa.db.rewardClaims.DeleteOne(filter, nil)
 	if err != nil {
-		log.Printf("storage.DeleteRewardClaim error: %s", err)
-		return fmt.Errorf("storage.DeleteRewardClaim error: %s", err)
+		log.Printf("storage.deleteRewardClaim error: %s", err)
+		return fmt.Errorf("storage.deleteRewardClaim error: %s", err)
 	}
 
 	return nil

@@ -19,6 +19,34 @@ definitions:
       user_id:
         type: string
     type: object
+  RewardClaim:
+    properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/RewardClaimItem'
+        type: array
+      org_id:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  RewardClaimItem:
+    properties:
+      amount:
+        type: integer
+      reward_type:
+        type: string
+    type: object
   RewardInventory:
     properties:
       amount:
@@ -93,9 +121,163 @@ info:
   title: Rewards Building Block API
   version: 0.0.3
 paths:
-  /admin/reward_operations:
+  /admin/claims:
     get:
-      description: Retrieves  all reward operations
+      description: Retrieves  all reward claims
+      operationId: AdminGetRewardClaims
+      parameters:
+      - description: Coma separated IDs of the desired records
+        in: query
+        name: ids
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardClaim'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new claim inventory
+      operationId: AdminCreateRewardClaim
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/claims/{id}:
+    delete:
+      description: Deletes a reward claim with the specified id
+      operationId: AdminDeleteRewardClaim
+      responses:
+        "200":
+          description: ""
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a claim inventory by id
+      operationId: AdminGetRewardClaim
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward claim with the specified id
+      operationId: AdminUpdateRewardClaim
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/inventories:
+    get:
+      description: Retrieves  all reward types
+      operationId: AdminGetRewardInventories
+      parameters:
+      - description: Coma separated IDs of the desired records
+        in: query
+        name: ids
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardInventory'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new reward inventory
+      operationId: AdminCreateRewardInventory
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/inventories/{id}:
+    delete:
+      description: Deletes a reward inventory with the specified id
+      operationId: AdminDeleteRewardInventory
+      responses:
+        "200":
+          description: ""
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a reward inventory by id
+      operationId: AdminGetRewardInventory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward inventory with the specified id
+      operationId: AdminUpdateRewardInventory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/operations:
+    get:
+      description: Retrieves  all reward types
       operationId: AdminGetRewardOperations
       responses:
         "200":
@@ -111,7 +293,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new operation
+      description: Create a new operation type
       operationId: AdminCreateRewardOperation
       responses:
         "200":
@@ -122,7 +304,7 @@ paths:
       - AdminUserAuth: []
       tags:
       - Admin
-  /admin/reward_operations/{id}:
+  /admin/operations/{id}:
     delete:
       description: Deletes a reward operation with the specified id
       operationId: AdminDeleteRewardOperation
@@ -165,86 +347,7 @@ paths:
       - AdminUserAuth: []
       tags:
       - Admin
-  /admin/reward_pool:
-    post:
-      consumes:
-      - application/json
-      description: Create a new reward inventory
-      operationId: AdminCreateRewardInventory
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/RewardInventory'
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
-  /admin/reward_pool/{id}:
-    delete:
-      description: Deletes a reward inventory with the specified id
-      operationId: AdminDeleteRewardInventory
-      responses:
-        "200":
-          description: ""
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
-    put:
-      consumes:
-      - application/json
-      description: Updates a reward inventory with the specified id
-      operationId: AdminUpdateRewardInventory
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/RewardInventory'
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
-  /admin/reward_pools:
-    get:
-      description: Retrieves  all reward types
-      operationId: AdminGetRewardInventories
-      parameters:
-      - description: Coma separated IDs of the desired records
-        in: query
-        name: ids
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/RewardInventory'
-            type: array
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
-  /admin/reward_pools/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves a reward inventory by id
-      operationId: AdminGetRewardInventory
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/RewardInventory'
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
-  /admin/reward_types:
+  /admin/types:
     get:
       description: Retrieves  all reward types
       operationId: AdminGetRewardTypes
@@ -273,7 +376,7 @@ paths:
       - AdminUserAuth: []
       tags:
       - Admin
-  /admin/reward_types/{id}:
+  /admin/types/{id}:
     delete:
       description: Deletes a reward type with the specified id
       operationId: AdminDeleteRewardType

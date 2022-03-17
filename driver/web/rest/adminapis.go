@@ -23,7 +23,7 @@ type AdminApisHandler struct {
 // @ID AdminGetRewardTypes
 // @Success 200 {array} model.RewardType
 // @Security AdminUserAuth
-// @Router /admin/reward_types [get]
+// @Router /admin/types [get]
 func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
 	if err != nil {
@@ -56,7 +56,7 @@ func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.Respon
 // @Produce json
 // @Success 200 {object} model.RewardType
 // @Security AdminUserAuth
-// @Router /admin/reward_types/{id} [get]
+// @Router /admin/types/{id} [get]
 func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -88,7 +88,7 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 // @Produce json
 // @Success 200 {object} model.RewardType
 // @Security AdminUserAuth
-// @Router /admin/reward_types/{id} [put]
+// @Router /admin/types/{id} [put]
 func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -134,7 +134,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 // @Accept json
 // @Success 200 {object} model.RewardType
 // @Security AdminUserAuth
-// @Router /admin/reward_types [post]
+// @Router /admin/types [post]
 func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -177,7 +177,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 // @ID AdminDeleteRewardType
 // @Success 200
 // @Security AdminUserAuth
-// @Router /admin/reward_types/{id} [delete]
+// @Router /admin/types/{id} [delete]
 func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -194,27 +194,27 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 }
 
 // GetRewardOperations Retrieves  all reward operations
-// @Description Retrieves  all reward operations
+// @Description Retrieves  all reward types
 // @Tags Admin
 // @ID AdminGetRewardOperations
 // @Success 200 {array} model.RewardOperation
 // @Security AdminUserAuth
-// @Router /admin/reward_operations [get]
+// @Router /admin/operations [get]
 func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetRewardOperations(claims.OrgID)
+	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardOperations(): %s", err)
+		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	if resData == nil {
-		resData = []model.RewardOperation{}
+		resData = []model.RewardType{}
 	}
 
 	data, err := json.Marshal(resData)
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardOperations(): %s", err)
+		log.Printf("Error on marshal reward types: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -232,21 +232,21 @@ func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.R
 // @Produce json
 // @Success 200 {object} model.RewardOperation
 // @Security AdminUserAuth
-// @Router /admin/reward_operations/{id} [get]
+// @Router /admin/operations/{id} [get]
 func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardOperationByID(claims.OrgID, id)
+	resData, err := h.app.Services.GetRewardType(claims.OrgID, id)
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(resData)
 	if err != nil {
-		log.Printf("Error on adminapis.GetRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -264,29 +264,29 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 // @Produce json
 // @Success 200 {object} model.RewardOperation
 // @Security AdminUserAuth
-// @Router /admin/reward_operations/{id} [put]
+// @Router /admin/operations/{id} [put]
 func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	var item model.RewardOperation
+	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
-		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardOperation(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(claims.OrgID, id, item)
 	if err != nil {
-		log.Printf("Error on adminapis.UpdateRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -304,40 +304,40 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 }
 
 // CreateRewardOperation Create a new operation
-// @Description Create a new operation
+// @Description Create a new operation type
 // @Tags Admin
 // @ID AdminCreateRewardOperation
 // @Accept json
 // @Success 200 {object} model.RewardOperation
 // @Security AdminUserAuth
-// @Router /admin/reward_operations [post]
+// @Router /admin/operations [post]
 func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	var item model.RewardOperation
+	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardOperation(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(claims.OrgID, item)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	jsonData, err := json.Marshal(createdItem)
 	if err != nil {
-		log.Printf("Error on adminapis.CreateRewardOperation: %s", err)
+		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -353,14 +353,14 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 // @ID AdminDeleteRewardOperation
 // @Success 200
 // @Security AdminUserAuth
-// @Router /admin/reward_operations/{id} [delete]
+// @Router /admin/operations/{id} [delete]
 func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardOperation(claims.OrgID, id)
+	err := h.app.Services.DeleteRewardType(claims.OrgID, id)
 	if err != nil {
-		log.Printf("Error on adminapis.DeleteRewardOperation(%s): %s", id, err)
+		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -376,7 +376,7 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // @ID AdminGetRewardInventories
 // @Success 200 {array} model.RewardInventory
 // @Security AdminUserAuth
-// @Router /admin/reward_pools [get]
+// @Router /admin/inventories [get]
 func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	IDs := []string{}
@@ -417,7 +417,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 // @Produce json
 // @Success 200 {object} model.RewardInventory
 // @Security AdminUserAuth
-// @Router /admin/reward_pools/{id} [get]
+// @Router /admin/inventories/{id} [get]
 func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -449,7 +449,7 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 // @Produce json
 // @Success 200 {object} model.RewardInventory
 // @Security AdminUserAuth
-// @Router /admin/reward_pool/{id} [put]
+// @Router /admin/inventories/{id} [put]
 func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -495,7 +495,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 // @Accept json
 // @Success 200 {object} model.RewardInventory
 // @Security AdminUserAuth
-// @Router /admin/reward_pool [post]
+// @Router /admin/inventories [post]
 func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -538,7 +538,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 // @ID AdminDeleteRewardInventory
 // @Success 200
 // @Security AdminUserAuth
-// @Router /admin/reward_pool/{id} [delete]
+// @Router /admin/inventories/{id} [delete]
 func (h AdminApisHandler) DeleteRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -546,6 +546,191 @@ func (h AdminApisHandler) DeleteRewardInventory(claims *tokenauth.Claims, w http
 	err := h.app.Services.DeleteRewardInventory(claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardInventory(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// GetRewardClaims Retrieves  all reward claims
+// @Description Retrieves  all reward claims
+// @Param ids query string false "Coma separated IDs of the desired records"
+// @Tags Admin
+// @ID AdminGetRewardClaims
+// @Success 200 {array} model.RewardClaim
+// @Security AdminUserAuth
+// @Router /admin/claims [get]
+func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	IDs := []string{}
+	IDskeys, ok := r.URL.Query()["ids"]
+	if ok && len(IDskeys[0]) > 0 {
+		extIDs := IDskeys[0]
+		IDs = strings.Split(extIDs, ",")
+	}
+
+	resData, err := h.app.Services.GetRewardClaims(claims.OrgID, IDs)
+	if err != nil {
+		log.Printf("Error on adminapis.getRewardClaims: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		resData = []model.RewardClaim{}
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.getRewardClaims: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// GetRewardClaim Retrieves a reward claim by id
+// @Description Retrieves a claim inventory by id
+// @Tags Admin
+// @ID AdminGetRewardClaim
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.RewardClaim
+// @Security AdminUserAuth
+// @Router /admin/claims/{id} [get]
+func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resData, err := h.app.Services.GetRewardClaim(claims.OrgID, id)
+	if err != nil {
+		log.Printf("Error on adminapis.getRewardClaim(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.getRewardClaim(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// UpdateRewardClaim Updates a reward claim with the specified id
+// @Description Updates a reward claim with the specified id
+// @Tags Admin
+// @ID AdminUpdateRewardClaim
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.RewardClaim
+// @Security AdminUserAuth
+// @Router /admin/claims/{id} [put]
+func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.RewardClaim
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.UpdateRewardClaim(claims.OrgID, id, item)
+	if err != nil {
+		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// CreateRewardClaim Create a new claim inventory
+// @Description Create a new claim inventory
+// @Tags Admin
+// @ID AdminCreateRewardClaim
+// @Accept json
+// @Success 200 {object} model.RewardInventory
+// @Security AdminUserAuth
+// @Router /admin/claims [post]
+func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on adminapis.createRewardClaim: %s", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.RewardClaim
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on adminapis.createRewardClaim: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	createdItem, err := h.app.Services.CreateRewardClaim(claims.OrgID, item)
+	if err != nil {
+		log.Printf("Error on adminapis.createRewardClaim: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(createdItem)
+	if err != nil {
+		log.Printf("Error on adminapis.createRewardClaim: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// DeleteRewardClaim Deletes a reward claim with the specified id
+// @Description Deletes a reward claim with the specified id
+// @Tags Admin
+// @ID AdminDeleteRewardClaim
+// @Success 200
+// @Security AdminUserAuth
+// @Router /admin/claims/{id} [delete]
+func (h AdminApisHandler) DeleteRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := h.app.Services.DeleteRewardClaim(claims.OrgID, id)
+	if err != nil {
+		log.Printf("Error on adminapis.deleteRewardClaim(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

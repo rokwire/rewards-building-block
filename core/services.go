@@ -135,6 +135,26 @@ func (app *Application) deleteGetRewardInventory(orgID string, id string) error 
 	return app.storage.DeleteRewardInventory(orgID, id)
 }
 
+func (app *Application) getRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error) {
+	return app.storage.GetRewardClaims(orgID, ids)
+}
+
+func (app *Application) getRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
+	return app.storage.GetRewardClaim(orgID, id)
+}
+
+func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return app.storage.CreateRewardClaim(orgID, item)
+}
+
+func (app *Application) updateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return app.storage.UpdateRewardClaim(orgID, id, item)
+}
+
+func (app *Application) deleteRewardClaim(orgID string, id string) error {
+	return app.storage.DeleteRewardClaim(orgID, id)
+}
+
 func (app *Application) getUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
 	return app.storage.GetUserBalance(orgID, userID)
 }
