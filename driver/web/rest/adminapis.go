@@ -372,12 +372,22 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // GetRewardInventories Retrieves  all reward inventories
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"
+// @Param in_stock query string false "in_stock - possible values: missing, 0- false, 1- true"
+// @Param depleted query integer false "depleted - possible values: missing, 0- false, 1- true"
+// @Param limit query string false "limit - limit the result"
+// @Param offset query string false "offset"
 // @Tags Admin
 // @ID AdminGetRewardInventories
 // @Success 200 {array} model.RewardInventory
 // @Security AdminUserAuth
 // @Router /admin/inventories [get]
 func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	rewardType := getStringQueryParam(r, "reward_type")
+	inStock := getBoolQueryParam(r, "in_stock", nil)
+	depleted := getBoolQueryParam(r, "depleted", nil)
+	limitFilter := getInt64QueryParam(r, "limit")
+	offsetFilter := getInt64QueryParam(r, "offset")
 
 	IDs := []string{}
 	IDskeys, ok := r.URL.Query()["ids"]
@@ -386,7 +396,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, nil)
+	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, depleted, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventories: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -557,12 +567,22 @@ func (h AdminApisHandler) DeleteRewardInventory(claims *tokenauth.Claims, w http
 // GetRewardClaims Retrieves  all reward claims
 // @Description Retrieves  all reward claims
 // @Param ids query string false "Coma separated IDs of the desired records"
+// @Param user_id query string false "user_id"
+// @Param status query string false "status"
+// @Param limit query string false "limit - limit the result"
+// @Param offset query string false "offset"
 // @Tags Admin
 // @ID AdminGetRewardClaims
 // @Success 200 {array} model.RewardClaim
 // @Security AdminUserAuth
 // @Router /admin/claims [get]
 func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	rewardType := getStringQueryParam(r, "reward_type")
+	userID := getStringQueryParam(r, "user_id")
+	status := getStringQueryParam(r, "status")
+	limitFilter := getInt64QueryParam(r, "limit")
+	offsetFilter := getInt64QueryParam(r, "offset")
 
 	IDs := []string{}
 	IDskeys, ok := r.URL.Query()["ids"]
@@ -571,7 +591,7 @@ func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.Respo
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardClaims(claims.OrgID, IDs)
+	resData, err := h.app.Services.GetRewardClaims(claims.OrgID, IDs, userID, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.getRewardClaims: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

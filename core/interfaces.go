@@ -39,13 +39,13 @@ type Services interface {
 	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error)
+	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
-	GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error)
+	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
@@ -55,7 +55,7 @@ type Services interface {
 
 	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
 	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
-	GetWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error)
+	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 
 	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error)
 }
@@ -112,8 +112,8 @@ func (s *servicesImpl) DeleteRewardOperation(orgID string, id string) error {
 	return s.app.deleteRewardOperation(orgID, id)
 }
 
-func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error) {
-	return s.app.getRewardInventories(orgID, ids, rewardType)
+func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	return s.app.getRewardInventories(orgID, ids, rewardType, inStock, depleted, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
@@ -136,8 +136,8 @@ func (s *servicesImpl) CreateReward(orgID string, item model.Reward) (*model.Rew
 	return s.app.createReward(orgID, item)
 }
 
-func (s *servicesImpl) GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error) {
-	return s.app.getRewardClaims(orgID, ids)
+func (s *servicesImpl) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+	return s.app.getRewardClaims(orgID, ids, userID, rewardType, status, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
@@ -164,8 +164,8 @@ func (s *servicesImpl) GetWalletBalance(orgID string, userID string, code string
 	return s.app.getWalletBalance(orgID, userID, code)
 }
 
-func (s *servicesImpl) GetWalletHistoryEntries(orgID string, userID string) ([]model.Reward, error) {
-	return s.app.getWalletHistoryEntries(orgID, userID)
+func (s *servicesImpl) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
+	return s.app.getUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
@@ -188,19 +188,19 @@ type Storage interface {
 	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error)
+	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 	DeleteRewardInventory(orgID string, id string) error
 
-	GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error)
+	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 	DeleteRewardClaim(orgID string, id string) error
 
-	GetUserRewards(orgID string, userID string) ([]model.Reward, error)
+	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)
 	CreateUserReward(orgID string, item model.Reward) (*model.Reward, error)
 

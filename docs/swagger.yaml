@@ -4,6 +4,10 @@ definitions:
     properties:
       amount:
         type: integer
+      building_block:
+        type: string
+      code:
+        type: string
       date_created:
         type: string
       date_updated:
@@ -139,6 +143,22 @@ paths:
         in: query
         name: ids
         type: string
+      - description: user_id
+        in: query
+        name: user_id
+        type: string
+      - description: status
+        in: query
+        name: status
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: string
       responses:
         "200":
           description: OK
@@ -154,7 +174,7 @@ paths:
       consumes:
       - application/json
       description: Create a new claim inventory
-      operationId: AdminCreateRewardClaim
+      operationId: CreateUserRewardClaim
       responses:
         "200":
           description: OK
@@ -163,7 +183,7 @@ paths:
       security:
       - AdminUserAuth: []
       tags:
-      - Admin
+      - Client
   /admin/claims/{id}:
     delete:
       description: Deletes a reward claim with the specified id
@@ -215,6 +235,22 @@ paths:
       - description: Coma separated IDs of the desired records
         in: query
         name: ids
+        type: string
+      - description: 'in_stock - possible values: missing, 0- false, 1- true'
+        in: query
+        name: in_stock
+        type: string
+      - description: 'depleted - possible values: missing, 0- false, 1- true'
+        in: query
+        name: depleted
+        type: integer
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
         type: string
       responses:
         "200":
@@ -459,7 +495,28 @@ paths:
   /user/history:
     get:
       description: Retrieves the wallet history
-      operationId: GetUserHistory
+      operationId: GetUserRewardsHistory
+      parameters:
+      - description: reward_type - filter by reward_type
+        in: query
+        name: reward_type
+        type: string
+      - description: code - filter by code
+        in: query
+        name: code
+        type: string
+      - description: filter by building_block
+        in: query
+        name: building_block
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
       responses:
         "200":
           description: ""

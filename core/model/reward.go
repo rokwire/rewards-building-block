@@ -42,14 +42,16 @@ type RewardInventory struct {
 
 // Reward wraps the history entry
 type Reward struct {
-	ID          string    `json:"id" bson:"_id"`
-	OrgID       string    `json:"org_id" bson:"org_id"`
-	UserID      string    `json:"user_id" bson:"user_id"`
-	RewardType  string    `json:"reward_type" bson:"reward_type"`
-	Amount      int64     `json:"amount" bson:"amount"`
-	Description string    `json:"description" bson:"description"`
-	DateCreated time.Time `json:"date_created" bson:"date_created"`
-	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
+	ID            string    `json:"id" bson:"_id"`
+	OrgID         string    `json:"org_id" bson:"org_id"`
+	UserID        string    `json:"user_id" bson:"user_id"`
+	RewardType    string    `json:"reward_type" bson:"reward_type"`
+	Code          string    `json:"code" bson:"code"`
+	BuildingBlock string    `json:"building_block" bson:"building_block"`
+	Amount        int64     `json:"amount" bson:"amount"`
+	Description   string    `json:"description" bson:"description"`
+	DateCreated   time.Time `json:"date_created" bson:"date_created"`
+	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
 } // @name Reward
 
 // RewardQuantity wraps current reward inventory state

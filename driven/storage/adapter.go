@@ -281,20 +281,36 @@ func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
 }
 
 // GetRewardInventories Gets all reward inventories
-func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string) ([]model.RewardInventory, error) {
-	filter := bson.D{}
+func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+	}
+
 	if len(ids) > 0 {
-		filter = bson.D{
-			primitive.E{Key: "_id", Value: bson.M{"$in": ids}},
-		}
+		filter = append(filter, primitive.E{Key: "_id", Value: bson.M{"$in": ids}})
 	}
 
 	if rewardType != nil {
-		filter = bson.D{
-			primitive.E{Key: "reward_type", Value: *rewardType},
-		}
+		filter = append(filter, primitive.E{Key: "reward_type", Value: *rewardType})
 	}
 
+	if inStock != nil {
+		filter = append(filter, primitive.E{Key: "in_stock", Value: *inStock})
+	}
+
+	if depleted != nil {
+		filter = append(filter, primitive.E{Key: "depleted", Value: *depleted})
+	}
+
+	findOptions := options.FindOptions{
+		Sort: bson.D{{"date_created", -1}},
+	}
+	if limit != nil {
+		findOptions.SetLimit(*limit)
+	}
+	if offset != nil {
+		findOptions.SetSkip(*offset)
+	}
 	var result []model.RewardInventory
 	err := sa.db.rewardInventories.Find(filter, &result, &options.FindOptions{
 		Sort: bson.D{{"date_created", 1}},
@@ -379,20 +395,40 @@ func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 	return nil
 }
 
-// GetUserRewards Gets all reward history entries
-func (sa *Adapter) GetUserRewards(orgID string, userID string) ([]model.Reward, error) {
+// GetUserRewardsHistory Gets all reward history entries
+func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 	}
 
-	var result []model.Reward
-	err := sa.db.rewardHistory.Find(filter, &result, &options.FindOptions{
+	if rewardType != nil {
+		filter = append(filter, primitive.E{Key: "reward_type", Value: *rewardType})
+	}
+
+	if code != nil {
+		filter = append(filter, primitive.E{Key: "code", Value: *code})
+	}
+
+	if rewardType != nil {
+		filter = append(filter, primitive.E{Key: "building_block", Value: *buildingBlock})
+	}
+
+	findOptions := options.FindOptions{
 		Sort: bson.D{{"date_created", -1}},
-	})
+	}
+	if limit != nil {
+		findOptions.SetLimit(*limit)
+	}
+	if offset != nil {
+		findOptions.SetSkip(*offset)
+	}
+
+	var result []model.Reward
+	err := sa.db.rewardHistory.Find(filter, &result, &findOptions)
 	if err != nil {
-		log.Printf("storage.GetUserRewards error: %s", err)
-		return nil, fmt.Errorf("storage.GetUserRewards error: %s", err)
+		log.Printf("storage.getUserRewardsHistory error: %s", err)
+		return nil, fmt.Errorf("storage.getUserRewardsHistory error: %s", err)
 	}
 	if result == nil {
 		result = []model.Reward{}
@@ -560,7 +596,7 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 }
 
 // GetRewardClaims Gets all reward claims
-func (sa *Adapter) GetRewardClaims(orgID string, ids []string) ([]model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}

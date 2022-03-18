@@ -311,6 +311,26 @@ func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
 		}
 	}
 
+	if indexMapping["code_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "code", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["building_block_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "building_block", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 	if indexMapping["date_created_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{

@@ -46,6 +46,30 @@ var doc = `{
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -71,9 +95,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin"
+                    "Client"
                 ],
-                "operationId": "AdminCreateRewardClaim",
+                "operationId": "CreateUserRewardClaim",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -172,6 +196,30 @@ var doc = `{
                         "type": "string",
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "in_stock - possible values: missing, 0- false, 1- true",
+                        "name": "in_stock",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "depleted - possible values: missing, 0- false, 1- true",
+                        "name": "depleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
                         "in": "query"
                     }
                 ],
@@ -578,7 +626,39 @@ var doc = `{
                 "tags": [
                     "Client"
                 ],
-                "operationId": "GetUserHistory",
+                "operationId": "GetUserRewardsHistory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "reward_type - filter by reward_type",
+                        "name": "reward_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "code - filter by code",
+                        "name": "code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by building_block",
+                        "name": "building_block",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -610,6 +690,12 @@ var doc = `{
             "properties": {
                 "amount": {
                     "type": "integer"
+                },
+                "building_block": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
                 },
                 "date_created": {
                     "type": "string"
