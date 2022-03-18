@@ -131,14 +131,14 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 	w.Write(data)
 }
 
-// CreateUserRewardClaim Create a new claim inventory
-// @Description Create a new claim inventory
+// CreateUserRewardClaim Create a new user claim
+// @Description Create a new claim user claim
 // @Tags Client
 // @ID CreateUserRewardClaim
 // @Accept json
-// @Success 200 {object} model.RewardInventory
+// @Success 200 {object} model.RewardClaim
 // @Security AdminUserAuth
-// @Router /admin/claims [post]
+// @Router /user/claim [post]
 func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)

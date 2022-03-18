@@ -174,7 +174,14 @@ paths:
       consumes:
       - application/json
       description: Create a new claim inventory
-      operationId: CreateUserRewardClaim
+      operationId: AdminCreateRewardClaim
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardClaim'
       responses:
         "200":
           description: OK
@@ -183,7 +190,7 @@ paths:
       security:
       - AdminUserAuth: []
       tags:
-      - Client
+      - Admin
   /admin/claims/{id}:
     delete:
       description: Deletes a reward claim with the specified id
@@ -216,6 +223,13 @@ paths:
       - application/json
       description: Updates a reward claim with the specified id
       operationId: AdminUpdateRewardClaim
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardClaim'
       produces:
       - application/json
       responses:
@@ -268,6 +282,13 @@ paths:
       - application/json
       description: Create a new reward inventory
       operationId: AdminCreateRewardInventory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardInventory'
       responses:
         "200":
           description: OK
@@ -309,6 +330,13 @@ paths:
       - application/json
       description: Updates a reward inventory with the specified id
       operationId: AdminUpdateRewardInventory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardInventory'
       produces:
       - application/json
       responses:
@@ -340,6 +368,13 @@ paths:
       - application/json
       description: Create a new operation type
       operationId: AdminCreateRewardOperation
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardOperation'
       responses:
         "200":
           description: OK
@@ -381,6 +416,13 @@ paths:
       - application/json
       description: Updates a reward operation with the specified id
       operationId: AdminUpdateRewardOperation
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardOperation'
       produces:
       - application/json
       responses:
@@ -412,6 +454,13 @@ paths:
       - application/json
       description: Create a new reward type
       operationId: AdminCreateRewardType
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardType'
       responses:
         "200":
           description: OK
@@ -453,6 +502,13 @@ paths:
       - application/json
       description: Updates a reward type with the specified id
       operationId: AdminUpdateRewardType
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardType'
       produces:
       - application/json
       responses:
@@ -490,6 +546,21 @@ paths:
           description: ""
       security:
       - UserAuth: []
+      tags:
+      - Client
+  /user/claim:
+    post:
+      consumes:
+      - application/json
+      description: Create a new claim user claim
+      operationId: CreateUserRewardClaim
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
       tags:
       - Client
   /user/history:

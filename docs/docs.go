@@ -95,9 +95,20 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Admin"
                 ],
-                "operationId": "CreateUserRewardClaim",
+                "operationId": "AdminCreateRewardClaim",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardClaim"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -152,6 +163,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminUpdateRewardClaim",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardClaim"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -249,6 +271,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminCreateRewardInventory",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -303,6 +336,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminUpdateRewardInventory",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardInventory"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -368,6 +412,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminCreateRewardOperation",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardOperation"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -422,6 +477,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminUpdateRewardOperation",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardOperation"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -487,6 +553,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminCreateRewardType",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -541,6 +618,17 @@ var doc = `{
                     "Admin"
                 ],
                 "operationId": "AdminUpdateRewardType",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RewardType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -611,6 +699,31 @@ var doc = `{
                 "responses": {
                     "200": {
                         "description": ""
+                    }
+                }
+            }
+        },
+        "/user/claim": {
+            "post": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Create a new claim user claim",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "CreateUserRewardClaim",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RewardClaim"
+                        }
                     }
                 }
             }

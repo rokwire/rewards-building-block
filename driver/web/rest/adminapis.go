@@ -84,6 +84,7 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 // @Description Updates a reward type with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardType
+// @Param data body model.RewardType true "body json"
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardType
@@ -131,6 +132,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 // @Description Create a new reward type
 // @Tags Admin
 // @ID AdminCreateRewardType
+// @Param data body model.RewardType true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardType
 // @Security AdminUserAuth
@@ -260,6 +262,7 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 // @Description Updates a reward operation with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardOperation
+// @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardOperation
@@ -307,6 +310,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 // @Description Create a new operation type
 // @Tags Admin
 // @ID AdminCreateRewardOperation
+// @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardOperation
 // @Security AdminUserAuth
@@ -455,6 +459,7 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 // @Description Updates a reward inventory with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardInventory
+// @Param data body model.RewardInventory true "body json"
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardInventory
@@ -502,6 +507,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 // @Description Create a new reward inventory
 // @Tags Admin
 // @ID AdminCreateRewardInventory
+// @Param data body model.RewardInventory true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardInventory
 // @Security AdminUserAuth
@@ -650,6 +656,7 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 // @Description Updates a reward claim with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardClaim
+// @Param data body model.RewardClaim true "body json"
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardClaim
@@ -697,6 +704,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 // @Description Create a new claim inventory
 // @Tags Admin
 // @ID AdminCreateRewardClaim
+// @Param data body model.RewardClaim true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardInventory
 // @Security AdminUserAuth
