@@ -677,7 +677,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.RewardQuantity"
+                                "$ref": "#/definitions/model.RewardQuantityState"
                             }
                         }
                     }
@@ -972,7 +972,7 @@ var doc = `{
                 }
             }
         },
-        "model.RewardQuantity": {
+        "model.RewardQuantityState": {
             "type": "object",
             "properties": {
                 "claimable_quantity": {

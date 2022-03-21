@@ -54,8 +54,8 @@ type Reward struct {
 	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
 } // @name Reward
 
-// RewardQuantity wraps current reward inventory state
-type RewardQuantity struct {
+// RewardQuantityState wraps current reward inventory state
+type RewardQuantityState struct {
 	RewardType         string `json:"reward_type" bson:"reward_type"`
 	RewardableQuantity int64  `json:"rewardable_quantity" bson:"rewardable_quantity"`
 	ClaimableQuantity  int64  `json:"claimable_quantity" bson:"claimable_quantity"`

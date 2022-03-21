@@ -70,20 +70,18 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	resData, err := h.app.Services.GetUserBalance(userClaims.OrgID, userClaims.Subject)
 	if err != nil {
-		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
+		log.Printf("Error on apis.GetUserRewardsAmount(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	if resData == nil {
-		resData = &model.WalletBalance{
-			Amount: 0,
-		}
+		resData = []model.RewardTypeAmount{}
 	}
 
 	data, err := json.Marshal(resData)
 	if err != nil {
-		log.Printf("Error on apis.GetUserBalance(%s): %s", userClaims.Subject, err)
+		log.Printf("Error on apis.GetUserRewardsAmount(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

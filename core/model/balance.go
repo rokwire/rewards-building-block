@@ -1,6 +1,7 @@
 package model
 
-// WalletBalance wraps the balance aggregation response
-type WalletBalance struct {
-	Amount int64 `json:"amount" bson:"amount"`
-} // @name WalletBalance
+// RewardTypeAmount wraps the balance aggregation response
+type RewardTypeAmount struct {
+	RewardType string `json:"reward_type" bson:"_id"`
+	Amount     int64  `json:"amount" bson:"amount"`
+} // @name RewardTypeAmount

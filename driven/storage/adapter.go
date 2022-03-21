@@ -469,50 +469,50 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 	return &item, nil
 }
 
-// GetUserBalance Gets all balances for the user id
-func (sa *Adapter) GetUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
+// GetUserRewardsAmount Gets user's rewards amount
+func (sa *Adapter) GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"user_id": userID}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
 	}
+	if rewardType != nil {
+		pipeline = append(pipeline, bson.M{"$match": bson.M{"reward_type": *rewardType}})
+	}
+	pipeline = append(pipeline, bson.M{"$group": bson.M{"_id": "$reward_type", "amount": bson.M{"$sum": "$amount"}}})
 
-	var result []model.WalletBalance
+	var result []model.RewardTypeAmount
 	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
 	if err != nil {
-		log.Printf("storage.GetUserBalance error: %s", err)
-		return nil, fmt.Errorf("storage.GetUserBalance error: %s", err)
+		log.Printf("storage.GetUserRewardsAmount error: %s", err)
+		return nil, fmt.Errorf("storage.GetUserRewardsAmount error: %s", err)
 	}
-	if len(result) > 0 {
-		return &result[0], nil
-	}
-	return &model.WalletBalance{
-		Amount: 0,
-	}, nil
+
+	return result, nil
 }
 
-// GetWalletBalance gets wallet balance by user id and wallet code
-func (sa *Adapter) GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error) {
+// GetUserClaimsAmount Gets user's claims amount
+func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"user_id": userID, "code": code}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
+		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
+		{"$unwind": bson.M{"path": "$items"}},
 	}
 
-	var result []model.WalletBalance
-	err := sa.db.rewardHistory.Aggregate(pipeline, &result, nil)
+	if rewardType != nil {
+		pipeline = append(pipeline, bson.M{"$match": bson.M{"items.reward_type": *rewardType}})
+	}
+	pipeline = append(pipeline, bson.M{"$group": bson.M{"_id": "$items.reward_type", "amount": bson.M{"$sum": "$items.amount"}}})
+
+	var result []model.RewardTypeAmount
+	err := sa.db.rewardClaims.Aggregate(pipeline, &result, nil)
 	if err != nil {
-		log.Printf("storage.GetWalletBalance error: %s", err)
-		return nil, fmt.Errorf("storage.GetWalletBalance error: %s", err)
+		log.Printf("storage.GetUserClaimsAmount error: %s", err)
+		return nil, fmt.Errorf("storage.GetUserClaimsAmount error: %s", err)
 	}
 
-	if len(result) > 0 {
-		return &result[0], nil
-	}
-
-	return nil, nil
+	return result, nil
 }
 
-// GetRewardQuantity Gets reward quantities state for the current moment
-func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
+// GetRewardQuantityState Gets reward quantities state for the current moment
+func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string) (*model.RewardQuantityState, error) {
 	pipeline := []bson.M{
 		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
 		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
@@ -524,8 +524,8 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 	}
 	err := sa.db.rewardInventories.Aggregate(pipeline, &inventoryResult, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardQuantity error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+		log.Printf("storage.GetRewardQuantityState error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
 	if len(inventoryResult) > 0 {
 		inventoryAmount = inventoryResult[0].Amount
@@ -542,8 +542,8 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 	}
 	err = sa.db.rewardInventories.Aggregate(pipeline, &inventoryInStockResult, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardQuantity error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+		log.Printf("storage.GetRewardQuantityState error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
 	if len(inventoryInStockResult) > 0 {
 		inventoryInStockAmount = inventoryInStockResult[0].Amount
@@ -560,8 +560,8 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 	}
 	err = sa.db.rewardHistory.Aggregate(pipeline, &rewardsResult, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardQuantity error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+		log.Printf("storage.GetRewardQuantityState error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
 	if len(rewardsResult) > 0 {
 		rewardsAmount = rewardsResult[0].Amount
@@ -579,8 +579,8 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 	}
 	err = sa.db.rewardClaims.Aggregate(pipeline, &claimsResult, nil)
 	if err != nil {
-		log.Printf("storage.GetRewardQuantity error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantity error: %s", err)
+		log.Printf("storage.GetRewardQuantityState error: %s", err)
+		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
 	if len(claimsResult) > 0 {
 		claimsAmount = claimsResult[0].Amount
@@ -588,7 +588,7 @@ func (sa *Adapter) GetRewardQuantity(orgID string, rewardType string) (*model.Re
 
 	rewardableQuantity := inventoryAmount - rewardsAmount
 	claimableQuantity := inventoryInStockAmount - claimsAmount
-	return &model.RewardQuantity{
+	return &model.RewardQuantityState{
 		RewardType:         rewardType,
 		RewardableQuantity: rewardableQuantity,
 		ClaimableQuantity:  claimableQuantity,

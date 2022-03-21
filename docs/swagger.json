@@ -665,7 +665,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.RewardQuantity"
+                                "$ref": "#/definitions/model.RewardQuantityState"
                             }
                         }
                     }
@@ -960,7 +960,7 @@
                 }
             }
         },
-        "model.RewardQuantity": {
+        "model.RewardQuantityState": {
             "type": "object",
             "properties": {
                 "claimable_quantity": {

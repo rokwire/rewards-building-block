@@ -115,7 +115,7 @@ definitions:
         description: tshirt
         type: string
     type: object
-  model.RewardQuantity:
+  model.RewardQuantityState:
     properties:
       claimable_quantity:
         type: integer
@@ -531,7 +531,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.RewardQuantity'
+              $ref: '#/definitions/model.RewardQuantityState'
             type: array
       security:
       - InternalApiAuth: []

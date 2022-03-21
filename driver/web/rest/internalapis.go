@@ -56,12 +56,14 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if operation != nil && item.BuildingBlock == operation.BuildingBlock && item.RewardType == operation.RewardType && operation.Amount > 0 {
+	if operation != nil && item.BuildingBlock == operation.BuildingBlock && item.RewardCode == operation.Code && operation.Amount > 0 {
 		createdItem, err := h.app.Services.CreateReward(item.OrgID, model.Reward{
-			UserID:      item.UserID,
-			RewardType:  item.RewardType,
-			Description: item.Description,
-			Amount:      operation.Amount,
+			UserID:        item.UserID,
+			RewardType:    operation.RewardType,
+			Code:          operation.Code,
+			BuildingBlock: operation.BuildingBlock,
+			Description:   item.Description,
+			Amount:        operation.Amount,
 		})
 		if err != nil {
 			log.Printf("Error on internalapis.CreateReward: %s", err)
@@ -96,7 +98,7 @@ type getRewardStatsBody struct {
 // @Tags Internal
 // @ID InternalGetRewardStats
 // @Accept json
-// @Success 200 {array} model.RewardQuantity
+// @Success 200 {array} model.RewardQuantityState
 // @Security InternalApiAuth
 // @Router /int/reward_history [post]
 func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +125,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	result := []model.RewardQuantity{}
+	result := []model.RewardQuantityState{}
 	if len(types) > 0 {
 		for _, rewardType := range types {
 			quantity, err := h.app.Services.GetRewardQuantity(item.OrgID, rewardType.RewardType)

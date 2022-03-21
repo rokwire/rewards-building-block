@@ -53,11 +53,10 @@ type Services interface {
 
 	CreateReward(orgID string, item model.Reward) (*model.Reward, error)
 
-	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
-	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
+	GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error)
 	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 
-	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error)
+	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantityState, error)
 }
 
 type servicesImpl struct {
@@ -156,19 +155,15 @@ func (s *servicesImpl) DeleteRewardClaim(orgID string, id string) error {
 	return s.app.deleteRewardClaim(orgID, id)
 }
 
-func (s *servicesImpl) GetUserBalance(orgID string, userID string) (*model.WalletBalance, error) {
+func (s *servicesImpl) GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error) {
 	return s.app.getUserBalance(orgID, userID)
-}
-
-func (s *servicesImpl) GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error) {
-	return s.app.getWalletBalance(orgID, userID, code)
 }
 
 func (s *servicesImpl) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
 	return s.app.getUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
-func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error) {
+func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantityState, error) {
 	return s.app.getRewardQuantity(orgID, rewardType)
 }
 
@@ -205,11 +200,11 @@ type Storage interface {
 	CreateUserReward(orgID string, item model.Reward) (*model.Reward, error)
 
 	// Quantities
-	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantity, error)
+	GetRewardQuantityState(orgID string, rewardType string) (*model.RewardQuantityState, error)
 
 	// User APIs
-	GetUserBalance(orgID string, userID string) (*model.WalletBalance, error)
-	GetWalletBalance(orgID string, userID string, code string) (*model.WalletBalance, error)
+	GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
+	GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
 
 	SetListener(listener storage.Listener)
 }
