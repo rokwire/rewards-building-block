@@ -29,15 +29,16 @@ type RewardOperation struct {
 
 // RewardInventory defines physical amount (availability) of a single award type
 type RewardInventory struct {
-	ID          string    `json:"id" bson:"_id"`
-	OrgID       string    `json:"org_id" bson:"org_id"`
-	RewardType  string    `json:"reward_type" bson:"reward_type"` // t-shirt
-	Amount      int64     `json:"amount" bson:"amount"`
-	InStock     bool      `json:"in_stock" bson:"in_stock"`
-	Depleted    bool      `json:"depleted" bson:"depleted"`
-	Description string    `json:"description" bson:"description"`
-	DateCreated time.Time `json:"date_created" bson:"date_created"`
-	DateUpdated time.Time `json:"date_updated" bson:"date_updated"`
+	ID            string    `json:"id" bson:"_id"`
+	OrgID         string    `json:"org_id" bson:"org_id"`
+	RewardType    string    `json:"reward_type" bson:"reward_type"` // t-shirt
+	InStock       bool      `json:"in_stock" bson:"in_stock"`
+	AmountTotal   int64     `json:"amount_total" bson:"amount_total"`
+	AmountGranted int64     `json:"amount_granted" bson:"amount_granted"`
+	AmountClaimed int64     `json:"amount_claimed" bson:"amount_claimed"`
+	Description   string    `json:"description" bson:"description"`
+	DateCreated   time.Time `json:"date_created" bson:"date_created"`
+	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
 } // @name RewardInventory
 
 // Reward wraps the history entry
@@ -56,9 +57,9 @@ type Reward struct {
 
 // RewardQuantityState wraps current reward inventory state
 type RewardQuantityState struct {
-	RewardType         string `json:"reward_type" bson:"reward_type"`
-	RewardableQuantity int64  `json:"rewardable_quantity" bson:"rewardable_quantity"`
-	ClaimableQuantity  int64  `json:"claimable_quantity" bson:"claimable_quantity"`
+	RewardType        string `json:"reward_type" bson:"reward_type"`
+	GrantableQuantity int64  `json:"grantable_quantity" bson:"grantable_quantity"`
+	ClaimableQuantity int64  `json:"claimable_quantity" bson:"claimable_quantity"`
 }
 
 // RewardClaim wraps a claim that is made by a user
@@ -75,6 +76,8 @@ type RewardClaim struct {
 
 // RewardClaimItem wraps a claim  entry that consists reward type and amount
 type RewardClaimItem struct {
-	RewardType string `json:"reward_type" bson:"reward_type"`
-	Amount     int64  `json:"amount" bson:"amount"`
+	RewardType  string `json:"reward_type" bson:"reward_type"`
+	InventoryID string `json:"inventory_id" bson:"inventory_id"`
+
+	Amount int64 `json:"amount" bson:"amount"`
 } // @name RewardClaimItem

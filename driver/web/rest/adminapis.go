@@ -377,7 +377,6 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"
 // @Param in_stock query string false "in_stock - possible values: missing, 0- false, 1- true"
-// @Param depleted query integer false "depleted - possible values: missing, 0- false, 1- true"
 // @Param limit query string false "limit - limit the result"
 // @Param offset query string false "offset"
 // @Tags Admin
@@ -389,7 +388,6 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 
 	rewardType := getStringQueryParam(r, "reward_type")
 	inStock := getBoolQueryParam(r, "in_stock", nil)
-	depleted := getBoolQueryParam(r, "depleted", nil)
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
@@ -400,7 +398,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, depleted, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventories: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

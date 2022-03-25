@@ -248,16 +248,36 @@ func (m *database) applyRewardInventoriesChecks(posts *collectionWrapper) error 
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "reward_type", Value: 1},
+			}, true)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["amount_total_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "amount_total", Value: 1},
 			}, false)
 		if err != nil {
 			return err
 		}
 	}
 
-	if indexMapping["depleted_1"] == nil {
+	if indexMapping["amount_granted_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
-				primitive.E{Key: "depleted", Value: 1},
+				primitive.E{Key: "amount_granted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["amount_claimed_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "amount_claimed", Value: 1},
 			}, false)
 		if err != nil {
 			return err

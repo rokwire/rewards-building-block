@@ -18,10 +18,12 @@
 package storage
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"rewards/core/model"
@@ -139,8 +141,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 			primitive.E{Key: "active", Value: item.Active},
 			primitive.E{Key: "description", Value: item.Description},
 			primitive.E{Key: "date_updated", Value: now},
-		},
-		},
+		}},
 	}
 	_, err := sa.db.rewardInventories.UpdateOne(filter, update, nil)
 	if err != nil {
@@ -244,8 +245,8 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 
 	now := time.Now().UTC()
 	filter := bson.D{
-		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
 	}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
@@ -270,7 +271,10 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
-	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
+	}
 	_, err := sa.db.rewardOperations.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardOperation error: %s", err)
@@ -281,7 +285,7 @@ func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
 }
 
 // GetRewardInventories Gets all reward inventories
-func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}
@@ -296,10 +300,6 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 
 	if inStock != nil {
 		filter = append(filter, primitive.E{Key: "in_stock", Value: *inStock})
-	}
-
-	if depleted != nil {
-		filter = append(filter, primitive.E{Key: "depleted", Value: *depleted})
 	}
 
 	findOptions := options.FindOptions{
@@ -324,7 +324,10 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 
 // GetRewardInventory Gets a reward inventory by id
 func (sa *Adapter) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
-	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
+	}
 	var result []model.RewardInventory
 	err := sa.db.rewardInventories.Find(filter, &result, nil)
 	if err != nil {
@@ -343,6 +346,12 @@ func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventor
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
+	item.OrgID = orgID
+
+	if err := sa.validateInventoryCreateOrUpdate(item); err != nil {
+		return nil, err
+	}
+
 	_, err := sa.db.rewardInventories.InsertOne(&item)
 	if err != nil {
 		log.Printf("storage.CreateRewardInventory error: %s", err)
@@ -354,8 +363,12 @@ func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventor
 // UpdateRewardInventory updates a reward pool
 func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
 	jsonID := item.ID
-	if jsonID != id {
+	if jsonID != id || orgID != item.OrgID {
 		return nil, fmt.Errorf("storage.UpdateRewardInventory attempt to override another object")
+	}
+
+	if err := sa.validateInventoryCreateOrUpdate(item); err != nil {
+		return nil, err
 	}
 
 	now := time.Now().UTC()
@@ -363,9 +376,10 @@ func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.Rew
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "date_updated", Value: now},
-			primitive.E{Key: "amount", Value: item.Amount},
+			primitive.E{Key: "amount", Value: item.AmountTotal},
+			primitive.E{Key: "quantity_granted", Value: item.AmountGranted},
+			primitive.E{Key: "quantity_claimed", Value: item.AmountClaimed},
 			primitive.E{Key: "in_stock", Value: item.InStock},
-			primitive.E{Key: "depleted", Value: item.Depleted},
 			primitive.E{Key: "description", Value: item.Description},
 		},
 		},
@@ -379,6 +393,18 @@ func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.Rew
 	item.DateUpdated = now
 
 	return &item, nil
+}
+
+func (sa *Adapter) validateInventoryCreateOrUpdate(item model.RewardInventory) error {
+	if item.AmountTotal <= 0 {
+		return fmt.Errorf("inventory amount is zero or negative")
+	} else if item.AmountGranted > item.AmountTotal {
+		return fmt.Errorf("quantity granted is greater than the amount")
+	} else if item.AmountClaimed > item.AmountGranted {
+		return fmt.Errorf("quantity claimed is greater than the quantity granted")
+	}
+
+	return nil
 }
 
 // DeleteRewardInventory deletes a reward pool. Don't delete if it's in use!
@@ -456,16 +482,72 @@ func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Re
 
 // CreateUserReward creates a new reward history entry
 func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Reward, error) {
+
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	item.OrgID = orgID
-	_, err := sa.db.rewardHistory.InsertOne(&item)
+
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			log.Printf("error starting a transaction - %s", err)
+			return err
+		}
+
+		inStock := true
+		inventories, err := sa.GetRewardInventories(orgID, nil, &item.RewardType, &inStock, nil, nil)
+		if err != nil {
+			log.Printf("storage.CreateUserReward error: %s", err)
+			return fmt.Errorf("storage.CreateUserReward error: %s", err)
+		}
+
+		if len(inventories) > 0 {
+			inventory := inventories[0]
+			if inventory.InStock && inventory.AmountTotal >= inventory.AmountGranted+item.Amount {
+				_, err = sa.db.rewardInventories.UpdateOneWithContext(
+					sessionContext,
+					bson.D{
+						primitive.E{Key: "org_id", Value: orgID},
+						primitive.E{Key: "reward_type", Value: item.RewardType},
+					},
+					bson.D{
+						primitive.E{Key: "$set", Value: bson.D{
+							primitive.E{Key: "date_updated", Value: now},
+							primitive.E{Key: "amount_granted", Value: inventory.AmountGranted + item.Amount},
+						}},
+					}, &options.UpdateOptions{})
+				if err != nil {
+					log.Printf("storage.CreateUserReward error: %s", err)
+					return fmt.Errorf("storage.CreateUserReward error: %s", err)
+				}
+			} else {
+				log.Printf("insuficient amount of %s: Expected %d, but have: %d", item.RewardType, inventory.AmountTotal, inventory.AmountGranted+item.Amount)
+				return fmt.Errorf("storage.CreateUserReward error: %s", err)
+			}
+		}
+
+		_, err = sa.db.rewardHistory.InsertOneWithContext(sessionContext, &item)
+		if err != nil {
+			log.Printf("storage.CreateUserReward error: %s", err)
+			return fmt.Errorf("storage.CreateUserReward error: %s", err)
+		}
+
+		//commit the transaction
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		return nil
+	})
+
 	if err != nil {
-		log.Printf("storage.CreateUserReward error: %s", err)
-		return nil, fmt.Errorf("storage.CreateUserReward error: %s", err)
+		log.Printf("storage.CreateUserReward transaction error: %s", err)
+		return nil, fmt.Errorf("storage.CreateUserReward transaction error: %s", err)
 	}
+
 	return &item, nil
 }
 
@@ -513,86 +595,26 @@ func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *
 
 // GetRewardQuantityState Gets reward quantities state for the current moment
 func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string) (*model.RewardQuantityState, error) {
-	pipeline := []bson.M{
-		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
-	}
 
-	var inventoryAmount int64
-	var inventoryResult []struct {
-		Amount int64 `bson:"amount"`
-	}
-	err := sa.db.rewardInventories.Aggregate(pipeline, &inventoryResult, nil)
+	inStock := true
+	inventories, err := sa.GetRewardInventories(orgID, nil, &rewardType, &inStock, nil, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardQuantityState error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
-	if len(inventoryResult) > 0 {
-		inventoryAmount = inventoryResult[0].Amount
+
+	if len(inventories) > 0 {
+		inventory := inventories[0]
+		grantableQuantity := inventory.AmountTotal - inventory.AmountGranted
+		claimableQuantity := inventory.AmountTotal - inventory.AmountClaimed
+		return &model.RewardQuantityState{
+			RewardType:        rewardType,
+			GrantableQuantity: grantableQuantity,
+			ClaimableQuantity: claimableQuantity,
+		}, nil
 	}
 
-	pipeline = []bson.M{
-		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
-	}
-
-	var inventoryInStockAmount int64
-	var inventoryInStockResult []struct {
-		Amount int64 `bson:"amount"`
-	}
-	err = sa.db.rewardInventories.Aggregate(pipeline, &inventoryInStockResult, nil)
-	if err != nil {
-		log.Printf("storage.GetRewardQuantityState error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
-	}
-	if len(inventoryInStockResult) > 0 {
-		inventoryInStockAmount = inventoryInStockResult[0].Amount
-	}
-
-	pipeline = []bson.M{
-		{"$match": bson.M{"org_id": orgID, "reward_type": rewardType}},
-		{"$group": bson.M{"_id": "$code", "amount": bson.M{"$sum": "$amount"}}},
-	}
-
-	var rewardsAmount int64
-	var rewardsResult []struct {
-		Amount int64 `bson:"amount"`
-	}
-	err = sa.db.rewardHistory.Aggregate(pipeline, &rewardsResult, nil)
-	if err != nil {
-		log.Printf("storage.GetRewardQuantityState error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
-	}
-	if len(rewardsResult) > 0 {
-		rewardsAmount = rewardsResult[0].Amount
-	}
-
-	pipeline = []bson.M{
-		{"$unwind": bson.M{"path": "$items"}},
-		{"$match": bson.M{"org_id": orgID, "items.reward_type": rewardType}},
-		{"$group": bson.M{"_id": rewardType, "amount": bson.M{"$sum": "$items.amount"}}},
-	}
-
-	var claimsAmount int64
-	var claimsResult []struct {
-		Amount int64 `bson:"amount"`
-	}
-	err = sa.db.rewardClaims.Aggregate(pipeline, &claimsResult, nil)
-	if err != nil {
-		log.Printf("storage.GetRewardQuantityState error: %s", err)
-		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
-	}
-	if len(claimsResult) > 0 {
-		claimsAmount = claimsResult[0].Amount
-	}
-
-	rewardableQuantity := inventoryAmount - rewardsAmount
-	claimableQuantity := inventoryInStockAmount - claimsAmount
-	return &model.RewardQuantityState{
-		RewardType:         rewardType,
-		RewardableQuantity: rewardableQuantity,
-		ClaimableQuantity:  claimableQuantity,
-	}, nil
+	return nil, nil
 }
 
 // GetRewardClaims Gets all reward claims
@@ -663,8 +685,7 @@ func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardC
 			primitive.E{Key: "description", Value: item.Description},
 			primitive.E{Key: "status", Value: item.Status},
 			primitive.E{Key: "date_updated", Value: now},
-		},
-		},
+		}},
 	}
 	_, err := sa.db.rewardClaims.UpdateOne(filter, update, nil)
 	if err != nil {

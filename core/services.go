@@ -105,7 +105,7 @@ func (app *Application) createReward(orgID string, item model.Reward) (*model.Re
 			return nil, fmt.Errorf("Error Application.createReward(): %s", err)
 		}
 
-		if quantity.RewardableQuantity >= item.Amount {
+		if quantity.GrantableQuantity >= item.Amount {
 			return app.storage.CreateUserReward(orgID, item)
 		}
 		return nil, fmt.Errorf("error Application.createReward(): not enough available quantity")
@@ -115,8 +115,8 @@ func (app *Application) createReward(orgID string, item model.Reward) (*model.Re
 
 // Reward pools
 
-func (app *Application) getRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-	return app.storage.GetRewardInventories(orgID, ids, rewardType, inStock, depleted, limit, offset)
+func (app *Application) getRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	return app.storage.GetRewardInventories(orgID, ids, rewardType, inStock, limit, offset)
 }
 
 func (app *Application) getRewardInventory(orgID string, id string) (*model.RewardInventory, error) {

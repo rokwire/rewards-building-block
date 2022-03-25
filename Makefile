@@ -17,7 +17,7 @@ VERSION ?= ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}
 
 export -n GOBIN
 export GOPATH
-#export PATH=$(BIN): $(shell printenv PATH)
+export PATH=$(BIN): $(shell printenv PATH)
 
 GO      = go
 GODOC   = godoc

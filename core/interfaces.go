@@ -39,7 +39,7 @@ type Services interface {
 	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
+	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
@@ -111,8 +111,8 @@ func (s *servicesImpl) DeleteRewardOperation(orgID string, id string) error {
 	return s.app.deleteRewardOperation(orgID, id)
 }
 
-func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-	return s.app.getRewardInventories(orgID, ids, rewardType, inStock, depleted, limit, offset)
+func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	return s.app.getRewardInventories(orgID, ids, rewardType, inStock, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
@@ -183,7 +183,7 @@ type Storage interface {
 	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, depleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
+	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
