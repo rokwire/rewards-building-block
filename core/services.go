@@ -216,13 +216,13 @@ func (app *Application) getUserBalanceMapping(orgID string, userID string) (map[
 		return nil, fmt.Errorf("Error app.getUserBalanceMapping() %s", err)
 	}
 	rewardsMapping := map[string]int64{}
-	if len(claimsBalance) > 0 {
-		for _, rewardTypeBalance := range rewardsBalance {
-			rewardsMapping[rewardTypeBalance.RewardType] = rewardTypeBalance.Amount
+	if len(rewardsBalance) > 0 {
+		for _, balance := range rewardsBalance {
+			rewardsMapping[balance.RewardType] = balance.Amount
 		}
 	}
 
-	if len(rewardsBalance) > 0 {
+	if len(claimsBalance) > 0 {
 		for _, claimdBalance := range claimsBalance {
 			rewardsMapping[claimdBalance.RewardType] -= claimdBalance.Amount
 		}

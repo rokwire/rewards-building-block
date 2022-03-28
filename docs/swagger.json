@@ -215,12 +215,6 @@
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "depleted - possible values: missing, 0- false, 1- true",
-                        "name": "depleted",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
                         "description": "limit - limit the result",
                         "name": "limit",
@@ -716,6 +710,54 @@
                 }
             }
         },
+        "/user/claims": {
+            "get": {
+                "security": [
+                    {
+                        "AdminUserAuth": []
+                    }
+                ],
+                "description": "Gets user claims",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserRewardClaim",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RewardClaim"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/history": {
             "get": {
                 "security": [
@@ -859,6 +901,9 @@
                 "amount": {
                     "type": "integer"
                 },
+                "inventory_id": {
+                    "type": "string"
+                },
                 "reward_type": {
                     "type": "string"
                 }
@@ -867,7 +912,13 @@
         "RewardInventory": {
             "type": "object",
             "properties": {
-                "amount": {
+                "amount_claimed": {
+                    "type": "integer"
+                },
+                "amount_granted": {
+                    "type": "integer"
+                },
+                "amount_total": {
                     "type": "integer"
                 },
                 "date_created": {
@@ -875,9 +926,6 @@
                 },
                 "date_updated": {
                     "type": "string"
-                },
-                "depleted": {
-                    "type": "boolean"
                 },
                 "description": {
                     "type": "string"
@@ -966,11 +1014,11 @@
                 "claimable_quantity": {
                     "type": "integer"
                 },
+                "grantable_quantity": {
+                    "type": "integer"
+                },
                 "reward_type": {
                     "type": "string"
-                },
-                "rewardable_quantity": {
-                    "type": "integer"
                 }
             }
         }

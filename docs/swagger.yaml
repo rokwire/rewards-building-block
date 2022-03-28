@@ -48,19 +48,23 @@ definitions:
     properties:
       amount:
         type: integer
+      inventory_id:
+        type: string
       reward_type:
         type: string
     type: object
   RewardInventory:
     properties:
-      amount:
+      amount_claimed:
+        type: integer
+      amount_granted:
+        type: integer
+      amount_total:
         type: integer
       date_created:
         type: string
       date_updated:
         type: string
-      depleted:
-        type: boolean
       description:
         type: string
       id:
@@ -119,10 +123,10 @@ definitions:
     properties:
       claimable_quantity:
         type: integer
+      grantable_quantity:
+        type: integer
       reward_type:
         type: string
-      rewardable_quantity:
-        type: integer
     type: object
 host: localhost
 info:
@@ -254,10 +258,6 @@ paths:
         in: query
         name: in_stock
         type: string
-      - description: 'depleted - possible values: missing, 0- false, 1- true'
-        in: query
-        name: depleted
-        type: integer
       - description: limit - limit the result
         in: query
         name: limit
@@ -559,6 +559,36 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Client
+  /user/claims:
+    get:
+      consumes:
+      - application/json
+      description: Gets user claims
+      operationId: GetUserRewardClaim
+      parameters:
+      - description: status
+        in: query
+        name: status
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardClaim'
+            type: array
       security:
       - AdminUserAuth: []
       tags:

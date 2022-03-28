@@ -129,6 +129,42 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 	w.Write(data)
 }
 
+// GetUserRewardClaim Gets user claims
+// @Description Gets user claims
+// @Tags Client
+// @ID GetUserRewardClaim
+// @Param status query string false "status"
+// @Param limit query string false "limit - limit the result"
+// @Param offset query string false "offset"
+// @Accept json
+// @Success 200 {array} model.RewardClaim
+// @Security AdminUserAuth
+// @Router /user/claims [get]
+func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	rewardType := getStringQueryParam(r, "reward_type")
+	status := getStringQueryParam(r, "status")
+	limitFilter := getInt64QueryParam(r, "limit")
+	offsetFilter := getInt64QueryParam(r, "offset")
+
+	rewardClaims, err := h.app.Services.GetRewardClaims(userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
+	if err != nil {
+		log.Printf("Error on apis.GetUserRewardClaim: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(rewardClaims)
+	if err != nil {
+		log.Printf("Error on apis.GetUserRewardClaim: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
 // CreateUserRewardClaim Create a new user claim
 // @Description Create a new claim user claim
 // @Tags Client
