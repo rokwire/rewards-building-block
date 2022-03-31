@@ -43,10 +43,12 @@ type RewardInventory struct {
 	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
 } // @name RewardInventory
 
+// GetGrantableAmount Gets grantable amount
 func (ri *RewardInventory) GetGrantableAmount() int {
 	return ri.AmountTotal - ri.AmountGranted
 }
 
+// GetClaimableAmount Gets claimable amount
 func (ri *RewardInventory) GetClaimableAmount() int {
 	return ri.AmountTotal - ri.AmountClaimed
 }

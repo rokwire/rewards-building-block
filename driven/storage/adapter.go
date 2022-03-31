@@ -373,7 +373,7 @@ func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.Rew
 	return sa.UpdateRewardInventoryWithContext(nil, orgID, id, item)
 }
 
-// UpdateRewardInventoryWithContext updates a reward pool
+// UpdateRewardInventoryWithContext updates a reward inventory with a context
 func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -784,7 +784,7 @@ func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardC
 	return sa.UpdateRewardClaimWithContext(nil, orgID, id, item)
 }
 
-// UpdateRewardClaim updates a reward claim
+// UpdateRewardClaimWithContext updates a reward claim with a context
 func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	if ctx == nil {
 		ctx = context.Background()

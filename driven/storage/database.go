@@ -294,6 +294,36 @@ func (m *database) applyRewardInventoriesChecks(posts *collectionWrapper) error 
 		}
 	}
 
+	if indexMapping["grant_depleted_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "grant_depleted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["claim_depleted_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "claim_depleted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["in_stock_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "in_stock", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Println("reward_inventories checks passed")
 	return nil
 }
