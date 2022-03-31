@@ -200,16 +200,6 @@ paths:
       tags:
       - Admin
   /admin/claims/{id}:
-    delete:
-      description: Deletes a reward claim with the specified id
-      operationId: AdminDeleteRewardClaim
-      responses:
-        "200":
-          description: ""
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
     get:
       consumes:
       - application/json
@@ -314,16 +304,6 @@ paths:
       tags:
       - Admin
   /admin/inventories/{id}:
-    delete:
-      description: Deletes a reward inventory with the specified id
-      operationId: AdminDeleteRewardInventory
-      responses:
-        "200":
-          description: ""
-      security:
-      - AdminUserAuth: []
-      tags:
-      - Admin
     get:
       consumes:
       - application/json

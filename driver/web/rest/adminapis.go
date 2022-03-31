@@ -550,28 +550,6 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 	w.Write(jsonData)
 }
 
-// DeleteRewardInventory Deletes a reward inventory with the specified id
-// @Description Deletes a reward inventory with the specified id
-// @Tags Admin
-// @ID AdminDeleteRewardInventory
-// @Success 200
-// @Security AdminUserAuth
-// @Router /admin/inventories/{id} [delete]
-func (h AdminApisHandler) DeleteRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	err := h.app.Services.DeleteRewardInventory(claims.OrgID, id)
-	if err != nil {
-		log.Printf("Error on adminapis.DeleteRewardInventory(%s): %s", id, err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-}
-
 // GetRewardClaims Retrieves  all reward claims
 // @Description Retrieves  all reward claims
 // @Param ids query string false "Coma separated IDs of the desired records"
@@ -745,26 +723,4 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
-}
-
-// DeleteRewardClaim Deletes a reward claim with the specified id
-// @Description Deletes a reward claim with the specified id
-// @Tags Admin
-// @ID AdminDeleteRewardClaim
-// @Success 200
-// @Security AdminUserAuth
-// @Router /admin/claims/{id} [delete]
-func (h AdminApisHandler) DeleteRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	err := h.app.Services.DeleteRewardClaim(claims.OrgID, id)
-	if err != nil {
-		log.Printf("Error on adminapis.deleteRewardClaim(%s): %s", id, err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
 }

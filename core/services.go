@@ -131,10 +131,6 @@ func (app *Application) updateRewardInventory(orgID string, id string, item mode
 	return app.storage.UpdateRewardInventory(orgID, id, item)
 }
 
-func (app *Application) deleteGetRewardInventory(orgID string, id string) error {
-	return app.storage.DeleteRewardInventory(orgID, id)
-}
-
 func (app *Application) getRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
 	return app.storage.GetRewardClaims(orgID, ids, userID, rewardType, status, limit, offset)
 }
@@ -172,10 +168,6 @@ func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) 
 
 func (app *Application) updateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	return app.storage.UpdateRewardClaim(orgID, id, item)
-}
-
-func (app *Application) deleteRewardClaim(orgID string, id string) error {
-	return app.storage.DeleteRewardClaim(orgID, id)
 }
 
 func (app *Application) getUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error) {

@@ -109,13 +109,11 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/inventories", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardInventory)).Methods("POST")
 	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventory)).Methods("GET")
 	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardInventory)).Methods("PUT")
-	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardInventory)).Methods("DELETE")
 
 	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaims)).Methods("GET")
 	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardClaim)).Methods("POST")
 	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaim)).Methods("GET")
 	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim)).Methods("PUT")
-	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardClaim)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }

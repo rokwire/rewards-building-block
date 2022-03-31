@@ -43,13 +43,11 @@ type Services interface {
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
-	DeleteRewardInventory(orgID string, id string) error
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
-	DeleteRewardClaim(orgID string, id string) error
 
 	CreateReward(orgID string, item model.Reward) (*model.Reward, error)
 
@@ -151,10 +149,6 @@ func (s *servicesImpl) UpdateRewardClaim(orgID string, id string, item model.Rew
 	return s.app.updateRewardClaim(orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardClaim(orgID string, id string) error {
-	return s.app.deleteRewardClaim(orgID, id)
-}
-
 func (s *servicesImpl) GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error) {
 	return s.app.getUserBalance(orgID, userID)
 }
@@ -187,13 +181,11 @@ type Storage interface {
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
-	DeleteRewardInventory(orgID string, id string) error
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
-	DeleteRewardClaim(orgID string, id string) error
 
 	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)

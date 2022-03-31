@@ -802,7 +802,6 @@ func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID strin
 	}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "items", Value: item.Items},
 			primitive.E{Key: "description", Value: item.Description},
 			primitive.E{Key: "status", Value: item.Status},
 			primitive.E{Key: "date_updated", Value: now},

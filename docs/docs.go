@@ -174,23 +174,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Deletes a reward claim with the specified id",
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminDeleteRewardClaim",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
             }
         },
         "/admin/inventories": {
@@ -351,23 +334,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/RewardInventory"
                         }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AdminUserAuth": []
-                    }
-                ],
-                "description": "Deletes a reward inventory with the specified id",
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "AdminDeleteRewardInventory",
-                "responses": {
-                    "200": {
-                        "description": ""
                     }
                 }
             }
