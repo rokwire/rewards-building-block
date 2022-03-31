@@ -703,11 +703,79 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 	item.OrgID = orgID
 	item.DateCreated = now
 	item.DateUpdated = now
-	_, err := sa.db.rewardClaims.InsertOne(&item)
+
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			log.Printf("error starting a transaction - %s", err)
+			return err
+		}
+
+		for _, claimEntry := range item.Items {
+			claimDepleted := false
+			inventories, err := sa.GetRewardInventories(orgID, nil, &claimEntry.RewardType, nil, nil, &claimDepleted, nil, nil)
+			if err != nil {
+				log.Printf("storage.CreateUserReward error: %s", err)
+				return fmt.Errorf("storage.CreateRewardClaim error: %s", err)
+			}
+
+			if len(inventories) > 0 {
+				accumulatedAmount := 0
+				remaingAmnount := claimEntry.Amount
+				for _, inventory := range inventories {
+					claimableAmount := inventory.GetClaimableAmount()
+					if claimableAmount > 0 {
+						if claimableAmount < remaingAmnount {
+							inventory.AmountClaimed += claimableAmount
+							accumulatedAmount += claimableAmount
+							remaingAmnount -= claimableAmount
+						} else {
+							inventory.AmountClaimed += remaingAmnount
+							accumulatedAmount += remaingAmnount
+							remaingAmnount -= remaingAmnount
+						}
+						_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+						if err != nil {
+							abortTransaction(sessionContext)
+							log.Printf("storage.CreateUserReward error: %s", err)
+							return fmt.Errorf("storage.CreateUserReward error: %s", err)
+						}
+						if accumulatedAmount == claimEntry.Amount {
+							break
+						}
+					}
+				}
+
+				if accumulatedAmount < claimEntry.Amount {
+					abortTransaction(sessionContext)
+					log.Printf("storage.CreateRewardClaim insuficient amount in the inventory for: %s", claimEntry.RewardType)
+					return fmt.Errorf("storage.CreateRewardClaim insuficient amount in the inventory for: %s", claimEntry.RewardType)
+				}
+			}
+		}
+
+		_, err = sa.db.rewardClaims.InsertOneWithContext(sessionContext, &item)
+		if err != nil {
+			log.Printf("storage.CreateRewardClaim error: %s", err)
+			return fmt.Errorf("storage.CreateRewardClaim error: %s", err)
+		}
+
+		//commit the transaction
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			abortTransaction(sessionContext)
+			fmt.Println(err)
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		log.Printf("storage.createRewardClaim error: %s", err)
-		return nil, fmt.Errorf("storage.createRewardClaim error: %s", err)
+		log.Printf("storage.CreateRewardClaim transaction error: %s", err)
+		return nil, fmt.Errorf("storage.CreateRewardClaim transaction error: %s", err)
 	}
+
 	return &item, nil
 }
 
