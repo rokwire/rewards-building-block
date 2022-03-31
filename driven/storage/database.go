@@ -248,7 +248,7 @@ func (m *database) applyRewardInventoriesChecks(posts *collectionWrapper) error 
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "reward_type", Value: 1},
-			}, true)
+			}, false)
 		if err != nil {
 			return err
 		}

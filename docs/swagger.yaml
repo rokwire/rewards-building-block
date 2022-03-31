@@ -61,12 +61,16 @@ definitions:
         type: integer
       amount_total:
         type: integer
+      claim_depleted:
+        type: boolean
       date_created:
         type: string
       date_updated:
         type: string
       description:
         type: string
+      grant_depleted:
+        type: boolean
       id:
         type: string
       in_stock:
@@ -254,9 +258,20 @@ paths:
         in: query
         name: ids
         type: string
-      - description: 'in_stock - possible values: missing, 0- false, 1- true'
+      - description: 'in_stock - possible values: missing (e.g no filter), 0- false,
+          1- true'
         in: query
         name: in_stock
+        type: string
+      - description: 'grant_depleted - possible values: missing (e.g no filter), 0-
+          false, 1- true'
+        in: query
+        name: grant_depleted
+        type: string
+      - description: 'claim_depleted - possible values: missing (e.g no filter), 0-
+          false, 1- true'
+        in: query
+        name: claim_depleted
         type: string
       - description: limit - limit the result
         in: query

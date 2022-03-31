@@ -214,8 +214,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "in_stock - possible values: missing, 0- false, 1- true",
+                        "description": "in_stock - possible values: missing (e.g no filter), 0- false, 1- true",
                         "name": "in_stock",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "grant_depleted - possible values: missing (e.g no filter), 0- false, 1- true",
+                        "name": "grant_depleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "claim_depleted - possible values: missing (e.g no filter), 0- false, 1- true",
+                        "name": "claim_depleted",
                         "in": "query"
                     },
                     {
@@ -925,6 +937,9 @@ const docTemplate = `{
                 "amount_total": {
                     "type": "integer"
                 },
+                "claim_depleted": {
+                    "type": "boolean"
+                },
                 "date_created": {
                     "type": "string"
                 },
@@ -933,6 +948,9 @@ const docTemplate = `{
                 },
                 "description": {
                     "type": "string"
+                },
+                "grant_depleted": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "string"

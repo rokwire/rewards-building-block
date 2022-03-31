@@ -285,7 +285,7 @@ func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
 }
 
 // GetRewardInventories Gets all reward inventories
-func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}
@@ -300,6 +300,14 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 
 	if inStock != nil {
 		filter = append(filter, primitive.E{Key: "in_stock", Value: *inStock})
+	}
+
+	if grantDepleted != nil {
+		filter = append(filter, primitive.E{Key: "grant_depleted", Value: *grantDepleted})
+	}
+
+	if claimDepleted != nil {
+		filter = append(filter, primitive.E{Key: "claim_depleted", Value: *claimDepleted})
 	}
 
 	findOptions := options.FindOptions{
@@ -362,6 +370,14 @@ func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventor
 
 // UpdateRewardInventory updates a reward pool
 func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return sa.UpdateRewardInventoryWithContext(nil, orgID, id, item)
+}
+
+// UpdateRewardInventoryWithContext updates a reward pool
+func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	jsonID := item.ID
 	if jsonID != id || orgID != item.OrgID {
 		return nil, fmt.Errorf("storage.UpdateRewardInventory attempt to override another object")
@@ -371,20 +387,25 @@ func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.Rew
 		return nil, err
 	}
 
+	item.GrantDepleted = item.AmountTotal <= item.AmountGranted
+	item.ClaimDepleted = item.AmountTotal <= item.AmountClaimed
+
 	now := time.Now().UTC()
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "date_updated", Value: now},
-			primitive.E{Key: "amount", Value: item.AmountTotal},
-			primitive.E{Key: "quantity_granted", Value: item.AmountGranted},
-			primitive.E{Key: "quantity_claimed", Value: item.AmountClaimed},
+			primitive.E{Key: "amount_total", Value: item.AmountTotal},
+			primitive.E{Key: "amount_granted", Value: item.AmountGranted},
+			primitive.E{Key: "amount_claimed", Value: item.AmountClaimed},
+			primitive.E{Key: "grant_depleted", Value: item.GrantDepleted},
+			primitive.E{Key: "claim_depleted", Value: item.ClaimDepleted},
 			primitive.E{Key: "in_stock", Value: item.InStock},
 			primitive.E{Key: "description", Value: item.Description},
 		},
 		},
 	}
-	_, err := sa.db.rewardInventories.UpdateOne(filter, update, nil)
+	_, err := sa.db.rewardInventories.UpdateOneWithContext(ctx, filter, update, nil)
 	if err != nil {
 		log.Printf("storage.UpdateRewardInventory error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardInventory error: %s", err)
@@ -399,9 +420,9 @@ func (sa *Adapter) validateInventoryCreateOrUpdate(item model.RewardInventory) e
 	if item.AmountTotal <= 0 {
 		return fmt.Errorf("inventory amount is zero or negative")
 	} else if item.AmountGranted > item.AmountTotal {
-		return fmt.Errorf("quantity granted is greater than the amount")
-	} else if item.AmountClaimed > item.AmountGranted {
-		return fmt.Errorf("quantity claimed is greater than the quantity granted")
+		return fmt.Errorf("quantity granted is greater than the total amount")
+	} else if item.AmountClaimed > item.AmountTotal {
+		return fmt.Errorf("quantity claimed is greater than the total amount")
 	}
 
 	return nil
@@ -411,7 +432,10 @@ func (sa *Adapter) validateInventoryCreateOrUpdate(item model.RewardInventory) e
 func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
-	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "_id", Value: id},
+	}
 	_, err := sa.db.rewardInventories.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardInventory error: %s", err)
@@ -496,40 +520,50 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 			return err
 		}
 
-		inStock := true
-		inventories, err := sa.GetRewardInventories(orgID, nil, &item.RewardType, &inStock, nil, nil)
+		grantDepleted := false
+		inventories, err := sa.GetRewardInventories(orgID, nil, &item.RewardType, nil, &grantDepleted, nil, nil, nil)
 		if err != nil {
 			log.Printf("storage.CreateUserReward error: %s", err)
 			return fmt.Errorf("storage.CreateUserReward error: %s", err)
 		}
 
 		if len(inventories) > 0 {
-			inventory := inventories[0]
-			if inventory.InStock && inventory.AmountTotal >= inventory.AmountGranted+item.Amount {
-				_, err = sa.db.rewardInventories.UpdateOneWithContext(
-					sessionContext,
-					bson.D{
-						primitive.E{Key: "org_id", Value: orgID},
-						primitive.E{Key: "reward_type", Value: item.RewardType},
-					},
-					bson.D{
-						primitive.E{Key: "$set", Value: bson.D{
-							primitive.E{Key: "date_updated", Value: now},
-							primitive.E{Key: "amount_granted", Value: inventory.AmountGranted + item.Amount},
-						}},
-					}, &options.UpdateOptions{})
-				if err != nil {
-					log.Printf("storage.CreateUserReward error: %s", err)
-					return fmt.Errorf("storage.CreateUserReward error: %s", err)
+			accumulatedAmount := 0
+			remaingAmnount := item.Amount
+			for _, inventory := range inventories {
+				grantableAmount := inventory.GetGrantableAmount()
+				if grantableAmount > 0 {
+					if grantableAmount < remaingAmnount {
+						inventory.AmountGranted += grantableAmount
+						accumulatedAmount += grantableAmount
+						remaingAmnount -= grantableAmount
+					} else {
+						inventory.AmountGranted += remaingAmnount
+						accumulatedAmount += remaingAmnount
+						remaingAmnount -= remaingAmnount
+					}
+					_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+					if err != nil {
+						abortTransaction(sessionContext)
+						log.Printf("storage.CreateUserReward error: %s", err)
+						return fmt.Errorf("storage.CreateUserReward error: %s", err)
+					}
+					if accumulatedAmount == item.Amount {
+						break
+					}
 				}
-			} else {
-				log.Printf("insuficient amount of %s: Expected %d, but have: %d", item.RewardType, inventory.AmountTotal, inventory.AmountGranted+item.Amount)
-				return fmt.Errorf("storage.CreateUserReward error: %s", err)
+			}
+
+			if accumulatedAmount < item.Amount {
+				abortTransaction(sessionContext)
+				log.Printf("storage.CreateUserReward insuficient amount in the inventory for: %s", item.RewardType)
+				return fmt.Errorf("storage.CreateUserReward insuficient amount in the inventory for: %s", item.RewardType)
 			}
 		}
 
 		_, err = sa.db.rewardHistory.InsertOneWithContext(sessionContext, &item)
 		if err != nil {
+			abortTransaction(sessionContext)
 			log.Printf("storage.CreateUserReward error: %s", err)
 			return fmt.Errorf("storage.CreateUserReward error: %s", err)
 		}
@@ -537,6 +571,7 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 		//commit the transaction
 		err = sessionContext.CommitTransaction(sessionContext)
 		if err != nil {
+			abortTransaction(sessionContext)
 			fmt.Println(err)
 			return err
 		}
@@ -594,19 +629,28 @@ func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *
 }
 
 // GetRewardQuantityState Gets reward quantities state for the current moment
-func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string) (*model.RewardQuantityState, error) {
+func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error) {
 
-	inStock := true
-	inventories, err := sa.GetRewardInventories(orgID, nil, &rewardType, &inStock, nil, nil)
+	inventories, err := sa.GetRewardInventories(orgID, nil, &rewardType, inStock, nil, nil, nil, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardQuantityState error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
 	}
 
+	var totalQuantity int = 0
+	var grantedQuantity int = 0
+	var grantableQuantity int = 0
+	var claimableQuantity int = 0
 	if len(inventories) > 0 {
-		inventory := inventories[0]
-		grantableQuantity := inventory.AmountTotal - inventory.AmountGranted
-		claimableQuantity := inventory.AmountTotal - inventory.AmountClaimed
+		for _, inventory := range inventories {
+			totalQuantity += inventory.AmountTotal
+			grantedQuantity += inventory.AmountGranted
+			if inventory.InStock {
+				claimableQuantity += inventory.AmountTotal - inventory.AmountClaimed
+			}
+		}
+		grantableQuantity = totalQuantity - grantedQuantity
+
 		return &model.RewardQuantityState{
 			RewardType:        rewardType,
 			GrantableQuantity: grantableQuantity,
@@ -669,6 +713,15 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 
 // UpdateRewardClaim updates a reward claim
 func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return sa.UpdateRewardClaimWithContext(nil, orgID, id, item)
+}
+
+// UpdateRewardClaim updates a reward claim
+func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	jsonID := item.ID
 	if jsonID != id {
 		return nil, fmt.Errorf("storage.updateRewardClaim attempt to override another object")
@@ -687,7 +740,7 @@ func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardC
 			primitive.E{Key: "date_updated", Value: now},
 		}},
 	}
-	_, err := sa.db.rewardClaims.UpdateOne(filter, update, nil)
+	_, err := sa.db.rewardClaims.UpdateOneWithContext(ctx, filter, update, nil)
 	if err != nil {
 		log.Printf("storage.updateRewardClaim error: %s", err)
 		return nil, fmt.Errorf("storage.updateRewardClaim error: %s", err)
@@ -708,6 +761,13 @@ func (sa *Adapter) DeleteRewardClaim(orgID string, id string) error {
 	}
 
 	return nil
+}
+
+func abortTransaction(sessionContext mongo.SessionContext) {
+	err := sessionContext.AbortTransaction(sessionContext)
+	if err != nil {
+		log.Printf("error on aborting a transaction - %s", err)
+	}
 }
 
 // SetListener sets the upper layer storage listener for sending collection changed callbacks

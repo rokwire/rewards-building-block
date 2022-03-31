@@ -21,7 +21,7 @@ type RewardOperation struct {
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // tshirt
 	Code          string    `json:"code" bson:"code"`               //
 	BuildingBlock string    `json:"building_block" bson:"building_block"`
-	Amount        int64     `json:"amount" bson:"amount"`
+	Amount        int       `json:"amount" bson:"amount"`
 	Description   string    `json:"description" bson:"description"`
 	DateCreated   time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
@@ -33,13 +33,23 @@ type RewardInventory struct {
 	OrgID         string    `json:"org_id" bson:"org_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // t-shirt
 	InStock       bool      `json:"in_stock" bson:"in_stock"`
-	AmountTotal   int64     `json:"amount_total" bson:"amount_total"`
-	AmountGranted int64     `json:"amount_granted" bson:"amount_granted"`
-	AmountClaimed int64     `json:"amount_claimed" bson:"amount_claimed"`
+	AmountTotal   int       `json:"amount_total" bson:"amount_total"`
+	AmountGranted int       `json:"amount_granted" bson:"amount_granted"`
+	AmountClaimed int       `json:"amount_claimed" bson:"amount_claimed"`
+	GrantDepleted bool      `json:"grant_depleted" bson:"grant_depleted"`
+	ClaimDepleted bool      `json:"claim_depleted" bson:"claim_depleted"`
 	Description   string    `json:"description" bson:"description"`
 	DateCreated   time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
 } // @name RewardInventory
+
+func (ri *RewardInventory) GetGrantableAmount() int {
+	return ri.AmountTotal - ri.AmountGranted
+}
+
+func (ri *RewardInventory) GetClaimableAmount() int {
+	return ri.AmountTotal - ri.AmountClaimed
+}
 
 // Reward wraps the history entry
 type Reward struct {
@@ -49,7 +59,7 @@ type Reward struct {
 	RewardType    string    `json:"reward_type" bson:"reward_type"`
 	Code          string    `json:"code" bson:"code"`
 	BuildingBlock string    `json:"building_block" bson:"building_block"`
-	Amount        int64     `json:"amount" bson:"amount"`
+	Amount        int       `json:"amount" bson:"amount"`
 	Description   string    `json:"description" bson:"description"`
 	DateCreated   time.Time `json:"date_created" bson:"date_created"`
 	DateUpdated   time.Time `json:"date_updated" bson:"date_updated"`
@@ -58,8 +68,8 @@ type Reward struct {
 // RewardQuantityState wraps current reward inventory state
 type RewardQuantityState struct {
 	RewardType        string `json:"reward_type" bson:"reward_type"`
-	GrantableQuantity int64  `json:"grantable_quantity" bson:"grantable_quantity"`
-	ClaimableQuantity int64  `json:"claimable_quantity" bson:"claimable_quantity"`
+	GrantableQuantity int    `json:"grantable_quantity" bson:"grantable_quantity"`
+	ClaimableQuantity int    `json:"claimable_quantity" bson:"claimable_quantity"`
 }
 
 // RewardClaim wraps a claim that is made by a user
@@ -79,5 +89,5 @@ type RewardClaimItem struct {
 	RewardType  string `json:"reward_type" bson:"reward_type"`
 	InventoryID string `json:"inventory_id" bson:"inventory_id"`
 
-	Amount int64 `json:"amount" bson:"amount"`
+	Amount int `json:"amount" bson:"amount"`
 } // @name RewardClaimItem

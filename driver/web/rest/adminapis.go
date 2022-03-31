@@ -376,7 +376,9 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // GetRewardInventories Retrieves  all reward inventories
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"
-// @Param in_stock query string false "in_stock - possible values: missing, 0- false, 1- true"
+// @Param in_stock query string false "in_stock - possible values: missing (e.g no filter), 0- false, 1- true"
+// @Param grant_depleted query string false "grant_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
+// @Param claim_depleted query string false "claim_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
 // @Param limit query string false "limit - limit the result"
 // @Param offset query string false "offset"
 // @Tags Admin
@@ -388,6 +390,8 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 
 	rewardType := getStringQueryParam(r, "reward_type")
 	inStock := getBoolQueryParam(r, "in_stock", nil)
+	grantDepleted := getBoolQueryParam(r, "grant_depleted", nil)
+	claimDepleted := getBoolQueryParam(r, "claim_depleted", nil)
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
@@ -398,7 +402,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, grantDepleted, claimDepleted, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventories: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
