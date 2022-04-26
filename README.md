@@ -23,6 +23,8 @@ MONGO_TIMEOUT | < value > | no | MongoDB timeout in milliseconds. Set default va
 DEFAULT_CACHE_EXPIRATION_SECONDS | < value > | false | Default cache expiration time in seconds. Default: 120
 CORE_SERVICE_REG_LOADER_URL | < value > | yes | Core service reg loader url
 REWARDS_SERVICE_URL | < value > | yes | Rewards base URL
+INTERNAL_API_KEY | < value > | yes | Internal API key for the corresponding environment
+
 ### Run Application
 
 #### Run locally without Docker

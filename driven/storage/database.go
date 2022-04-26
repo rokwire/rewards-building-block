@@ -28,7 +28,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Listener listens for storage updates
+type Listener interface {
+	OnRewardTypesChanged()
+}
+
 type database struct {
+	listener Listener
+
 	mongoDBAuth  string
 	mongoDBName  string
 	mongoTimeout time.Duration
@@ -36,7 +43,11 @@ type database struct {
 	db       *mongo.Database
 	dbClient *mongo.Client
 
-	rewardTypes *collectionWrapper
+	rewardTypes       *collectionWrapper
+	rewardOperations  *collectionWrapper
+	rewardInventories *collectionWrapper
+	rewardHistory     *collectionWrapper
+	rewardClaims      *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -68,12 +79,41 @@ func (m *database) start() error {
 	if err != nil {
 		return err
 	}
+	go rewardTypes.Watch(nil)
+
+	rewardOperations := &collectionWrapper{database: m, coll: db.Collection("reward_operations")}
+	err = m.applyRewardOperationsChecks(rewardOperations)
+	if err != nil {
+		return err
+	}
+
+	rewardInventories := &collectionWrapper{database: m, coll: db.Collection("reward_inventories")}
+	err = m.applyRewardInventoriesChecks(rewardInventories)
+	if err != nil {
+		return err
+	}
+
+	rewardHistory := &collectionWrapper{database: m, coll: db.Collection("reward_history")}
+	err = m.applyRewardHistoryChecks(rewardHistory)
+	if err != nil {
+		return err
+	}
+
+	rewardClaims := &collectionWrapper{database: m, coll: db.Collection("reward_claims")}
+	err = m.applyRewardClaimsChecks(rewardClaims)
+	if err != nil {
+		return err
+	}
 
 	//asign the db, db client and the collections
 	m.db = db
 	m.dbClient = client
 
 	m.rewardTypes = rewardTypes
+	m.rewardInventories = rewardInventories
+	m.rewardHistory = rewardHistory
+	m.rewardOperations = rewardOperations
+	m.rewardClaims = rewardClaims
 
 	return nil
 }
@@ -91,11 +131,11 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		}
 	}
 
-	if indexMapping["name_1"] == nil {
+	if indexMapping["org_id_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
-				primitive.E{Key: "name", Value: 1},
-			}, true)
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
 		if err != nil {
 			return err
 		}
@@ -111,6 +151,293 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		}
 	}
 
+	if indexMapping["reward_type_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "reward_type", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Println("reward_types checks passed")
+	return nil
+}
+
+func (m *database) applyRewardOperationsChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_operations checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["code_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "code", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["building_block_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "building_block", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["reward_type_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "reward_type", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_operations checks passed")
+	return nil
+}
+
+func (m *database) applyRewardInventoriesChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_inventories checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["reward_type_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "reward_type", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["amount_total_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "amount_total", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["amount_granted_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "amount_granted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["amount_claimed_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "amount_claimed", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["grant_depleted_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "grant_depleted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["claim_depleted_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "claim_depleted", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["in_stock_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "in_stock", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_inventories checks passed")
+	return nil
+}
+
+func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_history checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["user_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "user_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["code_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "code", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["building_block_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "building_block", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_history checks passed")
+	return nil
+}
+
+func (m *database) applyRewardClaimsChecks(posts *collectionWrapper) error {
+	log.Println("apply reward_claims checks.....")
+
+	indexes, _ := posts.ListIndexes()
+	indexMapping := map[string]interface{}{}
+	if indexes != nil {
+
+		for _, index := range indexes {
+			name := index["name"].(string)
+			indexMapping[name] = index
+		}
+	}
+
+	if indexMapping["org_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["user_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "user_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["date_created_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "date_created", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("reward_claims checks passed")
 	return nil
 }

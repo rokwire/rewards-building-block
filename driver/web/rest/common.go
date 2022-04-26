@@ -37,13 +37,13 @@ func getIntQueryParam(r *http.Request, paramName string, defaultValue int) int {
 	return defaultValue
 }
 
-func getBoolQueryParam(r *http.Request, paramName string, defaultValue bool) bool {
+func getBoolQueryParam(r *http.Request, paramName string, defaultValue *bool) *bool {
 	params, ok := r.URL.Query()[paramName]
 	if ok && len(params[0]) > 0 {
 		val, err := strconv.Atoi(params[0])
 		if err == nil {
 			bValue := val != 0
-			return bValue
+			return &bValue
 		}
 	}
 	return defaultValue

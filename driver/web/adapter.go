@@ -19,6 +19,7 @@ package web
 
 import (
 	"fmt"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -39,23 +40,24 @@ type Adapter struct {
 	auth          *Auth
 	authorization *casbin.Enforcer
 
-	apisHandler      rest.ApisHandler
-	adminApisHandler rest.AdminApisHandler
+	apisHandler         rest.ApisHandler
+	adminApisHandler    rest.AdminApisHandler
+	internalApisHandler rest.InternalApisHandler
 
 	app *core.Application
 }
 
 // @title Rewards Building Block API
 // @description RoRewards Building Block API Documentation.
-// @version 0.0.1
+// @version 1.0.6
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost
 // @BasePath /content
 // @schemes https
 
-// @securityDefinitions.apikey UserAuth
-// @in header (add Bearer prefix to the Authorization value)
+// @securityDefinitions.apikey InternalApiAuth
+// @in header (add INTERNAL-API-KEY with correct value as a header)
 // @name Authorization
 
 // @securityDefinitions.apikey AdminUserAuth
@@ -71,19 +73,47 @@ func (we Adapter) Start() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
+	subrouter := router.PathPrefix("/rewards").Subrouter()
+	subrouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
+	subrouter.HandleFunc("/doc", we.serveDoc)
+	subrouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+
 	// handle apis
-	contentRouter := router.PathPrefix("/rewards/api").Subrouter()
-	contentRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
-	contentRouter.HandleFunc("/doc", we.serveDoc)
-	contentRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+	apiRouter := subrouter.PathPrefix("/api").Subrouter()
+
+	// Internal APIs called from other BBs
+	apiRouter.HandleFunc("/int/reward", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.CreateReward)).Methods("POST")
+	apiRouter.HandleFunc("/int/stats", we.internalAPIKeyAuthWrapFunc(we.internalApisHandler.GetRewardStats)).Methods("GET")
+
+	// Client APIs
+	apiRouter.HandleFunc("/user/balance", we.userAuthWrapFunc(we.apisHandler.GetUserBalance)).Methods("GET")
+	apiRouter.HandleFunc("/user/history", we.userAuthWrapFunc(we.apisHandler.GetUserRewardsHistory)).Methods("GET")
+	apiRouter.HandleFunc("/user/claims", we.userAuthWrapFunc(we.apisHandler.GetUserRewardClaim)).Methods("GET")
+	apiRouter.HandleFunc("/user/claims", we.userAuthWrapFunc(we.apisHandler.CreateUserRewardClaim)).Methods("POST")
 
 	// handle student guide admin apis
-	adminSubRouter := contentRouter.PathPrefix("/admin").Subrouter()
-	adminSubRouter.HandleFunc("/reward_types", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardTypes)).Methods("GET")
-	adminSubRouter.HandleFunc("/reward_types", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardType)).Methods("POST")
-	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardType)).Methods("GET")
-	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
-	adminSubRouter.HandleFunc("/reward_types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
+	adminSubRouter := apiRouter.PathPrefix("/admin").Subrouter()
+	adminSubRouter.HandleFunc("/types", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardTypes)).Methods("GET")
+	adminSubRouter.HandleFunc("/types", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardType)).Methods("POST")
+	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardType)).Methods("GET")
+	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
+	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
+
+	adminSubRouter.HandleFunc("/operations", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperations)).Methods("GET")
+	adminSubRouter.HandleFunc("/operations", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardOperation)).Methods("POST")
+	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperation)).Methods("GET")
+	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardOperation)).Methods("PUT")
+	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardOperation)).Methods("DELETE")
+
+	adminSubRouter.HandleFunc("/inventories", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventories)).Methods("GET")
+	adminSubRouter.HandleFunc("/inventories", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardInventory)).Methods("POST")
+	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventory)).Methods("GET")
+	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardInventory)).Methods("PUT")
+
+	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaims)).Methods("GET")
+	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardClaim)).Methods("POST")
+	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaim)).Methods("GET")
+	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim)).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -123,7 +153,7 @@ func (we Adapter) apiKeyOrTokenWrapFunc(handler apiKeysAuthFunc) http.HandlerFun
 	}
 }
 
-type userAuthFunc = func(http.ResponseWriter, *http.Request)
+type userAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 
 func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -131,14 +161,14 @@ func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 
 		coreAuth, claims := we.auth.coreAuth.Check(req)
 		if coreAuth && claims != nil && !claims.Anonymous {
-			handler(w, req)
+			handler(claims, w, req)
 			return
 		}
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 }
 
-type adminAuthFunc = func(http.ResponseWriter, *http.Request)
+type adminAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 
 func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -159,7 +189,7 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 				}
 			}
 			if HasAccess {
-				handler(w, req)
+				handler(claims, w, req)
 				return
 			}
 			log.Printf("Access control error - Core Subject: %s is trying to apply %s operation for %s\n", claims.Subject, act, obj)
@@ -171,6 +201,22 @@ func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	}
 }
 
+type internalAPIKeyAuthFunc = func(http.ResponseWriter, *http.Request)
+
+func (we Adapter) internalAPIKeyAuthWrapFunc(handler internalAPIKeyAuthFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		utils.LogRequest(req)
+
+		apiKeyAuthenticated := we.auth.internalAuth.check(w, req)
+
+		if apiKeyAuthenticated {
+			handler(w, req)
+		} else {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		}
+	}
+}
+
 // NewWebAdapter creates new WebAdapter instance
 func NewWebAdapter(host string, port string, app *core.Application, config model.Config) Adapter {
 	auth := NewAuth(app, config)
@@ -178,7 +224,17 @@ func NewWebAdapter(host string, port string, app *core.Application, config model
 
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
-	return Adapter{host: host, port: port, auth: auth, authorization: authorization, apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app}
+	internalApisHandler := rest.NewInternalApisHandler(app)
+	return Adapter{
+		host:                host,
+		port:                port,
+		auth:                auth,
+		authorization:       authorization,
+		apisHandler:         apisHandler,
+		adminApisHandler:    adminApisHandler,
+		internalApisHandler: internalApisHandler,
+		app:                 app,
+	}
 }
 
 // AppListener implements core.ApplicationListener interface
