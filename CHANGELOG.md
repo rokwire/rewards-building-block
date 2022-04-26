@@ -6,5 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2022-01-13
+## [1.0.7] - 2022-04-26
+- Update Swagger library due to security issue [#1](https://github.com/rokwire/lms-building-block/issues/1)
+
+## [1.0.6] - 2022-03-31
+## [1.0.5] - 2022-03-28
+## [1.0.4] - 2022-03-25
+## [1.0.3] - 2022-03-21
+## [1.0.2] - 2022-03-18
+## [1.0.1] - 2022-02-18
+## [0.0.5] - 2022-02-17
 - Introduce Rewards BB 
