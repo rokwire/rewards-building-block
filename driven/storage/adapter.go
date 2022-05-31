@@ -95,6 +95,58 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 	return &Adapter{db: db}
 }
 
+//StoreMultiTenancyData stores multi-tenancy to already exisiting data in the collections
+func (sa *Adapter) StoreMultiTenancyData(context TransactionContext, appID string, orgID string) error {
+	//TODO
+
+	filter := bson.D{}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+		}},
+	}
+	//types
+	_, err := sa.db.rewardTypes.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//history
+	_, err = sa.db.rewardHistory.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//operations
+	_, err = sa.db.rewardOperations.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//inventories
+	_, err = sa.db.rewardInventories.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+
+	//claims
+	_, err = sa.db.rewardClaims.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FindAllContentItems  finds all content items
+func (sa *Adapter) FindAllRewardTypeItems() ([]model.RewardType, error) {
+	filter := bson.D{}
+	var result []model.RewardType
+	err := sa.db.rewardTypes.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // GetRewardTypes Gets all reward types
 func (sa *Adapter) GetRewardTypes(orgID string) ([]model.RewardType, error) {
 	filter := bson.D{

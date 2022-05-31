@@ -164,6 +164,7 @@ func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*mode
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	PerformTransaction(func(context storage.TransactionContext) error) error
+
 	GetRewardTypes(orgID string) ([]model.RewardType, error)
 	GetRewardType(orgID string, id string) (*model.RewardType, error)
 	GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error)
@@ -198,6 +199,9 @@ type Storage interface {
 	// User APIs
 	GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
 	GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
+
+	FindAllRewardTypeItems() ([]model.RewardType, error)
+	StoreMultiTenancyData(context storage.TransactionContext, appID string, orgID string) error
 
 	SetListener(listener storage.Listener)
 }
