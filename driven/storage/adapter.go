@@ -20,26 +20,66 @@ package storage
 import (
 	"context"
 	"fmt"
+	"log"
+	"rewards/core/model"
+	"strconv"
+	"time"
+
+	"github.com/rokwire/logging-library-go/logs"
+
+	"github.com/rokwire/logging-library-go/errors"
+	"github.com/rokwire/logging-library-go/logutils"
+
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"rewards/core/model"
-	"strconv"
-	"time"
 )
 
 // Adapter implements the Storage interface
 type Adapter struct {
-	db *database
+	db     *database
+	logger *logs.Logger
 }
 
 // Start starts the storage
 func (sa *Adapter) Start() error {
 	err := sa.db.start()
 	return err
+}
+
+//PerformTransaction performs a transaction
+func (sa *Adapter) PerformTransaction(transaction func(context TransactionContext) error) error {
+	// transaction
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionStart, logutils.TypeTransaction, nil, err)
+		}
+		err = transaction(sessionContext)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		}
+
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
+	err := sessionContext.AbortTransaction(sessionContext)
+	if err != nil {
+		sa.logger.Errorf("error aborting a transaction - %s", err)
+	}
 }
 
 // NewStorageAdapter creates a new storage adapter instance
@@ -861,4 +901,9 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 			m.listener.OnRewardTypesChanged()
 		}
 	}
+}
+
+//TransactionContext wraps mongo.SessionContext for use by external packages
+type TransactionContext interface {
+	mongo.SessionContext
 }

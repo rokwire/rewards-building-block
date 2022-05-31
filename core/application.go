@@ -18,7 +18,9 @@
 package core
 
 import (
+	"log"
 	cacheadapter "rewards/driven/cache"
+	"rewards/driven/storage"
 )
 
 //Application represents the core application code based on hexagonal architecture
@@ -34,7 +36,34 @@ type Application struct {
 
 // Start starts the core part of the application
 func (app *Application) Start() {
+	err := app.storeMultiTenancyData()
+	if err != nil {
+		log.Fatalf("error initializing multi-tenancy data: %s", err.Error())
+	}
+
 	app.storage.SetListener(app)
+}
+
+//as the service starts supporting multi-tenancy we need to add the needed multi-tenancy fields for the existing data,
+func (app *Application) storeMultiTenancyData() error {
+	//in transaction
+	transaction := func(context storage.TransactionContext) error {
+
+		sg, err := app.storage.GetRewardTypes("")
+		if err != nil {
+			return err
+		}
+		log.Println(sg)
+
+		return nil
+	}
+
+	err := app.storage.PerformTransaction(transaction)
+	if err != nil {
+		log.Printf("error performing transaction for multi tenancy")
+		return err
+	}
+	return nil
 }
 
 // NewApplication creates new Application
