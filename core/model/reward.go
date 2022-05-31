@@ -6,6 +6,7 @@ import "time"
 type RewardType struct {
 	ID          string    `json:"id" bson:"_id"`
 	OrgID       string    `json:"org_id" bson:"org_id"`
+	AppID       string    `json:"app_id" bson:"app_id"`
 	RewardType  string    `json:"reward_type" bson:"reward_type"`   // tshirt
 	DisplayName string    `json:"display_name" bson:"display_name"` //
 	Active      bool      `json:"active" bson:"active"`
