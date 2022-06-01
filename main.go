@@ -57,8 +57,10 @@ func main() {
 	defaultCacheExpirationSeconds := getEnvKey("DEFAULT_CACHE_EXPIRATION_SECONDS", false)
 	cacheAdapter := cacheadapter.NewCacheAdapter(defaultCacheExpirationSeconds)
 
+	mtAppID := getEnvKey("REWARDS_MULTI_TENANCY_APP_ID", true)
+	mtOrgID := getEnvKey("REWARDS_MULTI_TENANCY_ORG_ID", true)
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter, mtAppID, mtOrgID)
 	application.Start()
 
 	// web adapter

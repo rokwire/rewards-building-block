@@ -19,10 +19,11 @@ package storage
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -141,6 +142,16 @@ func (m *database) applyRewardTypesChecks(posts *collectionWrapper) error {
 		}
 	}
 
+	if indexMapping["app_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "app_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 	if indexMapping["building_block_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
@@ -182,6 +193,16 @@ func (m *database) applyRewardOperationsChecks(posts *collectionWrapper) error {
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["app_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "app_id", Value: 1},
 			}, false)
 		if err != nil {
 			return err
@@ -238,6 +259,16 @@ func (m *database) applyRewardInventoriesChecks(posts *collectionWrapper) error 
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["app_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "app_id", Value: 1},
 			}, false)
 		if err != nil {
 			return err
@@ -351,6 +382,16 @@ func (m *database) applyRewardHistoryChecks(posts *collectionWrapper) error {
 		}
 	}
 
+	if indexMapping["app_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "app_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
 	if indexMapping["user_id_1"] == nil {
 		err := posts.AddIndex(
 			bson.D{
@@ -412,6 +453,16 @@ func (m *database) applyRewardClaimsChecks(posts *collectionWrapper) error {
 		err := posts.AddIndex(
 			bson.D{
 				primitive.E{Key: "org_id", Value: 1},
+			}, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if indexMapping["app_id_1"] == nil {
+		err := posts.AddIndex(
+			bson.D{
+				primitive.E{Key: "app_id", Value: 1},
 			}, false)
 		if err != nil {
 			return err

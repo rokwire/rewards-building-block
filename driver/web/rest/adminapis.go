@@ -26,7 +26,7 @@ type AdminApisHandler struct {
 // @Security AdminUserAuth
 // @Router /admin/types [get]
 func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
+	resData, err := h.app.Services.GetRewardTypes(&claims.AppID, claims.OrgID)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -204,7 +204,7 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 // @Security AdminUserAuth
 // @Router /admin/operations [get]
 func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
+	resData, err := h.app.Services.GetRewardTypes(&claims.AppID, claims.OrgID)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

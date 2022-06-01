@@ -27,13 +27,13 @@ func (app *Application) getVersion() string {
 	return app.version
 }
 
-func (app *Application) getRewardTypes(orgID string) ([]model.RewardType, error) {
+func (app *Application) getRewardTypes(appID *string, orgID string) ([]model.RewardType, error) {
 	types := app.cacheAdapter.GetRewardTypes()
 	if types != nil {
 		return types, nil
 	}
 
-	storedTypes, err := app.storage.GetRewardTypes(orgID)
+	storedTypes, err := app.storage.GetRewardTypes(appID, orgID)
 	if err == nil && storedTypes != nil {
 		app.cacheAdapter.SetRewardTypes(storedTypes)
 	}

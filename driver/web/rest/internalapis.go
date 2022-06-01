@@ -91,6 +91,7 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 // getRewardStatsBody wrapper
 type getRewardStatsBody struct {
 	OrgID string `json:"org_id"`
+	AppID string `json:"app_id"`
 } //@name getRewardStatsBody
 
 // GetRewardStats Gets reward quantity stats for the current moment
@@ -118,7 +119,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	types, err := h.app.Services.GetRewardTypes(item.OrgID)
+	types, err := h.app.Services.GetRewardTypes(&item.AppID, item.OrgID)
 	if err != nil {
 		log.Printf("Error on internalapis.GetRewardStats: Reward types not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

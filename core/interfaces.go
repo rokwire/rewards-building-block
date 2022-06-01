@@ -26,7 +26,7 @@ import (
 type Services interface {
 	GetVersion() string
 
-	GetRewardTypes(orgID string) ([]model.RewardType, error)
+	GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error)
 	GetRewardType(orgID string, id string) (*model.RewardType, error)
 	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
 	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
@@ -65,8 +65,8 @@ func (s *servicesImpl) GetVersion() string {
 	return s.app.getVersion()
 }
 
-func (s *servicesImpl) GetRewardTypes(orgID string) ([]model.RewardType, error) {
-	return s.app.getRewardTypes(orgID)
+func (s *servicesImpl) GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error) {
+	return s.app.getRewardTypes(appID, orgID)
 }
 
 func (s *servicesImpl) GetRewardType(orgID string, id string) (*model.RewardType, error) {
@@ -165,7 +165,7 @@ func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*mode
 type Storage interface {
 	PerformTransaction(func(context storage.TransactionContext) error) error
 
-	GetRewardTypes(orgID string) ([]model.RewardType, error)
+	GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error)
 	GetRewardType(orgID string, id string) (*model.RewardType, error)
 	GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error)
 	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
@@ -200,7 +200,7 @@ type Storage interface {
 	GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
 	GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
 
-	FindAllRewardTypeItems() ([]model.RewardType, error)
+	FindAllRewardTypeItems(context storage.TransactionContext) ([]model.RewardType, error)
 	StoreMultiTenancyData(context storage.TransactionContext, appID string, orgID string) error
 
 	SetListener(listener storage.Listener)

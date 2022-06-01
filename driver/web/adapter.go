@@ -116,7 +116,8 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/claims/{id}", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardClaim, we.auth.coreAuth.standardAuth)).Methods("GET")
 	adminSubRouter.HandleFunc("/claims/{id}", we.coreAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim, we.auth.coreAuth.standardAuth)).Methods("PUT")
 
-	log.Fatal(http.ListenAndServe(":"+we.port, router))
+	//log.Fatal(http.ListenAndServe(":"+we.port, router))
+	log.Fatal(http.ListenAndServe(":81", router))
 }
 
 func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {

@@ -32,6 +32,9 @@ type Application struct {
 
 	storage      Storage
 	cacheAdapter *cacheadapter.CacheAdapter
+
+	multiTenancyAppID string
+	multiTenancyOrgID string
 }
 
 // Start starts the core part of the application
@@ -52,7 +55,7 @@ func (app *Application) storeMultiTenancyData() error {
 
 		//check if we need to apply multi-tenancy data
 		var applyData bool
-		items, err := app.storage.FindAllRewardTypeItems()
+		items, err := app.storage.FindAllRewardTypeItems(context)
 		if err != nil {
 			return err
 		}
@@ -71,7 +74,10 @@ func (app *Application) storeMultiTenancyData() error {
 		//apply data if necessary
 		if applyData {
 			log.Print("\tapplying multi-tenancy data..")
-			//TODO
+			err := app.storage.StoreMultiTenancyData(context, app.multiTenancyAppID, app.multiTenancyOrgID)
+			if err != nil {
+				return err
+			}
 		} else {
 			log.Print("\tno need to apply multi-tenancy data, so do nothing")
 		}
@@ -89,12 +95,14 @@ func (app *Application) storeMultiTenancyData() error {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter) *Application {
+func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, mtAppID string, mtOrgID string) *Application {
 	application := Application{
-		version:      version,
-		build:        build,
-		storage:      storage,
-		cacheAdapter: cacheadapter}
+		version:           version,
+		build:             build,
+		storage:           storage,
+		cacheAdapter:      cacheadapter,
+		multiTenancyAppID: mtAppID,
+		multiTenancyOrgID: mtOrgID}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

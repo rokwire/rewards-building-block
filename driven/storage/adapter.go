@@ -45,6 +45,7 @@ type Adapter struct {
 
 // Start starts the storage
 func (sa *Adapter) Start() error {
+
 	err := sa.db.start()
 	return err
 }
@@ -137,7 +138,7 @@ func (sa *Adapter) StoreMultiTenancyData(context TransactionContext, appID strin
 }
 
 // FindAllContentItems  finds all content items
-func (sa *Adapter) FindAllRewardTypeItems() ([]model.RewardType, error) {
+func (sa *Adapter) FindAllRewardTypeItems(context TransactionContext) ([]model.RewardType, error) {
 	filter := bson.D{}
 	var result []model.RewardType
 	err := sa.db.rewardTypes.Find(filter, &result, nil)
@@ -148,7 +149,7 @@ func (sa *Adapter) FindAllRewardTypeItems() ([]model.RewardType, error) {
 }
 
 // GetRewardTypes Gets all reward types
-func (sa *Adapter) GetRewardTypes(orgID string) ([]model.RewardType, error) {
+func (sa *Adapter) GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}
