@@ -32,12 +32,12 @@ type Services interface {
 	UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
 	DeleteRewardType(appID *string, orgID string, id string) error
 
-	GetRewardOperations(orgID string) ([]model.RewardOperation, error)
-	GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error)
-	GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error)
-	CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error)
-	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
-	DeleteRewardOperation(orgID string, id string) error
+	GetRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error)
+	GetRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error)
+	GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error)
+	CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error)
+	UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
+	DeleteRewardOperation(appID *string, orgID string, id string) error
 
 	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
@@ -85,28 +85,28 @@ func (s *servicesImpl) DeleteRewardType(appID *string, orgID string, id string) 
 	return s.app.deleteRewardTypes(appID, orgID, id)
 }
 
-func (s *servicesImpl) GetRewardOperations(orgID string) ([]model.RewardOperation, error) {
-	return s.app.getRewardOperations(orgID)
+func (s *servicesImpl) GetRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error) {
+	return s.app.getRewardOperations(appID, orgID)
 }
 
-func (s *servicesImpl) GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
-	return s.app.getRewardOperationByID(orgID, id)
+func (s *servicesImpl) GetRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error) {
+	return s.app.getRewardOperationByID(appID, orgID, id)
 }
 
-func (s *servicesImpl) GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
-	return s.app.getRewardOperationByCode(orgID, code)
+func (s *servicesImpl) GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error) {
+	return s.app.getRewardOperationByCode(appID, orgID, code)
 }
 
-func (s *servicesImpl) CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return s.app.createRewardOperation(orgID, item)
+func (s *servicesImpl) CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return s.app.createRewardOperation(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return s.app.updateRewardOperation(orgID, id, item)
+func (s *servicesImpl) UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return s.app.updateRewardOperation(appID, orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardOperation(orgID string, id string) error {
-	return s.app.deleteRewardOperation(orgID, id)
+func (s *servicesImpl) DeleteRewardOperation(appID *string, orgID string, id string) error {
+	return s.app.deleteRewardOperation(appID, orgID, id)
 }
 
 func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
@@ -172,12 +172,12 @@ type Storage interface {
 	UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
 	DeleteRewardType(appID *string, orgID string, id string) error
 
-	GetRewardOperations(orgID string) ([]model.RewardOperation, error)
-	GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error)
-	GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error)
-	CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error)
-	UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
-	DeleteRewardOperation(orgID string, id string) error
+	GetRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error)
+	GetRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error)
+	GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error)
+	CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error)
+	UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
+	DeleteRewardOperation(appID *string, orgID string, id string) error
 
 	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)

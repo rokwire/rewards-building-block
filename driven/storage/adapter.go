@@ -267,9 +267,10 @@ func (sa *Adapter) DeleteRewardType(appID *string, orgID string, id string) erro
 }
 
 // GetRewardOperations Gets all reward operations
-func (sa *Adapter) GetRewardOperations(orgID string) ([]model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 	var result []model.RewardOperation
 	err := sa.db.rewardOperations.Find(filter, &result, nil)
@@ -284,8 +285,9 @@ func (sa *Adapter) GetRewardOperations(orgID string) ([]model.RewardOperation, e
 }
 
 // GetRewardOperationByID Gets a reward operation by id
-func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -302,8 +304,9 @@ func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.Rewar
 }
 
 // GetRewardOperationByCode Gets a reward type by code
-func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "code", Value: code},
 	}
@@ -320,10 +323,11 @@ func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.R
 }
 
 // CreateRewardOperation creates a new reward operation
-func (sa *Adapter) CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+func (sa *Adapter) CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 	_, err := sa.db.rewardOperations.InsertOne(&item)
@@ -335,7 +339,7 @@ func (sa *Adapter) CreateRewardOperation(orgID string, item model.RewardOperatio
 }
 
 // UpdateRewardOperation updates a reward operation
-func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+func (sa *Adapter) UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
 	jsonID := item.ID
 	if jsonID != id {
 		return nil, fmt.Errorf("storage.UpdateRewardOperation attempt to override another object")
@@ -343,6 +347,7 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 
 	now := time.Now().UTC()
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -366,10 +371,11 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 }
 
 // DeleteRewardOperation deletes a reward operation
-func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
+func (sa *Adapter) DeleteRewardOperation(appID *string, orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}

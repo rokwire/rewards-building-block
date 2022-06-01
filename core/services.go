@@ -56,28 +56,28 @@ func (app *Application) deleteRewardTypes(appID *string, orgID string, id string
 	return app.storage.DeleteRewardType(appID, orgID, id)
 }
 
-func (app *Application) getRewardOperations(orgID string) ([]model.RewardOperation, error) {
-	return app.storage.GetRewardOperations(orgID)
+func (app *Application) getRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error) {
+	return app.storage.GetRewardOperations(appID, orgID)
 }
 
-func (app *Application) getRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
-	return app.storage.GetRewardOperationByID(orgID, id)
+func (app *Application) getRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error) {
+	return app.storage.GetRewardOperationByID(appID, orgID, id)
 }
 
-func (app *Application) getRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
-	return app.storage.GetRewardOperationByCode(orgID, code)
+func (app *Application) getRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error) {
+	return app.storage.GetRewardOperationByCode(appID, orgID, code)
 }
 
-func (app *Application) createRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return app.storage.CreateRewardOperation(orgID, item)
+func (app *Application) createRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return app.storage.CreateRewardOperation(appID, orgID, item)
 }
 
-func (app *Application) updateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return app.storage.UpdateRewardOperation(orgID, id, item)
+func (app *Application) updateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return app.storage.UpdateRewardOperation(appID, orgID, id, item)
 }
 
-func (app *Application) deleteRewardOperation(orgID string, id string) error {
-	return app.storage.DeleteRewardOperation(orgID, id)
+func (app *Application) deleteRewardOperation(appID *string, orgID string, id string) error {
+	return app.storage.DeleteRewardOperation(appID, orgID, id)
 }
 
 func (app *Application) createReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {

@@ -50,7 +50,7 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	operation, err := h.app.Services.GetRewardOperationByCode(item.OrgID, item.RewardCode)
+	operation, err := h.app.Services.GetRewardOperationByCode(&item.AppID, item.OrgID, item.RewardCode)
 	if err != nil {
 		log.Printf("Error on internalapis.CreateReward: Reward operation not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

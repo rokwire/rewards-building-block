@@ -19,6 +19,7 @@ type RewardType struct {
 type RewardOperation struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"org_id" bson:"org_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // tshirt
 	Code          string    `json:"code" bson:"code"`               //
 	BuildingBlock string    `json:"building_block" bson:"building_block"`
