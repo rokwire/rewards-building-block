@@ -389,9 +389,10 @@ func (sa *Adapter) DeleteRewardOperation(appID *string, orgID string, id string)
 }
 
 // GetRewardInventories Gets all reward inventories
-func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 
 	if len(ids) > 0 {
@@ -609,13 +610,14 @@ func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Re
 }
 
 // CreateUserReward creates a new reward history entry
-func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Reward, error) {
+func (sa *Adapter) CreateUserReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {
 
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	item.OrgID = orgID
+	item.AppID = *appID
 
 	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
 		err := sessionContext.StartTransaction()
@@ -625,7 +627,7 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 		}
 
 		grantDepleted := false
-		inventories, err := sa.GetRewardInventories(orgID, nil, &item.RewardType, nil, &grantDepleted, nil, nil, nil)
+		inventories, err := sa.GetRewardInventories(appID, orgID, nil, &item.RewardType, nil, &grantDepleted, nil, nil, nil)
 		if err != nil {
 			log.Printf("storage.CreateUserReward error: %s", err)
 			return fmt.Errorf("storage.CreateUserReward error: %s", err)
@@ -691,9 +693,9 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 }
 
 // GetUserRewardsAmount Gets user's rewards amount
-func (sa *Adapter) GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
+func (sa *Adapter) GetUserRewardsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
+		{"$match": bson.M{"app_id": appID, "org_id": orgID, "user_id": userID}},
 	}
 	if rewardType != nil {
 		pipeline = append(pipeline, bson.M{"$match": bson.M{"reward_type": *rewardType}})
@@ -711,9 +713,9 @@ func (sa *Adapter) GetUserRewardsAmount(orgID string, userID string, rewardType 
 }
 
 // GetUserClaimsAmount Gets user's claims amount
-func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
+func (sa *Adapter) GetUserClaimsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
+		{"$match": bson.M{"app_id": appID, "org_id": orgID, "user_id": userID}},
 		{"$unwind": bson.M{"path": "$items"}},
 	}
 
@@ -733,9 +735,9 @@ func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *
 }
 
 // GetRewardQuantityState Gets reward quantities state for the current moment
-func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error) {
+func (sa *Adapter) GetRewardQuantityState(appID *string, orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error) {
 
-	inventories, err := sa.GetRewardInventories(orgID, nil, &rewardType, inStock, nil, nil, nil, nil)
+	inventories, err := sa.GetRewardInventories(appID, orgID, nil, &rewardType, inStock, nil, nil, nil, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardQuantityState error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
@@ -801,10 +803,11 @@ func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, 
 }
 
 // CreateRewardClaim creates a new reward claim
-func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (sa *Adapter) CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 
@@ -817,7 +820,7 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 
 		for _, claimEntry := range item.Items {
 			claimDepleted := false
-			inventories, err := sa.GetRewardInventories(orgID, nil, &claimEntry.RewardType, nil, nil, &claimDepleted, nil, nil)
+			inventories, err := sa.GetRewardInventories(appID, orgID, nil, &claimEntry.RewardType, nil, nil, &claimDepleted, nil, nil)
 			if err != nil {
 				log.Printf("storage.CreateUserReward error: %s", err)
 				return fmt.Errorf("storage.CreateRewardClaim error: %s", err)

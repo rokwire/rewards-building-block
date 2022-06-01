@@ -403,7 +403,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, grantDepleted, claimDepleted, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetRewardInventories(&claims.AppID, claims.OrgID, IDs, rewardType, inStock, grantDepleted, claimDepleted, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventories: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -707,7 +707,7 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardClaim(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(&claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.createRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

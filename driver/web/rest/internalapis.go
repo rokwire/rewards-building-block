@@ -130,7 +130,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 	result := []model.RewardQuantityState{}
 	if len(types) > 0 {
 		for _, rewardType := range types {
-			quantity, err := h.app.Services.GetRewardQuantity(item.OrgID, rewardType.RewardType)
+			quantity, err := h.app.Services.GetRewardQuantity(&item.AppID, item.OrgID, rewardType.RewardType)
 			if err != nil {
 				log.Printf("Error on internalapis.GetRewardStats: %s", err)
 				http.Error(w, err.Error(), http.StatusBadRequest)

@@ -39,22 +39,22 @@ type Services interface {
 	UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(appID *string, orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
+	GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
-	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
+	CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
 	CreateReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
-	GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error)
+	GetUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error)
 	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 
-	GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantityState, error)
+	GetRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error)
 }
 
 type servicesImpl struct {
@@ -109,8 +109,8 @@ func (s *servicesImpl) DeleteRewardOperation(appID *string, orgID string, id str
 	return s.app.deleteRewardOperation(appID, orgID, id)
 }
 
-func (s *servicesImpl) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-	return s.app.getRewardInventories(orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
+func (s *servicesImpl) GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	return s.app.getRewardInventories(appID, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
@@ -141,24 +141,24 @@ func (s *servicesImpl) GetRewardClaim(orgID string, id string) (*model.RewardCla
 	return s.app.getRewardClaim(orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return s.app.createRewardClaim(orgID, item)
+func (s *servicesImpl) CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return s.app.createRewardClaim(appID, orgID, item)
 }
 
 func (s *servicesImpl) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	return s.app.updateRewardClaim(orgID, id, item)
 }
 
-func (s *servicesImpl) GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error) {
-	return s.app.getUserBalance(orgID, userID)
+func (s *servicesImpl) GetUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error) {
+	return s.app.getUserBalance(appID, orgID, userID)
 }
 
 func (s *servicesImpl) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
 	return s.app.getUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
-func (s *servicesImpl) GetRewardQuantity(orgID string, rewardType string) (*model.RewardQuantityState, error) {
-	return s.app.getRewardQuantity(orgID, rewardType)
+func (s *servicesImpl) GetRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error) {
+	return s.app.getRewardQuantity(appID, orgID, rewardType)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -179,26 +179,26 @@ type Storage interface {
 	UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(appID *string, orgID string, id string) error
 
-	GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
+	GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
-	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
+	CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
 	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)
-	CreateUserReward(orgID string, item model.Reward) (*model.Reward, error)
+	CreateUserReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
 	// Quantities
-	GetRewardQuantityState(orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error)
+	GetRewardQuantityState(appID *string, orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error)
 
 	// User APIs
-	GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
-	GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
+	GetUserRewardsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
+	GetUserClaimsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error)
 
 	FindAllRewardTypeItems(context storage.TransactionContext) ([]model.RewardType, error)
 	StoreMultiTenancyData(context storage.TransactionContext, appID string, orgID string) error

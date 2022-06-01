@@ -99,14 +99,14 @@ func (app *Application) createReward(appID *string, orgID string, item model.Rew
 		}
 
 		//TBD: Check for available quantity!!!
-		quantity, err := app.storage.GetRewardQuantityState(orgID, item.RewardType, nil)
+		quantity, err := app.storage.GetRewardQuantityState(appID, orgID, item.RewardType, nil)
 		if err != nil {
 			log.Printf("Error Application.createReward(): %s", err)
 			return nil, fmt.Errorf("Error Application.createReward(): %s", err)
 		}
 
 		if quantity.GrantableQuantity >= item.Amount {
-			return app.storage.CreateUserReward(orgID, item)
+			return app.storage.CreateUserReward(appID, orgID, item)
 		}
 		return nil, fmt.Errorf("error Application.createReward(): not enough available quantity")
 	}
@@ -115,8 +115,8 @@ func (app *Application) createReward(appID *string, orgID string, item model.Rew
 
 // Reward pools
 
-func (app *Application) getRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-	return app.storage.GetRewardInventories(orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
+func (app *Application) getRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	return app.storage.GetRewardInventories(appID, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
 func (app *Application) getRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
@@ -139,9 +139,9 @@ func (app *Application) getRewardClaim(orgID string, id string) (*model.RewardCl
 	return app.storage.GetRewardClaim(orgID, id)
 }
 
-func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (app *Application) createRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
 	if len(item.Items) > 0 {
-		balanceMapping, err := app.getUserBalanceMapping(orgID, item.UserID)
+		balanceMapping, err := app.getUserBalanceMapping(appID, orgID, item.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("Error on app.createRewardClaim() - %s", err)
 		}
@@ -153,7 +153,7 @@ func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) 
 			}
 
 			inStock := true
-			quantity, err := app.storage.GetRewardQuantityState(orgID, claimEntry.RewardType, &inStock)
+			quantity, err := app.storage.GetRewardQuantityState(appID, orgID, claimEntry.RewardType, &inStock)
 			if err != nil {
 				return nil, fmt.Errorf("Error on app.createRewardClaim() - %s", err)
 			}
@@ -161,7 +161,7 @@ func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) 
 				return nil, fmt.Errorf("Error on app.createRewardClaim() - not enough quantity for %s. Expected: %d", claimEntry.RewardType, claimEntry.Amount)
 			}
 		}
-		return app.storage.CreateRewardClaim(orgID, item)
+		return app.storage.CreateRewardClaim(appID, orgID, item)
 	}
 	return nil, fmt.Errorf("Error on app.createRewardClaim() - missing or zero quantity for reward items")
 }
@@ -170,13 +170,13 @@ func (app *Application) updateRewardClaim(orgID string, id string, item model.Re
 	return app.storage.UpdateRewardClaim(orgID, id, item)
 }
 
-func (app *Application) getUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error) {
-	rewardsBalance, err := app.storage.GetUserRewardsAmount(orgID, userID, nil)
+func (app *Application) getUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error) {
+	rewardsBalance, err := app.storage.GetUserRewardsAmount(appID, orgID, userID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error app.getUserBalance() %s", err)
 	}
 
-	claimsBalance, err := app.storage.GetUserClaimsAmount(orgID, userID, nil)
+	claimsBalance, err := app.storage.GetUserClaimsAmount(appID, orgID, userID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error app.getUserBalance() %s", err)
 	}
@@ -198,13 +198,13 @@ func (app *Application) getUserBalance(orgID string, userID string) ([]model.Rew
 	return rewardsBalance, nil
 }
 
-func (app *Application) getUserBalanceMapping(orgID string, userID string) (map[string]int, error) {
-	rewardsBalance, err := app.storage.GetUserRewardsAmount(orgID, userID, nil)
+func (app *Application) getUserBalanceMapping(appID *string, orgID string, userID string) (map[string]int, error) {
+	rewardsBalance, err := app.storage.GetUserRewardsAmount(appID, orgID, userID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error app.getUserBalanceMapping() %s", err)
 	}
 
-	claimsBalance, err := app.storage.GetUserClaimsAmount(orgID, userID, nil)
+	claimsBalance, err := app.storage.GetUserClaimsAmount(appID, orgID, userID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error app.getUserBalanceMapping() %s", err)
 	}
@@ -228,8 +228,8 @@ func (app *Application) getUserRewardsHistory(orgID string, userID string, rewar
 	return app.storage.GetUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
-func (app *Application) getRewardQuantity(orgID string, rewardType string) (*model.RewardQuantityState, error) {
-	return app.storage.GetRewardQuantityState(orgID, rewardType, nil)
+func (app *Application) getRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error) {
+	return app.storage.GetRewardQuantityState(appID, orgID, rewardType, nil)
 }
 
 // OnRewardTypesChanged callback that indicates the reward types collection is changed

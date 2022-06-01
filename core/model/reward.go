@@ -59,6 +59,7 @@ func (ri *RewardInventory) GetClaimableAmount() int {
 type Reward struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"app_id" bson:"app_id"`
 	UserID        string    `json:"user_id" bson:"user_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"`
 	Code          string    `json:"code" bson:"code"`
@@ -80,6 +81,7 @@ type RewardQuantityState struct {
 type RewardClaim struct {
 	ID          string            `json:"id" bson:"_id"`
 	OrgID       string            `json:"org_id" bson:"org_id"`
+	AppID       string            `json:"app_id" bson:"app_id"`
 	UserID      string            `json:"user_id" bson:"user_id"`
 	Items       []RewardClaimItem `json:"items" bson:"items"`
 	Status      string            `json:"status" bson:"status"`

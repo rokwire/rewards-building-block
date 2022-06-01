@@ -19,12 +19,13 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb
@@ -68,7 +69,7 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 // @Security UserAuth
 // @Router /user/balance [get]
 func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetUserBalance(userClaims.OrgID, userClaims.Subject)
+	resData, err := h.app.Services.GetUserBalance(&userClaims.AppID, userClaims.OrgID, userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardsAmount(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -191,7 +192,7 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 	}
 
 	item.UserID = userClaims.Subject
-	createdItem, err := h.app.Services.CreateRewardClaim(userClaims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(&userClaims.AppID, userClaims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on apis.CreateUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
