@@ -166,8 +166,9 @@ func (sa *Adapter) GetRewardTypes(appID *string, orgID string) ([]model.RewardTy
 }
 
 // GetRewardType Gets a reward type by id
-func (sa *Adapter) GetRewardType(orgID string, id string) (*model.RewardType, error) {
+func (sa *Adapter) GetRewardType(appID *string, orgID string, id string) (*model.RewardType, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -184,8 +185,9 @@ func (sa *Adapter) GetRewardType(orgID string, id string) (*model.RewardType, er
 }
 
 // GetRewardTypeByType Gets a reward type by type
-func (sa *Adapter) GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error) {
+func (sa *Adapter) GetRewardTypeByType(appID *string, orgID string, rewardType string) (*model.RewardType, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "reward_type", Value: rewardType},
 	}
@@ -202,10 +204,11 @@ func (sa *Adapter) GetRewardTypeByType(orgID string, rewardType string) (*model.
 }
 
 // CreateRewardType creates a new reward type
-func (sa *Adapter) CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
+func (sa *Adapter) CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 	_, err := sa.db.rewardTypes.InsertOne(&item)
@@ -217,7 +220,7 @@ func (sa *Adapter) CreateRewardType(orgID string, item model.RewardType) (*model
 }
 
 // UpdateRewardType updates a reward type
-func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+func (sa *Adapter) UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
 	jsonID := item.ID
 	if jsonID != id {
 		return nil, fmt.Errorf("storage.UpdateRewardType attempt to override another object")
@@ -227,6 +230,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
@@ -236,7 +240,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 			primitive.E{Key: "date_updated", Value: now},
 		}},
 	}
-	_, err := sa.db.rewardInventories.UpdateOne(filter, update, nil)
+	_, err := sa.db.rewardTypes.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("storage.UpdateRewardType error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardType error: %s", err)
@@ -248,11 +252,12 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 }
 
 // DeleteRewardType deletes a reward type
-func (sa *Adapter) DeleteRewardType(orgID string, id string) error {
+func (sa *Adapter) DeleteRewardType(appID *string, orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
-	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	_, err := sa.db.rewardInventories.DeleteOne(filter, nil)
+	filter := bson.D{primitive.E{Key: "_id", Value: id}, primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID}}
+	_, err := sa.db.rewardTypes.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardType error: %s", err)
 		return fmt.Errorf("storage.DeleteRewardType error: %s", err)

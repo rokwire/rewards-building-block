@@ -40,20 +40,20 @@ func (app *Application) getRewardTypes(appID *string, orgID string) ([]model.Rew
 	return storedTypes, err
 }
 
-func (app *Application) getRewardType(orgID string, id string) (*model.RewardType, error) {
-	return app.storage.GetRewardType(orgID, id)
+func (app *Application) getRewardType(appID *string, orgID string, id string) (*model.RewardType, error) {
+	return app.storage.GetRewardType(appID, orgID, id)
 }
 
-func (app *Application) createRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
-	return app.storage.CreateRewardType(orgID, item)
+func (app *Application) createRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
+	return app.storage.CreateRewardType(appID, orgID, item)
 }
 
-func (app *Application) updateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
-	return app.storage.UpdateRewardType(orgID, id, item)
+func (app *Application) updateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+	return app.storage.UpdateRewardType(appID, orgID, id, item)
 }
 
-func (app *Application) deleteRewardTypes(orgID string, id string) error {
-	return app.storage.DeleteRewardType(orgID, id)
+func (app *Application) deleteRewardTypes(appID *string, orgID string, id string) error {
+	return app.storage.DeleteRewardType(appID, orgID, id)
 }
 
 func (app *Application) getRewardOperations(orgID string) ([]model.RewardOperation, error) {
@@ -80,9 +80,9 @@ func (app *Application) deleteRewardOperation(orgID string, id string) error {
 	return app.storage.DeleteRewardOperation(orgID, id)
 }
 
-func (app *Application) createReward(orgID string, item model.Reward) (*model.Reward, error) {
+func (app *Application) createReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {
 	if item.RewardType != "" && item.UserID != "" {
-		rewardType, err := app.storage.GetRewardTypeByType(orgID, item.RewardType)
+		rewardType, err := app.storage.GetRewardTypeByType(appID, orgID, item.RewardType)
 		if err != nil {
 			log.Printf("Error Application.createReward(): %s", err)
 			return nil, fmt.Errorf("Error Application.createReward(): %s", err)

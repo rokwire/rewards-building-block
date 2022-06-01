@@ -62,7 +62,7 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardType(claims.OrgID, id)
+	resData, err := h.app.Services.GetRewardType(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -110,7 +110,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(&claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -155,7 +155,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(&claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -185,7 +185,7 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(claims.OrgID, id)
+	err := h.app.Services.DeleteRewardType(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -240,7 +240,7 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardType(claims.OrgID, id)
+	resData, err := h.app.Services.GetRewardType(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -288,7 +288,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(&claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -333,7 +333,7 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(&claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -363,7 +363,7 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(claims.OrgID, id)
+	err := h.app.Services.DeleteRewardType(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

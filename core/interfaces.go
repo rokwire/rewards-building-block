@@ -27,10 +27,10 @@ type Services interface {
 	GetVersion() string
 
 	GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error)
-	GetRewardType(orgID string, id string) (*model.RewardType, error)
-	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
-	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardType(orgID string, id string) error
+	GetRewardType(appID *string, orgID string, id string) (*model.RewardType, error)
+	CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error)
+	UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
+	DeleteRewardType(appID *string, orgID string, id string) error
 
 	GetRewardOperations(orgID string) ([]model.RewardOperation, error)
 	GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error)
@@ -49,7 +49,7 @@ type Services interface {
 	CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error)
 	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
-	CreateReward(orgID string, item model.Reward) (*model.Reward, error)
+	CreateReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
 	GetUserBalance(orgID string, userID string) ([]model.RewardTypeAmount, error)
 	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
@@ -69,20 +69,20 @@ func (s *servicesImpl) GetRewardTypes(appID *string, orgID string) ([]model.Rewa
 	return s.app.getRewardTypes(appID, orgID)
 }
 
-func (s *servicesImpl) GetRewardType(orgID string, id string) (*model.RewardType, error) {
-	return s.app.getRewardType(orgID, id)
+func (s *servicesImpl) GetRewardType(appID *string, orgID string, id string) (*model.RewardType, error) {
+	return s.app.getRewardType(appID, orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
-	return s.app.createRewardType(orgID, item)
+func (s *servicesImpl) CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
+	return s.app.createRewardType(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
-	return s.app.updateRewardType(orgID, id, item)
+func (s *servicesImpl) UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+	return s.app.updateRewardType(appID, orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardType(orgID string, id string) error {
-	return s.app.deleteRewardTypes(orgID, id)
+func (s *servicesImpl) DeleteRewardType(appID *string, orgID string, id string) error {
+	return s.app.deleteRewardTypes(appID, orgID, id)
 }
 
 func (s *servicesImpl) GetRewardOperations(orgID string) ([]model.RewardOperation, error) {
@@ -125,12 +125,12 @@ func (s *servicesImpl) UpdateRewardInventory(orgID string, id string, item model
 	return s.app.updateRewardInventory(orgID, id, item)
 }
 
-func (s *servicesImpl) DeleteRewardInventory(orgID string, id string) error {
-	return s.app.deleteRewardTypes(orgID, id)
+func (s *servicesImpl) DeleteRewardInventory(appID *string, orgID string, id string) error {
+	return s.app.deleteRewardTypes(appID, orgID, id)
 }
 
-func (s *servicesImpl) CreateReward(orgID string, item model.Reward) (*model.Reward, error) {
-	return s.app.createReward(orgID, item)
+func (s *servicesImpl) CreateReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {
+	return s.app.createReward(appID, orgID, item)
 }
 
 func (s *servicesImpl) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
@@ -166,11 +166,11 @@ type Storage interface {
 	PerformTransaction(func(context storage.TransactionContext) error) error
 
 	GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error)
-	GetRewardType(orgID string, id string) (*model.RewardType, error)
-	GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error)
-	CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error)
-	UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error)
-	DeleteRewardType(orgID string, id string) error
+	GetRewardType(appID *string, orgID string, id string) (*model.RewardType, error)
+	GetRewardTypeByType(appID *string, orgID string, rewardType string) (*model.RewardType, error)
+	CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error)
+	UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
+	DeleteRewardType(appID *string, orgID string, id string) error
 
 	GetRewardOperations(orgID string) ([]model.RewardOperation, error)
 	GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error)
