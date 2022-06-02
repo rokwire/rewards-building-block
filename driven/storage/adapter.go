@@ -553,8 +553,9 @@ func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 }
 
 // GetUserRewardsHistory Gets all reward history entries
-func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
+func (sa *Adapter) GetUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 	}
@@ -594,7 +595,7 @@ func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType
 }
 
 // GetUserRewardByID Gets a reward history entry by id
-func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error) {
+func (sa *Adapter) GetUserRewardByID(appID *string, orgID string, userID, id string) (*model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "user_id", Value: userID},
@@ -770,8 +771,9 @@ func (sa *Adapter) GetRewardQuantityState(appID *string, orgID string, rewardTyp
 }
 
 // GetRewardClaims Gets all reward claims
-func (sa *Adapter) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 	}
 	var result []model.RewardClaim
@@ -787,7 +789,7 @@ func (sa *Adapter) GetRewardClaims(orgID string, ids []string, userID *string, r
 }
 
 // GetRewardClaim Gets a reward claim by id
-func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
@@ -889,12 +891,12 @@ func (sa *Adapter) CreateRewardClaim(appID *string, orgID string, item model.Rew
 }
 
 // UpdateRewardClaim updates a reward claim
-func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return sa.UpdateRewardClaimWithContext(nil, orgID, id, item)
+func (sa *Adapter) UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return sa.UpdateRewardClaimWithContext(nil, appID, orgID, id, item)
 }
 
 // UpdateRewardClaimWithContext updates a reward claim with a context
-func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -907,6 +909,7 @@ func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID strin
 	now := time.Now().UTC()
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 	}
 	update := bson.D{

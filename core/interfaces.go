@@ -44,15 +44,15 @@ type Services interface {
 	CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
-	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
-	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
+	GetRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
+	GetRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error)
-	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
+	UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
 	CreateReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
 	GetUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error)
-	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
+	GetUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
 
 	GetRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error)
 }
@@ -133,28 +133,28 @@ func (s *servicesImpl) CreateReward(appID *string, orgID string, item model.Rewa
 	return s.app.createReward(appID, orgID, item)
 }
 
-func (s *servicesImpl) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
-	return s.app.getRewardClaims(orgID, ids, userID, rewardType, status, limit, offset)
+func (s *servicesImpl) GetRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+	return s.app.getRewardClaims(appID, orgID, ids, userID, rewardType, status, limit, offset)
 }
 
-func (s *servicesImpl) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
-	return s.app.getRewardClaim(orgID, id)
+func (s *servicesImpl) GetRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error) {
+	return s.app.getRewardClaim(appID, orgID, id)
 }
 
 func (s *servicesImpl) CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
 	return s.app.createRewardClaim(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return s.app.updateRewardClaim(orgID, id, item)
+func (s *servicesImpl) UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return s.app.updateRewardClaim(appID, orgID, id, item)
 }
 
 func (s *servicesImpl) GetUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error) {
 	return s.app.getUserBalance(appID, orgID, userID)
 }
 
-func (s *servicesImpl) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
-	return s.app.getUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
+func (s *servicesImpl) GetUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
+	return s.app.getUserRewardsHistory(appID, orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
 func (s *servicesImpl) GetRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error) {
@@ -184,13 +184,13 @@ type Storage interface {
 	CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error)
 	UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
-	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
-	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
+	GetRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
+	GetRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error)
-	UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
+	UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
-	GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
-	GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error)
+	GetUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error)
+	GetUserRewardByID(appID *string, orgID string, userID, id string) (*model.Reward, error)
 	CreateUserReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
 	// Quantities

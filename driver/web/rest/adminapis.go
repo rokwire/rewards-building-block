@@ -578,7 +578,7 @@ func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.Respo
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardClaims(claims.OrgID, IDs, userID, rewardType, status, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetRewardClaims(&claims.AppID, claims.OrgID, IDs, userID, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.getRewardClaims: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -614,7 +614,7 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardClaim(claims.OrgID, id)
+	resData, err := h.app.Services.GetRewardClaim(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.getRewardClaim(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -662,7 +662,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardClaim(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardClaim(&claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

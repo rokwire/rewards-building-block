@@ -131,12 +131,12 @@ func (app *Application) updateRewardInventory(appID *string, orgID string, id st
 	return app.storage.UpdateRewardInventory(appID, orgID, id, item)
 }
 
-func (app *Application) getRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
-	return app.storage.GetRewardClaims(orgID, ids, userID, rewardType, status, limit, offset)
+func (app *Application) getRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+	return app.storage.GetRewardClaims(appID, orgID, ids, userID, rewardType, status, limit, offset)
 }
 
-func (app *Application) getRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
-	return app.storage.GetRewardClaim(orgID, id)
+func (app *Application) getRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error) {
+	return app.storage.GetRewardClaim(appID, orgID, id)
 }
 
 func (app *Application) createRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
@@ -166,8 +166,8 @@ func (app *Application) createRewardClaim(appID *string, orgID string, item mode
 	return nil, fmt.Errorf("Error on app.createRewardClaim() - missing or zero quantity for reward items")
 }
 
-func (app *Application) updateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return app.storage.UpdateRewardClaim(orgID, id, item)
+func (app *Application) updateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return app.storage.UpdateRewardClaim(appID, orgID, id, item)
 }
 
 func (app *Application) getUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error) {
@@ -224,8 +224,8 @@ func (app *Application) getUserBalanceMapping(appID *string, orgID string, userI
 	return rewardsMapping, nil
 }
 
-func (app *Application) getUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
-	return app.storage.GetUserRewardsHistory(orgID, userID, rewardType, code, buildingBlock, limit, offset)
+func (app *Application) getUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
+	return app.storage.GetUserRewardsHistory(appID, orgID, userID, rewardType, code, buildingBlock, limit, offset)
 }
 
 func (app *Application) getRewardQuantity(appID *string, orgID string, rewardType string) (*model.RewardQuantityState, error) {

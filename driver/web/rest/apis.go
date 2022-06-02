@@ -111,7 +111,7 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	resData, err := h.app.Services.GetUserRewardsHistory(userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetUserRewardsHistory(&userClaims.AppID, userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.getUserRewardsHistory(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -147,7 +147,7 @@ func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.Res
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	rewardClaims, err := h.app.Services.GetRewardClaims(userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
+	rewardClaims, err := h.app.Services.GetRewardClaims(&userClaims.AppID, userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
