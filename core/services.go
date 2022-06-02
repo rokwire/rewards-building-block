@@ -27,21 +27,30 @@ func (app *Application) getVersion() string {
 	return app.version
 }
 
-func (app *Application) getRewardTypes(appID *string, orgID string) ([]model.RewardType, error) {
+func (app *Application) getRewardTypes(allApps bool, appID *string, orgID string) ([]model.RewardType, error) {
 	types := app.cacheAdapter.GetRewardTypes()
 	if types != nil {
 		return types, nil
 	}
 
-	storedTypes, err := app.storage.GetRewardTypes(appID, orgID)
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+
+	storedTypes, err := app.storage.GetRewardTypes(appIDParam, orgID)
 	if err == nil && storedTypes != nil {
 		app.cacheAdapter.SetRewardTypes(storedTypes)
 	}
 	return storedTypes, err
 }
 
-func (app *Application) getRewardType(appID *string, orgID string, id string) (*model.RewardType, error) {
-	return app.storage.GetRewardType(appID, orgID, id)
+func (app *Application) getRewardType(allApps bool, appID *string, orgID string, id string) (*model.RewardType, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardType(appIDParam, orgID, id)
 }
 
 func (app *Application) createRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
@@ -56,12 +65,20 @@ func (app *Application) deleteRewardTypes(appID *string, orgID string, id string
 	return app.storage.DeleteRewardType(appID, orgID, id)
 }
 
-func (app *Application) getRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error) {
-	return app.storage.GetRewardOperations(appID, orgID)
+func (app *Application) getRewardOperations(allApps bool, appID *string, orgID string) ([]model.RewardOperation, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardOperations(appIDParam, orgID)
 }
 
-func (app *Application) getRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error) {
-	return app.storage.GetRewardOperationByID(appID, orgID, id)
+func (app *Application) getRewardOperationByID(allApps bool, appID *string, orgID string, id string) (*model.RewardOperation, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardOperationByID(appIDParam, orgID, id)
 }
 
 func (app *Application) getRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error) {
@@ -115,12 +132,20 @@ func (app *Application) createReward(appID *string, orgID string, item model.Rew
 
 // Reward pools
 
-func (app *Application) getRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-	return app.storage.GetRewardInventories(appID, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
+func (app *Application) getRewardInventories(allApps bool, appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardInventories(appIDParam, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
-func (app *Application) getRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error) {
-	return app.storage.GetRewardInventory(appID, orgID, id)
+func (app *Application) getRewardInventory(allApps bool, appID *string, orgID string, id string) (*model.RewardInventory, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardInventory(appIDParam, orgID, id)
 }
 
 func (app *Application) createRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
@@ -131,12 +156,20 @@ func (app *Application) updateRewardInventory(appID *string, orgID string, id st
 	return app.storage.UpdateRewardInventory(appID, orgID, id, item)
 }
 
-func (app *Application) getRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
-	return app.storage.GetRewardClaims(appID, orgID, ids, userID, rewardType, status, limit, offset)
+func (app *Application) getRewardClaims(allApps bool, appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardClaims(appIDParam, orgID, ids, userID, rewardType, status, limit, offset)
 }
 
-func (app *Application) getRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error) {
-	return app.storage.GetRewardClaim(appID, orgID, id)
+func (app *Application) getRewardClaim(allApps bool, appID *string, orgID string, id string) (*model.RewardClaim, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.GetRewardClaim(appIDParam, orgID, id)
 }
 
 func (app *Application) createRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {

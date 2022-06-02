@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+	"strconv"
 )
 
 // InternalApisHandler handles the rest internal APIs implementation
@@ -112,6 +113,13 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item getRewardStatsBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -120,7 +128,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	types, err := h.app.Services.GetRewardTypes(&item.AppID, item.OrgID)
+	types, err := h.app.Services.GetRewardTypes(allApps, &item.AppID, item.OrgID)
 	if err != nil {
 		log.Printf("Error on internalapis.GetRewardStats: Reward types not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
