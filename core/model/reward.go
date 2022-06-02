@@ -33,6 +33,7 @@ type RewardOperation struct {
 type RewardInventory struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"app_id" bson:"app_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // t-shirt
 	InStock       bool      `json:"in_stock" bson:"in_stock"`
 	AmountTotal   int       `json:"amount_total" bson:"amount_total"`

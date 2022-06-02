@@ -40,9 +40,9 @@ type Services interface {
 	DeleteRewardOperation(appID *string, orgID string, id string) error
 
 	GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
-	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
-	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
-	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
+	GetRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error)
+	CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error)
+	UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)
@@ -113,16 +113,16 @@ func (s *servicesImpl) GetRewardInventories(appID *string, orgID string, ids []s
 	return s.app.getRewardInventories(appID, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
-func (s *servicesImpl) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
-	return s.app.getRewardInventory(orgID, id)
+func (s *servicesImpl) GetRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error) {
+	return s.app.getRewardInventory(appID, orgID, id)
 }
 
-func (s *servicesImpl) CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return s.app.createRewardInventory(orgID, item)
+func (s *servicesImpl) CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return s.app.createRewardInventory(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return s.app.updateRewardInventory(orgID, id, item)
+func (s *servicesImpl) UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return s.app.updateRewardInventory(appID, orgID, id, item)
 }
 
 func (s *servicesImpl) DeleteRewardInventory(appID *string, orgID string, id string) error {
@@ -180,9 +180,9 @@ type Storage interface {
 	DeleteRewardOperation(appID *string, orgID string, id string) error
 
 	GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
-	GetRewardInventory(orgID string, id string) (*model.RewardInventory, error)
-	CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error)
-	UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
+	GetRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error)
+	CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error)
+	UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
 	GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(orgID string, id string) (*model.RewardClaim, error)

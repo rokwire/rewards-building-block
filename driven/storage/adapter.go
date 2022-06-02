@@ -436,8 +436,9 @@ func (sa *Adapter) GetRewardInventories(appID *string, orgID string, ids []strin
 }
 
 // GetRewardInventory Gets a reward inventory by id
-func (sa *Adapter) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -454,12 +455,13 @@ func (sa *Adapter) GetRewardInventory(orgID string, id string) (*model.RewardInv
 }
 
 // CreateRewardInventory creates a new reward inventory
-func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+func (sa *Adapter) CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	item.OrgID = orgID
+	item.AppID = *appID
 
 	if err := sa.validateInventoryCreateOrUpdate(item); err != nil {
 		return nil, err
@@ -474,12 +476,12 @@ func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventor
 }
 
 // UpdateRewardInventory updates a reward pool
-func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return sa.UpdateRewardInventoryWithContext(nil, orgID, id, item)
+func (sa *Adapter) UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return sa.UpdateRewardInventoryWithContext(nil, appID, orgID, id, item)
 }
 
 // UpdateRewardInventoryWithContext updates a reward inventory with a context
-func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -648,7 +650,7 @@ func (sa *Adapter) CreateUserReward(appID *string, orgID string, item model.Rewa
 						accumulatedAmount += remaingAmnount
 						remaingAmnount -= remaingAmnount
 					}
-					_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+					_, err = sa.UpdateRewardInventoryWithContext(sessionContext, appID, orgID, inventory.ID, inventory)
 					if err != nil {
 						abortTransaction(sessionContext)
 						log.Printf("storage.CreateUserReward error: %s", err)
@@ -841,7 +843,7 @@ func (sa *Adapter) CreateRewardClaim(appID *string, orgID string, item model.Rew
 							accumulatedAmount += remaingAmnount
 							remaingAmnount -= remaingAmnount
 						}
-						_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+						_, err = sa.UpdateRewardInventoryWithContext(sessionContext, appID, orgID, inventory.ID, inventory)
 						if err != nil {
 							abortTransaction(sessionContext)
 							log.Printf("storage.CreateUserReward error: %s", err)

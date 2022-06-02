@@ -119,16 +119,16 @@ func (app *Application) getRewardInventories(appID *string, orgID string, ids []
 	return app.storage.GetRewardInventories(appID, orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
-func (app *Application) getRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
-	return app.storage.GetRewardInventory(orgID, id)
+func (app *Application) getRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error) {
+	return app.storage.GetRewardInventory(appID, orgID, id)
 }
 
-func (app *Application) createRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return app.storage.CreateRewardInventory(orgID, item)
+func (app *Application) createRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return app.storage.CreateRewardInventory(appID, orgID, item)
 }
 
-func (app *Application) updateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return app.storage.UpdateRewardInventory(orgID, id, item)
+func (app *Application) updateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return app.storage.UpdateRewardInventory(appID, orgID, id, item)
 }
 
 func (app *Application) getRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {

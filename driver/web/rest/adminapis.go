@@ -439,7 +439,7 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardInventory(claims.OrgID, id)
+	resData, err := h.app.Services.GetRewardInventory(&claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventory(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -487,7 +487,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardInventory(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardInventory(&claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardInventory(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -532,7 +532,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardInventory(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardInventory(&claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardInventory: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
