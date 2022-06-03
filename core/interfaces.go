@@ -29,25 +29,25 @@ type Services interface {
 	GetRewardTypes(allApps bool, appID *string, orgID string) ([]model.RewardType, error)
 	GetRewardType(allApps bool, appID *string, orgID string, id string) (*model.RewardType, error)
 	CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error)
-	UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
+	UpdateRewardType(allApps bool, appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error)
 	DeleteRewardType(allApps bool, appID *string, orgID string, id string) error
 
 	GetRewardOperations(allApps bool, appID *string, orgID string) ([]model.RewardOperation, error)
 	GetRewardOperationByID(allApps bool, appID *string, orgID string, id string) (*model.RewardOperation, error)
 	GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error)
 	CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error)
-	UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
+	UpdateRewardOperation(allApps bool, appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error)
 	DeleteRewardOperation(allApps bool, appID *string, orgID string, id string) error
 
 	GetRewardInventories(allApps bool, appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error)
 	GetRewardInventory(allApps bool, appID *string, orgID string, id string) (*model.RewardInventory, error)
 	CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error)
-	UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
+	UpdateRewardInventory(allApps bool, appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error)
 
 	GetRewardClaims(allApps bool, appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error)
 	GetRewardClaim(allApps bool, appID *string, orgID string, id string) (*model.RewardClaim, error)
 	CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error)
-	UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
+	UpdateRewardClaim(allApps bool, appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error)
 
 	CreateReward(appID *string, orgID string, item model.Reward) (*model.Reward, error)
 
@@ -77,8 +77,8 @@ func (s *servicesImpl) CreateRewardType(appID *string, orgID string, item model.
 	return s.app.createRewardType(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
-	return s.app.updateRewardType(appID, orgID, id, item)
+func (s *servicesImpl) UpdateRewardType(allApps bool, appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+	return s.app.updateRewardType(allApps, appID, orgID, id, item)
 }
 
 func (s *servicesImpl) DeleteRewardType(allApps bool, appID *string, orgID string, id string) error {
@@ -101,8 +101,8 @@ func (s *servicesImpl) CreateRewardOperation(appID *string, orgID string, item m
 	return s.app.createRewardOperation(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return s.app.updateRewardOperation(appID, orgID, id, item)
+func (s *servicesImpl) UpdateRewardOperation(allApps bool, appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+	return s.app.updateRewardOperation(allApps, appID, orgID, id, item)
 }
 
 func (s *servicesImpl) DeleteRewardOperation(allApps bool, appID *string, orgID string, id string) error {
@@ -121,8 +121,8 @@ func (s *servicesImpl) CreateRewardInventory(appID *string, orgID string, item m
 	return s.app.createRewardInventory(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return s.app.updateRewardInventory(appID, orgID, id, item)
+func (s *servicesImpl) UpdateRewardInventory(allApps bool, appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return s.app.updateRewardInventory(allApps, appID, orgID, id, item)
 }
 
 func (s *servicesImpl) DeleteRewardInventory(allApps bool, appID *string, orgID string, id string) error {
@@ -145,8 +145,8 @@ func (s *servicesImpl) CreateRewardClaim(appID *string, orgID string, item model
 	return s.app.createRewardClaim(appID, orgID, item)
 }
 
-func (s *servicesImpl) UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return s.app.updateRewardClaim(appID, orgID, id, item)
+func (s *servicesImpl) UpdateRewardClaim(allApps bool, appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return s.app.updateRewardClaim(allApps, appID, orgID, id, item)
 }
 
 func (s *servicesImpl) GetUserBalance(appID *string, orgID string, userID string) ([]model.RewardTypeAmount, error) {

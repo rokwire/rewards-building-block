@@ -110,6 +110,13 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
@@ -125,7 +132,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(&claims.AppID, claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -309,6 +316,13 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
@@ -324,7 +338,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(&claims.AppID, claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -528,6 +542,13 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardInventory(%s): %s", id, err)
@@ -543,7 +564,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardInventory(&claims.AppID, claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardInventory(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardInventory(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -717,6 +738,13 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
@@ -732,7 +760,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardClaim(&claims.AppID, claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardClaim(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
