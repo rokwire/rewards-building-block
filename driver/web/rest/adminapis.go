@@ -23,6 +23,7 @@ type AdminApisHandler struct {
 // @Description Retrieves  all reward types
 // @Tags Admin
 // @ID AdminGetRewardTypes
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Success 200 {array} model.RewardType
 // @Security AdminUserAuth
 // @Router /admin/types [get]
@@ -61,6 +62,7 @@ func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.Respon
 // @Description Retrieves a reward type by id
 // @Tags Admin
 // @ID AdminRewardTypes
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardType
@@ -100,6 +102,7 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 // @Description Updates a reward type with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardType
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardType true "body json"
 // @Accept json
 // @Produce json
@@ -155,6 +158,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 // @Description Create a new reward type
 // @Tags Admin
 // @ID AdminCreateRewardType
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardType true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardType
@@ -206,6 +210,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 // DeleteRewardType Deletes a reward type with the specified id
 // @Description Deletes a reward type with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminDeleteRewardType
 // @Success 200
 // @Security AdminUserAuth
@@ -236,6 +241,7 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 // @Description Retrieves  all reward types
 // @Tags Admin
 // @ID AdminGetRewardOperations
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Success 200 {array} model.RewardOperation
 // @Security AdminUserAuth
 // @Router /admin/operations [get]
@@ -274,6 +280,7 @@ func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.R
 // @Description Retrieves a reward operation by id
 // @Tags Admin
 // @ID AdminGetRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardOperation
@@ -313,6 +320,7 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 // @Description Updates a reward operation with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Produce json
@@ -368,6 +376,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 // @Description Create a new operation type
 // @Tags Admin
 // @ID AdminCreateRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardOperation
@@ -419,6 +428,7 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 // DeleteRewardOperation Deletes a reward operation with the specified id
 // @Description Deletes a reward operation with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminDeleteRewardOperation
 // @Success 200
 // @Security AdminUserAuth
@@ -448,6 +458,7 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // GetRewardInventories Retrieves  all reward inventories
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param in_stock query string false "in_stock - possible values: missing (e.g no filter), 0- false, 1- true"
 // @Param grant_depleted query string false "grant_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
 // @Param claim_depleted query string false "claim_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
@@ -505,6 +516,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 
 // GetRewardInventory Retrieves a reward inventory by id
 // @Description Retrieves a reward inventory by id
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Tags Admin
 // @ID AdminGetRewardInventory
 // @Accept json
@@ -545,6 +557,7 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 // UpdateRewardInventory Updates a reward inventory with the specified id
 // @Description Updates a reward inventory with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminUpdateRewardInventory
 // @Param data body model.RewardInventory true "body json"
 // @Accept json
@@ -600,6 +613,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 // CreateRewardInventory Create a new reward inventory
 // @Description Create a new reward inventory
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminCreateRewardInventory
 // @Param data body model.RewardInventory true "body json"
 // @Accept json
@@ -651,6 +665,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 
 // GetRewardClaims Retrieves  all reward claims
 // @Description Retrieves  all reward claims
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param ids query string false "Coma separated IDs of the desired records"
 // @Param user_id query string false "user_id"
 // @Param status query string false "status"
@@ -709,6 +724,7 @@ func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.Respo
 // GetRewardClaim Retrieves a reward claim by id
 // @Description Retrieves a claim inventory by id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminGetRewardClaim
 // @Accept json
 // @Produce json
@@ -748,6 +764,7 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 // UpdateRewardClaim Updates a reward claim with the specified id
 // @Description Updates a reward claim with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminUpdateRewardClaim
 // @Param data body model.RewardClaim true "body json"
 // @Accept json
@@ -804,6 +821,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 // @Description Create a new claim inventory
 // @Tags Admin
 // @ID AdminCreateRewardClaim
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardClaim true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardInventory
