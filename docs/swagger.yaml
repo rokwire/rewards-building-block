@@ -4,6 +4,8 @@ definitions:
     properties:
       amount:
         type: integer
+      app_id:
+        type: string
       building_block:
         type: string
       code:
@@ -25,6 +27,8 @@ definitions:
     type: object
   RewardClaim:
     properties:
+      app_id:
+        type: string
       date_created:
         type: string
       date_updated:
@@ -61,6 +65,8 @@ definitions:
         type: integer
       amount_total:
         type: integer
+      app_id:
+        type: string
       claim_depleted:
         type: boolean
       date_created:
@@ -107,6 +113,8 @@ definitions:
     properties:
       active:
         type: boolean
+      app_id:
+        type: string
       date_created:
         type: string
       date_updated:

@@ -816,6 +816,9 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
+                "app_id": {
+                    "type": "string"
+                },
                 "building_block": {
                     "type": "string"
                 },
@@ -848,6 +851,9 @@ const docTemplate = `{
         "RewardClaim": {
             "type": "object",
             "properties": {
+                "app_id": {
+                    "type": "string"
+                },
                 "date_created": {
                     "type": "string"
                 },
@@ -902,6 +908,9 @@ const docTemplate = `{
                 },
                 "amount_total": {
                     "type": "integer"
+                },
+                "app_id": {
+                    "type": "string"
                 },
                 "claim_depleted": {
                     "type": "boolean"
@@ -971,6 +980,9 @@ const docTemplate = `{
             "properties": {
                 "active": {
                     "type": "boolean"
+                },
+                "app_id": {
+                    "type": "string"
                 },
                 "date_created": {
                     "type": "string"
