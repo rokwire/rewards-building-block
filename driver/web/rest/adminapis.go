@@ -169,6 +169,13 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -177,7 +184,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(&claims.AppID, claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -375,6 +382,13 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -383,7 +397,7 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(&claims.AppID, claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -601,6 +615,13 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardInventory
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -609,7 +630,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardInventory(&claims.AppID, claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardInventory(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardInventory: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -797,6 +818,13 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardClaim
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -805,7 +833,7 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardClaim(&claims.AppID, claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.createRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

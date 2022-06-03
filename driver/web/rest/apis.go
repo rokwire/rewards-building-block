@@ -190,6 +190,12 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	var item model.RewardClaim
 	err = json.Unmarshal(data, &item)
@@ -200,7 +206,7 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 	}
 
 	item.UserID = userClaims.Subject
-	createdItem, err := h.app.Services.CreateRewardClaim(&userClaims.AppID, userClaims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(allApps, &userClaims.AppID, userClaims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on apis.CreateUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

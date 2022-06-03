@@ -53,8 +53,12 @@ func (app *Application) getRewardType(allApps bool, appID *string, orgID string,
 	return app.storage.GetRewardType(appIDParam, orgID, id)
 }
 
-func (app *Application) createRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
-	return app.storage.CreateRewardType(appID, orgID, item)
+func (app *Application) createRewardType(allApps bool, appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.CreateRewardType(appIDParam, orgID, item)
 }
 
 func (app *Application) updateRewardType(allApps bool, appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
@@ -93,8 +97,12 @@ func (app *Application) getRewardOperationByCode(appID *string, orgID string, co
 	return app.storage.GetRewardOperationByCode(appID, orgID, code)
 }
 
-func (app *Application) createRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
-	return app.storage.CreateRewardOperation(appID, orgID, item)
+func (app *Application) createRewardOperation(allApps bool, appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.CreateRewardOperation(appIDParam, orgID, item)
 }
 
 func (app *Application) updateRewardOperation(allApps bool, appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
@@ -164,8 +172,12 @@ func (app *Application) getRewardInventory(allApps bool, appID *string, orgID st
 	return app.storage.GetRewardInventory(appIDParam, orgID, id)
 }
 
-func (app *Application) createRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return app.storage.CreateRewardInventory(appID, orgID, item)
+func (app *Application) createRewardInventory(allApps bool, appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.CreateRewardInventory(appIDParam, orgID, item)
 }
 
 func (app *Application) updateRewardInventory(allApps bool, appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
@@ -192,7 +204,7 @@ func (app *Application) getRewardClaim(allApps bool, appID *string, orgID string
 	return app.storage.GetRewardClaim(appIDParam, orgID, id)
 }
 
-func (app *Application) createRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (app *Application) createRewardClaim(allApps bool, appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
 	if len(item.Items) > 0 {
 		balanceMapping, err := app.getUserBalanceMapping(appID, orgID, item.UserID)
 		if err != nil {
@@ -214,7 +226,11 @@ func (app *Application) createRewardClaim(appID *string, orgID string, item mode
 				return nil, fmt.Errorf("Error on app.createRewardClaim() - not enough quantity for %s. Expected: %d", claimEntry.RewardType, claimEntry.Amount)
 			}
 		}
-		return app.storage.CreateRewardClaim(appID, orgID, item)
+		var appIDParam *string
+		if !allApps {
+			appIDParam = appID //associated with current app
+		}
+		return app.storage.CreateRewardClaim(appIDParam, orgID, item)
 	}
 	return nil, fmt.Errorf("Error on app.createRewardClaim() - missing or zero quantity for reward items")
 }
