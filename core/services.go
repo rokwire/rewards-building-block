@@ -61,8 +61,12 @@ func (app *Application) updateRewardType(appID *string, orgID string, id string,
 	return app.storage.UpdateRewardType(appID, orgID, id, item)
 }
 
-func (app *Application) deleteRewardTypes(appID *string, orgID string, id string) error {
-	return app.storage.DeleteRewardType(appID, orgID, id)
+func (app *Application) deleteRewardTypes(allApps bool, appID *string, orgID string, id string) error {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.DeleteRewardType(appIDParam, orgID, id)
 }
 
 func (app *Application) getRewardOperations(allApps bool, appID *string, orgID string) ([]model.RewardOperation, error) {
@@ -93,8 +97,12 @@ func (app *Application) updateRewardOperation(appID *string, orgID string, id st
 	return app.storage.UpdateRewardOperation(appID, orgID, id, item)
 }
 
-func (app *Application) deleteRewardOperation(appID *string, orgID string, id string) error {
-	return app.storage.DeleteRewardOperation(appID, orgID, id)
+func (app *Application) deleteRewardOperation(allApps bool, appID *string, orgID string, id string) error {
+	var appIDParam *string
+	if !allApps {
+		appIDParam = appID //associated with current app
+	}
+	return app.storage.DeleteRewardOperation(appIDParam, orgID, id)
 }
 
 func (app *Application) createReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {

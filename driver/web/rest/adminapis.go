@@ -200,7 +200,14 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(&claims.AppID, claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	err := h.app.Services.DeleteRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -392,7 +399,14 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(&claims.AppID, claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	err := h.app.Services.DeleteRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
