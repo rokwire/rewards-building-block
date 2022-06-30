@@ -5,7 +5,7 @@ The Rewards Building Block handles the management of reward inventory and transa
 
 The functionality provided by this application is documented in the [Wiki](https://github.com/rokwire/rewards-building-block/wiki).
 
-The API documentation is available here: https://api-dev.rokwire.illinois.edu/rewards/doc/ui/
+The API documentation is available here: https://api.rokwire.illinois.edu/rewards/doc/ui/
 
 ## Set Up
 
