@@ -21,6 +21,8 @@ import (
 	"log"
 	cacheadapter "rewards/driven/cache"
 	"rewards/driven/storage"
+
+	"github.com/rokwire/logging-library-go/logs"
 )
 
 //Application represents the core application code based on hexagonal architecture
@@ -29,6 +31,7 @@ type Application struct {
 	build   string
 
 	Services Services //expose to the drivers adapters
+	logger   *logs.Logger
 
 	storage      Storage
 	cacheAdapter *cacheadapter.CacheAdapter
@@ -95,14 +98,15 @@ func (app *Application) storeMultiTenancyData() error {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, mtAppID string, mtOrgID string) *Application {
+func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, mtAppID string, mtOrgID string, logger *logs.Logger) *Application {
 	application := Application{
 		version:           version,
 		build:             build,
 		storage:           storage,
 		cacheAdapter:      cacheadapter,
 		multiTenancyAppID: mtAppID,
-		multiTenancyOrgID: mtOrgID}
+		multiTenancyOrgID: mtOrgID,
+		logger:            logger}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

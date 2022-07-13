@@ -22,6 +22,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/rokwire/logging-library-go/logs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -49,6 +50,8 @@ type database struct {
 	rewardInventories *collectionWrapper
 	rewardHistory     *collectionWrapper
 	rewardClaims      *collectionWrapper
+
+	logger *logs.Logger
 }
 
 func (m *database) start() error {

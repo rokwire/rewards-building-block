@@ -49,6 +49,7 @@ type CoreAuth struct {
 type Auth struct {
 	internalAuth *InternalAuth
 	coreAuth     *CoreAuth
+	logger       *logs.Logger
 }
 
 //StandardAuth entity
@@ -124,10 +125,10 @@ func (auth *Auth) clientIDCheck(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config) *Auth {
+func NewAuth(app *core.Application, config model.Config, logger *logs.Logger) *Auth {
 	coreAuth := NewCoreAuth(app, config)
 	internalAuth := newInternalAuth(config)
-	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth}
+	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth, logger: logger}
 	return &auth
 }
 
