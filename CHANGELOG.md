@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Multy-tanancy [#8](https://github.com/rokwire/rewards-building-block/issues/8)
+- Set logger [#12](https://github.com/rokwire/rewards-building-block/issues/12)
 
 ## [1.0.8] - 2022-04-29
 - Update Core auth library to the latest version and repo [#5](https://github.com/rokwire/lms-building-block/issues/5)
