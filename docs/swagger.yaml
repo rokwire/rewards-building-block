@@ -4,8 +4,6 @@ definitions:
     properties:
       amount:
         type: integer
-      app_id:
-        type: string
       building_block:
         type: string
       code:
@@ -27,8 +25,6 @@ definitions:
     type: object
   RewardClaim:
     properties:
-      app_id:
-        type: string
       date_created:
         type: string
       date_updated:
@@ -65,8 +61,6 @@ definitions:
         type: integer
       amount_total:
         type: integer
-      app_id:
-        type: string
       claim_depleted:
         type: boolean
       date_created:
@@ -113,8 +107,6 @@ definitions:
     properties:
       active:
         type: boolean
-      app_id:
-        type: string
       date_created:
         type: string
       date_updated:
@@ -155,11 +147,6 @@ paths:
       description: Retrieves  all reward claims
       operationId: AdminGetRewardClaims
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: Coma separated IDs of the desired records
         in: query
         name: ids
@@ -197,11 +184,6 @@ paths:
       description: Create a new claim inventory
       operationId: AdminCreateRewardClaim
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -223,12 +205,6 @@ paths:
       - application/json
       description: Retrieves a claim inventory by id
       operationId: AdminGetRewardClaim
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       produces:
       - application/json
       responses:
@@ -246,11 +222,6 @@ paths:
       description: Updates a reward claim with the specified id
       operationId: AdminUpdateRewardClaim
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -277,11 +248,6 @@ paths:
         in: query
         name: ids
         type: string
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: 'in_stock - possible values: missing (e.g no filter), 0- false,
           1- true'
         in: query
@@ -322,11 +288,6 @@ paths:
       description: Create a new reward inventory
       operationId: AdminCreateRewardInventory
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -348,12 +309,6 @@ paths:
       - application/json
       description: Retrieves a reward inventory by id
       operationId: AdminGetRewardInventory
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       produces:
       - application/json
       responses:
@@ -371,11 +326,6 @@ paths:
       description: Updates a reward inventory with the specified id
       operationId: AdminUpdateRewardInventory
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -397,12 +347,6 @@ paths:
     get:
       description: Retrieves  all reward types
       operationId: AdminGetRewardOperations
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: OK
@@ -420,11 +364,6 @@ paths:
       description: Create a new operation type
       operationId: AdminCreateRewardOperation
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -444,12 +383,6 @@ paths:
     delete:
       description: Deletes a reward operation with the specified id
       operationId: AdminDeleteRewardOperation
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: ""
@@ -462,12 +395,6 @@ paths:
       - application/json
       description: Retrieves a reward operation by id
       operationId: AdminGetRewardOperation
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       produces:
       - application/json
       responses:
@@ -485,11 +412,6 @@ paths:
       description: Updates a reward operation with the specified id
       operationId: AdminUpdateRewardOperation
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -511,12 +433,6 @@ paths:
     get:
       description: Retrieves  all reward types
       operationId: AdminGetRewardTypes
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: OK
@@ -534,11 +450,6 @@ paths:
       description: Create a new reward type
       operationId: AdminCreateRewardType
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -558,12 +469,6 @@ paths:
     delete:
       description: Deletes a reward type with the specified id
       operationId: AdminDeleteRewardType
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: ""
@@ -576,12 +481,6 @@ paths:
       - application/json
       description: Retrieves a reward type by id
       operationId: AdminRewardTypes
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       produces:
       - application/json
       responses:
@@ -599,11 +498,6 @@ paths:
       description: Updates a reward type with the specified id
       operationId: AdminUpdateRewardType
       parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: body json
         in: body
         name: data
@@ -627,12 +521,6 @@ paths:
       - application/json
       description: Gets reward quantity stats for the current moment
       operationId: InternalGetRewardStats
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: OK
@@ -661,12 +549,6 @@ paths:
       - application/json
       description: Create a new claim user claim
       operationId: CreateUserRewardClaim
-      parameters:
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       responses:
         "200":
           description: OK
@@ -691,11 +573,6 @@ paths:
         in: query
         name: limit
         type: string
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: offset
         in: query
         name: offset
@@ -724,11 +601,6 @@ paths:
         in: query
         name: code
         type: string
-      - description: It says if the data is associated with the current app or it
-          is for all the apps within the organization. It is 'false' by default.
-        in: query
-        name: all-apps
-        type: boolean
       - description: filter by building_block
         in: query
         name: building_block

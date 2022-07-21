@@ -30,12 +30,6 @@
                 "operationId": "AdminGetRewardClaims",
                 "parameters": [
                     {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
@@ -94,12 +88,6 @@
                 "operationId": "AdminCreateRewardClaim",
                 "parameters": [
                     {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
-                    {
                         "description": "body json",
                         "name": "data",
                         "in": "body",
@@ -137,14 +125,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardClaim",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -172,12 +152,6 @@
                 ],
                 "operationId": "AdminUpdateRewardClaim",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -215,12 +189,6 @@
                         "type": "string",
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -282,12 +250,6 @@
                 "operationId": "AdminCreateRewardInventory",
                 "parameters": [
                     {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
-                    {
                         "description": "body json",
                         "name": "data",
                         "in": "body",
@@ -325,14 +287,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardInventory",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -360,12 +314,6 @@
                 ],
                 "operationId": "AdminUpdateRewardInventory",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -398,14 +346,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperations",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -433,12 +373,6 @@
                 ],
                 "operationId": "AdminCreateRewardOperation",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -477,14 +411,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperation",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -512,12 +438,6 @@
                 ],
                 "operationId": "AdminUpdateRewardOperation",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -548,14 +468,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardOperation",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -575,14 +487,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardTypes",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -610,12 +514,6 @@
                 ],
                 "operationId": "AdminCreateRewardType",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -654,14 +552,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminRewardTypes",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -689,12 +579,6 @@
                 ],
                 "operationId": "AdminUpdateRewardType",
                 "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -725,14 +609,6 @@
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardType",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -755,14 +631,6 @@
                     "Internal"
                 ],
                 "operationId": "InternalGetRewardStats",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -810,14 +678,6 @@
                     "Client"
                 ],
                 "operationId": "CreateUserRewardClaim",
-                "parameters": [
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -854,12 +714,6 @@
                         "type": "string",
                         "description": "limit - limit the result",
                         "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -905,12 +759,6 @@
                         "type": "string",
                         "description": "code - filter by code",
                         "name": "code",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
-                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -964,9 +812,6 @@
                 "amount": {
                     "type": "integer"
                 },
-                "app_id": {
-                    "type": "string"
-                },
                 "building_block": {
                     "type": "string"
                 },
@@ -999,9 +844,6 @@
         "RewardClaim": {
             "type": "object",
             "properties": {
-                "app_id": {
-                    "type": "string"
-                },
                 "date_created": {
                     "type": "string"
                 },
@@ -1056,9 +898,6 @@
                 },
                 "amount_total": {
                     "type": "integer"
-                },
-                "app_id": {
-                    "type": "string"
                 },
                 "claim_depleted": {
                     "type": "boolean"
@@ -1128,9 +967,6 @@
             "properties": {
                 "active": {
                     "type": "boolean"
-                },
-                "app_id": {
-                    "type": "string"
                 },
                 "date_created": {
                     "type": "string"
