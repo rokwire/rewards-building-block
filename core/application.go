@@ -16,6 +16,8 @@ package core
 
 import (
 	cacheadapter "rewards/driven/cache"
+
+	"github.com/rokwire/logging-library-go/logs"
 )
 
 //Application represents the core application code based on hexagonal architecture
@@ -24,6 +26,7 @@ type Application struct {
 	build   string
 
 	Services Services //expose to the drivers adapters
+	logger   *logs.Logger
 
 	storage      Storage
 	cacheAdapter *cacheadapter.CacheAdapter
@@ -35,12 +38,13 @@ func (app *Application) Start() {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter) *Application {
+func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, logger *logs.Logger) *Application {
 	application := Application{
 		version:      version,
 		build:        build,
 		storage:      storage,
-		cacheAdapter: cacheadapter}
+		cacheAdapter: cacheadapter,
+		logger:       logger}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

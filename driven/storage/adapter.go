@@ -17,20 +17,24 @@ package storage
 import (
 	"context"
 	"fmt"
+	"log"
+	"rewards/core/model"
+	"strconv"
+	"time"
+
+	"github.com/rokwire/logging-library-go/logs"
+
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"rewards/core/model"
-	"strconv"
-	"time"
 )
 
 // Adapter implements the Storage interface
 type Adapter struct {
-	db *database
+	db     *database
+	logger *logs.Logger
 }
 
 // Start starts the storage
@@ -40,7 +44,7 @@ func (sa *Adapter) Start() error {
 }
 
 // NewStorageAdapter creates a new storage adapter instance
-func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string) *Adapter {
+func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string, logger *logs.Logger) *Adapter {
 	timeout, err := strconv.Atoi(mongoTimeout)
 	if err != nil {
 		log.Println("Set default timeout - 500")
@@ -48,7 +52,7 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 	}
 	timeoutMS := time.Millisecond * time.Duration(timeout)
 
-	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: timeoutMS}
+	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: timeoutMS, logger: logger}
 	return &Adapter{db: db}
 }
 

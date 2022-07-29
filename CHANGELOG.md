@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Set logger [#12](https://github.com/rokwire/rewards-building-block/issues/12)
 - Prepare the project to become open source [#7](https://github.com/rokwire/rewards-building-block/issues/7)
 
 ## [1.0.8] - 2022-04-29

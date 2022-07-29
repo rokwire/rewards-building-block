@@ -23,6 +23,8 @@ import (
 	storage "rewards/driven/storage"
 	driver "rewards/driver/web"
 	"strings"
+
+	"github.com/rokwire/logging-library-go/logs"
 )
 
 var (
@@ -37,6 +39,9 @@ func main() {
 		Version = "dev"
 	}
 
+	loggerOpts := logs.LoggerOpts{SuppressRequests: []logs.HttpRequestProperties{logs.NewAwsHealthCheckHttpRequestProperties("/rewards/version")}}
+	logger := logs.NewLogger("core", &loggerOpts)
+
 	port := getEnvKey("PORT", true)
 
 	internalAPIKey := getEnvKey("INTERNAL_API_KEY", true)
@@ -45,7 +50,7 @@ func main() {
 	mongoDBAuth := getEnvKey("MONGO_AUTH", true)
 	mongoDBName := getEnvKey("MONGO_DATABASE", true)
 	mongoTimeout := getEnvKey("MONGO_TIMEOUT", false)
-	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
+	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout, logger)
 	err := storageAdapter.Start()
 	if err != nil {
 		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
@@ -55,7 +60,7 @@ func main() {
 	cacheAdapter := cacheadapter.NewCacheAdapter(defaultCacheExpirationSeconds)
 
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter, logger)
 	application.Start()
 
 	// web adapter
@@ -69,7 +74,7 @@ func main() {
 		ContentServiceURL: rewardsServiceURL,
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config)
+	webAdapter := driver.NewWebAdapter(host, port, application, config, logger)
 
 	webAdapter.Start()
 }

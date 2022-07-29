@@ -16,7 +16,6 @@ package web
 
 import (
 	"fmt"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -24,6 +23,10 @@ import (
 	"rewards/driver/web/rest"
 	"rewards/utils"
 	"strings"
+
+	"github.com/rokwire/logging-library-go/logs"
+
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 
 	"github.com/casbin/casbin"
 	"github.com/gorilla/mux"
@@ -41,7 +44,8 @@ type Adapter struct {
 	adminApisHandler    rest.AdminApisHandler
 	internalApisHandler rest.InternalApisHandler
 
-	app *core.Application
+	app    *core.Application
+	logger *logs.Logger
 }
 
 // @title Rewards Building Block API
@@ -112,7 +116,8 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaim)).Methods("GET")
 	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim)).Methods("PUT")
 
-	log.Fatal(http.ListenAndServe(":"+we.port, router))
+	//log.Fatal(http.ListenAndServe(":"+we.port, router))
+	log.Fatal(http.ListenAndServe(":", router))
 }
 
 func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +143,6 @@ type apiKeysAuthFunc = func(http.ResponseWriter, *http.Request)
 func (we Adapter) apiKeyOrTokenWrapFunc(handler apiKeysAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
-
 		// apply core token check
 		coreAuth, _ := we.auth.coreAuth.Check(req)
 		if coreAuth {
@@ -170,7 +174,6 @@ type adminAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
-
 		obj := req.URL.Path // the resource that is going to be accessed.
 		act := req.Method   // the operation that the user performs on the resource.
 
@@ -215,8 +218,8 @@ func (we Adapter) internalAPIKeyAuthWrapFunc(handler internalAPIKeyAuthFunc) htt
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, config model.Config) Adapter {
-	auth := NewAuth(app, config)
+func NewWebAdapter(host string, port string, app *core.Application, config model.Config, logger *logs.Logger) Adapter {
+	auth := NewAuth(app, config, logger)
 	authorization := casbin.NewEnforcer("driver/web/authorization_model.conf", "driver/web/authorization_policy.csv")
 
 	apisHandler := rest.NewApisHandler(app)
@@ -231,6 +234,7 @@ func NewWebAdapter(host string, port string, app *core.Application, config model
 		adminApisHandler:    adminApisHandler,
 		internalApisHandler: internalApisHandler,
 		app:                 app,
+		logger:              logger,
 	}
 }
 
