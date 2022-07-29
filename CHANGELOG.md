@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Multy-tanancy [#8](https://github.com/rokwire/rewards-building-block/issues/8)
 - Set logger [#12](https://github.com/rokwire/rewards-building-block/issues/12)
 - Prepare the project to become open source [#7](https://github.com/rokwire/rewards-building-block/issues/7)
 

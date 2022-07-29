@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
-	"strconv"
 
 	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
@@ -67,7 +66,7 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 // @Security UserAuth
 // @Router /user/balance [get]
 func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetUserBalance(&userClaims.AppID, userClaims.OrgID, userClaims.Subject)
+	resData, err := h.app.Services.GetUserBalance(userClaims.OrgID, userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardsAmount(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -110,7 +109,7 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	resData, err := h.app.Services.GetUserRewardsHistory(&userClaims.AppID, userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetUserRewardsHistory(userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.getUserRewardsHistory(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -142,19 +141,13 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 // @Security AdminUserAuth
 // @Router /user/claims [get]
 func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	//get all-apps param value
-	allApps := false //false by defautl
-	allAppsParam := r.URL.Query().Get("all-apps")
-	if allAppsParam != "" {
-		allApps, _ = strconv.ParseBool(allAppsParam)
-	}
 
 	rewardType := getStringQueryParam(r, "reward_type")
 	status := getStringQueryParam(r, "status")
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	rewardClaims, err := h.app.Services.GetRewardClaims(allApps, &userClaims.AppID, userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
+	rewardClaims, err := h.app.Services.GetRewardClaims(userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -190,12 +183,6 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	//get all-apps param value
-	allApps := false //false by defautl
-	allAppsParam := r.URL.Query().Get("all-apps")
-	if allAppsParam != "" {
-		allApps, _ = strconv.ParseBool(allAppsParam)
-	}
 
 	var item model.RewardClaim
 	err = json.Unmarshal(data, &item)
@@ -206,7 +193,7 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 	}
 
 	item.UserID = userClaims.Subject
-	createdItem, err := h.app.Services.CreateRewardClaim(allApps, &userClaims.AppID, userClaims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(userClaims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on apis.CreateUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

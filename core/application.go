@@ -15,9 +15,7 @@
 package core
 
 import (
-	"log"
 	cacheadapter "rewards/driven/cache"
-	"rewards/driven/storage"
 
 	"github.com/rokwire/logging-library-go/logs"
 )
@@ -32,78 +30,21 @@ type Application struct {
 
 	storage      Storage
 	cacheAdapter *cacheadapter.CacheAdapter
-
-	multiTenancyAppID string
-	multiTenancyOrgID string
 }
 
 // Start starts the core part of the application
 func (app *Application) Start() {
-	err := app.storeMultiTenancyData()
-	if err != nil {
-		log.Fatalf("error initializing multi-tenancy data: %s", err.Error())
-	}
-
 	app.storage.SetListener(app)
 }
 
-//as the service starts supporting multi-tenancy we need to add the needed multi-tenancy fields for the existing data,
-func (app *Application) storeMultiTenancyData() error {
-	log.Println("storeMultiTenancyData...")
-	//in transaction
-	transaction := func(context storage.TransactionContext) error {
-
-		//check if we need to apply multi-tenancy data
-		var applyData bool
-		items, err := app.storage.FindAllRewardTypeItems(context)
-		if err != nil {
-			return err
-		}
-		for _, current := range items {
-			if len(current.AppID) > 0 {
-				log.Printf("\thas already app_id:%s", current.AppID)
-				applyData = false
-				break
-			} else {
-				log.Print("\tno app_id")
-				applyData = true
-				break
-			}
-		}
-
-		//apply data if necessary
-		if applyData {
-			log.Print("\tapplying multi-tenancy data..")
-			err := app.storage.StoreMultiTenancyData(context, app.multiTenancyAppID, app.multiTenancyOrgID)
-			if err != nil {
-				return err
-			}
-		} else {
-			log.Print("\tno need to apply multi-tenancy data, so do nothing")
-		}
-
-		return nil
-
-	}
-
-	err := app.storage.PerformTransaction(transaction)
-	if err != nil {
-		log.Printf("error performing transaction for multi tenancy")
-		return err
-	}
-	return nil
-}
-
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, mtAppID string, mtOrgID string, logger *logs.Logger) *Application {
+func NewApplication(version string, build string, storage Storage, cacheadapter *cacheadapter.CacheAdapter, logger *logs.Logger) *Application {
 	application := Application{
-		version:           version,
-		build:             build,
-		storage:           storage,
-		cacheAdapter:      cacheadapter,
-		multiTenancyAppID: mtAppID,
-		multiTenancyOrgID: mtOrgID,
-		logger:            logger}
+		version:      version,
+		build:        build,
+		storage:      storage,
+		cacheAdapter: cacheadapter,
+		logger:       logger}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}
