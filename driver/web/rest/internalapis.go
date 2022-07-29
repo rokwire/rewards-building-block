@@ -31,7 +31,6 @@ type InternalApisHandler struct {
 // createRewardHistoryEntryBody wrapper
 type createRewardHistoryEntryBody struct {
 	OrgID         string `json:"org_id"`
-	AppID         string `json:"app_id"`
 	UserID        string `json:"user_id"`
 	RewardType    string `json:"reward_type"`
 	RewardCode    string `json:"code"`
@@ -106,7 +105,6 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 // getRewardStatsBody wrapper
 type getRewardStatsBody struct {
 	OrgID string `json:"org_id"`
-	AppID string `json:"app_id"`
 } //@name getRewardStatsBody
 
 // GetRewardStats Gets reward quantity stats for the current moment
