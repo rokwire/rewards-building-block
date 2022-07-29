@@ -111,7 +111,6 @@ type getRewardStatsBody struct {
 // @Description Gets reward quantity stats for the current moment
 // @Tags Internal
 // @ID InternalGetRewardStats
-// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Success 200 {array} model.RewardQuantityState
 // @Security InternalApiAuth

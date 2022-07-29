@@ -129,7 +129,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardClaim",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -292,7 +291,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardInventory",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -352,7 +350,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperations",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -418,7 +415,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperation",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -476,7 +472,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardOperation",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": ""
@@ -496,7 +491,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardTypes",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -562,7 +556,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminRewardTypes",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -620,7 +613,6 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardType",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": ""
@@ -643,7 +635,6 @@ const docTemplate = `{
                     "Internal"
                 ],
                 "operationId": "InternalGetRewardStats",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -691,7 +682,6 @@ const docTemplate = `{
                     "Client"
                 ],
                 "operationId": "CreateUserRewardClaim",
-                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -826,9 +816,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
-                "app_id": {
-                    "type": "string"
-                },
                 "building_block": {
                     "type": "string"
                 },
@@ -861,9 +848,6 @@ const docTemplate = `{
         "RewardClaim": {
             "type": "object",
             "properties": {
-                "app_id": {
-                    "type": "string"
-                },
                 "date_created": {
                     "type": "string"
                 },
@@ -918,9 +902,6 @@ const docTemplate = `{
                 },
                 "amount_total": {
                     "type": "integer"
-                },
-                "app_id": {
-                    "type": "string"
                 },
                 "claim_depleted": {
                     "type": "boolean"
@@ -990,9 +971,6 @@ const docTemplate = `{
             "properties": {
                 "active": {
                     "type": "boolean"
-                },
-                "app_id": {
-                    "type": "string"
                 },
                 "date_created": {
                     "type": "string"

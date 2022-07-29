@@ -95,7 +95,6 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 // @ID GetUserRewardsHistory
 // @Param reward_type query string false "reward_type - filter by reward_type"
 // @Param code  query string false "code - filter by code"
-// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param building_block query string false "filter by building_block"
 // @Param limit query integer false "limit - limit the result"
 // @Param offset query integer false "offset"
@@ -134,7 +133,6 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 // @ID GetUserRewardClaim
 // @Param status query string false "status"
 // @Param limit query string false "limit - limit the result"
-// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param offset query string false "offset"
 // @Accept json
 // @Success 200 {array} model.RewardClaim
@@ -170,7 +168,6 @@ func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.Res
 // @Description Create a new claim user claim
 // @Tags Client
 // @ID CreateUserRewardClaim
-// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Success 200 {object} model.RewardClaim
 // @Security AdminUserAuth

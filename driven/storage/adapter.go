@@ -145,7 +145,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 			primitive.E{Key: "date_updated", Value: now},
 		}},
 	}
-	_, err := sa.db.rewardTypes.UpdateOne(filter, update, nil)
+	_, err := sa.db.rewardInventories.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("storage.UpdateRewardType error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardType error: %s", err)
@@ -160,8 +160,8 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 func (sa *Adapter) DeleteRewardType(orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
-	filter := bson.D{primitive.E{Key: "_id", Value: id}, primitive.E{Key: "org_id", Value: orgID}}
-	_, err := sa.db.rewardTypes.DeleteOne(filter, nil)
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	_, err := sa.db.rewardInventories.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardType error: %s", err)
 		return fmt.Errorf("storage.DeleteRewardType error: %s", err)
@@ -863,9 +863,4 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 			m.listener.OnRewardTypesChanged()
 		}
 	}
-}
-
-//TransactionContext wraps mongo.SessionContext for use by external packages
-type TransactionContext interface {
-	mongo.SessionContext
 }
