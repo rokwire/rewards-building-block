@@ -38,32 +38,26 @@ func (app *Application) getRewardTypes(orgID string) ([]model.RewardType, error)
 }
 
 func (app *Application) getRewardType(orgID string, id string) (*model.RewardType, error) {
-
 	return app.storage.GetRewardType(orgID, id)
 }
 
 func (app *Application) createRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
-
 	return app.storage.CreateRewardType(orgID, item)
 }
 
 func (app *Application) updateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
-
 	return app.storage.UpdateRewardType(orgID, id, item)
 }
 
 func (app *Application) deleteRewardTypes(orgID string, id string) error {
-
 	return app.storage.DeleteRewardType(orgID, id)
 }
 
 func (app *Application) getRewardOperations(orgID string) ([]model.RewardOperation, error) {
-
 	return app.storage.GetRewardOperations(orgID)
 }
 
 func (app *Application) getRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
-
 	return app.storage.GetRewardOperationByID(orgID, id)
 }
 
@@ -72,17 +66,14 @@ func (app *Application) getRewardOperationByCode(orgID string, code string) (*mo
 }
 
 func (app *Application) createRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
-
 	return app.storage.CreateRewardOperation(orgID, item)
 }
 
 func (app *Application) updateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
-
 	return app.storage.UpdateRewardOperation(orgID, id, item)
 }
 
 func (app *Application) deleteRewardOperation(orgID string, id string) error {
-
 	return app.storage.DeleteRewardOperation(orgID, id)
 }
 
@@ -122,32 +113,26 @@ func (app *Application) createReward(orgID string, item model.Reward) (*model.Re
 // Reward pools
 
 func (app *Application) getRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
-
 	return app.storage.GetRewardInventories(orgID, ids, rewardType, inStock, grantDepleted, claimDepleted, limit, offset)
 }
 
 func (app *Application) getRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
-
 	return app.storage.GetRewardInventory(orgID, id)
 }
 
 func (app *Application) createRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
-
 	return app.storage.CreateRewardInventory(orgID, item)
 }
 
 func (app *Application) updateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-
 	return app.storage.UpdateRewardInventory(orgID, id, item)
 }
 
 func (app *Application) getRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
-
 	return app.storage.GetRewardClaims(orgID, ids, userID, rewardType, status, limit, offset)
 }
 
 func (app *Application) getRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
-
 	return app.storage.GetRewardClaim(orgID, id)
 }
 
@@ -180,7 +165,6 @@ func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) 
 }
 
 func (app *Application) updateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-
 	return app.storage.UpdateRewardClaim(orgID, id, item)
 }
 

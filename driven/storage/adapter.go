@@ -24,9 +24,6 @@ import (
 
 	"github.com/rokwire/logging-library-go/logs"
 
-	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logutils"
-
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -47,39 +44,6 @@ func (sa *Adapter) Start() error {
 	return err
 }
 
-//PerformTransaction performs a transaction
-func (sa *Adapter) PerformTransaction(transaction func(context TransactionContext) error) error {
-	// transaction
-	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
-		err := sessionContext.StartTransaction()
-		if err != nil {
-			sa.abortTransaction(sessionContext)
-			return errors.WrapErrorAction(logutils.ActionStart, logutils.TypeTransaction, nil, err)
-		}
-		err = transaction(sessionContext)
-		if err != nil {
-			sa.abortTransaction(sessionContext)
-			return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
-		}
-
-		err = sessionContext.CommitTransaction(sessionContext)
-		if err != nil {
-			sa.abortTransaction(sessionContext)
-			return errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
-		}
-		return nil
-	})
-
-	return err
-}
-
-func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
-	err := sessionContext.AbortTransaction(sessionContext)
-	if err != nil {
-		sa.logger.Errorf("error aborting a transaction - %s", err)
-	}
-}
-
 // NewStorageAdapter creates a new storage adapter instance
 func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string, logger *logs.Logger) *Adapter {
 	timeout, err := strconv.Atoi(mongoTimeout)
@@ -91,58 +55,6 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 
 	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: timeoutMS, logger: logger}
 	return &Adapter{db: db}
-}
-
-//StoreMultiTenancyData stores multi-tenancy to already exisiting data in the collections
-func (sa *Adapter) StoreMultiTenancyData(context TransactionContext, appID string, orgID string) error {
-	//TODO
-
-	filter := bson.D{}
-	update := bson.D{
-		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "app_id", Value: appID},
-			primitive.E{Key: "org_id", Value: orgID},
-		}},
-	}
-	//types
-	_, err := sa.db.rewardTypes.UpdateManyWithContext(context, filter, update, nil)
-	if err != nil {
-		return err
-	}
-	//history
-	_, err = sa.db.rewardHistory.UpdateManyWithContext(context, filter, update, nil)
-	if err != nil {
-		return err
-	}
-	//operations
-	_, err = sa.db.rewardOperations.UpdateManyWithContext(context, filter, update, nil)
-	if err != nil {
-		return err
-	}
-	//inventories
-	_, err = sa.db.rewardInventories.UpdateManyWithContext(context, filter, update, nil)
-	if err != nil {
-		return err
-	}
-
-	//claims
-	_, err = sa.db.rewardClaims.UpdateManyWithContext(context, filter, update, nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// FindAllContentItems  finds all content items
-func (sa *Adapter) FindAllRewardTypeItems(context TransactionContext) ([]model.RewardType, error) {
-	filter := bson.D{}
-	var result []model.RewardType
-	err := sa.db.rewardTypes.Find(filter, &result, nil)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
 }
 
 // GetRewardTypes Gets all reward types
