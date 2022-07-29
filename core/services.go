@@ -158,7 +158,6 @@ func (app *Application) createRewardClaim(orgID string, item model.RewardClaim) 
 				return nil, fmt.Errorf("Error on app.createRewardClaim() - not enough quantity for %s. Expected: %d", claimEntry.RewardType, claimEntry.Amount)
 			}
 		}
-
 		return app.storage.CreateRewardClaim(orgID, item)
 	}
 	return nil, fmt.Errorf("Error on app.createRewardClaim() - missing or zero quantity for reward items")

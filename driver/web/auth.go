@@ -21,25 +21,12 @@ import (
 	"rewards/core"
 	"rewards/core/model"
 
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/logging-library-go/errors"
 	"github.com/rokwire/logging-library-go/logs"
-	"github.com/rokwire/logging-library-go/logutils"
-
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
-
-//Authorization is an interface for auth types
-type Authorization interface {
-	check(req *http.Request) (int, *tokenauth.Claims, error)
-	start()
-}
 
 // CoreAuth implementation
 type CoreAuth struct {
-	app          *core.Application
-	tokenAuth    *tokenauth.TokenAuth
-	standardAuth *StandardAuth
+	app *core.Application
 }
 
 // Auth handler
@@ -47,66 +34,6 @@ type Auth struct {
 	internalAuth *InternalAuth
 	coreAuth     *CoreAuth
 	logger       *logs.Logger
-}
-
-//StandardAuth entity
-type StandardAuth struct {
-	tokenAuth *tokenauth.TokenAuth
-}
-
-func (a *StandardAuth) start() {}
-
-func (a *StandardAuth) check(req *http.Request) (int, *tokenauth.Claims, error) {
-	claims, err := a.tokenAuth.CheckRequestTokens(req)
-	if err != nil {
-		return http.StatusUnauthorized, nil, errors.WrapErrorAction("typeCheckServicesAuthRequestToken", logutils.TypeToken, nil, err)
-	}
-
-	return http.StatusOK, claims, err
-}
-
-func newStandardAuth(tokenAuth *tokenauth.TokenAuth) *StandardAuth {
-	standartAuth := StandardAuth{tokenAuth: tokenAuth}
-	return &standartAuth
-}
-
-// NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
-
-	remoteConfig := authservice.RemoteAuthDataLoaderConfig{
-		AuthServicesHost: config.CoreBBHost,
-	}
-
-	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core"}, logs.NewLogger("groupsbb", &logs.LoggerOpts{}))
-	authService, err := authservice.NewAuthService("rewards", config.ContentServiceURL, serviceLoader)
-	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
-	}
-	tokenAuth, err := tokenauth.NewTokenAuth(true, authService, nil, nil)
-	if err != nil {
-		log.Fatalf("Error intitializing token auth: %v", err)
-	}
-	standardAuth := newStandardAuth(tokenAuth)
-
-	auth := CoreAuth{app: app, tokenAuth: tokenAuth, standardAuth: standardAuth}
-	return &auth
-}
-
-// Check checks the request contains a valid Core access token
-func (ca CoreAuth) Check(r *http.Request) (bool, *tokenauth.Claims) {
-	claims, err := ca.tokenAuth.CheckRequestTokens(r)
-	if err != nil {
-		log.Printf("error validate token: %s", err)
-		return false, nil
-	}
-
-	if claims != nil {
-		if claims.Valid() == nil {
-			return true, claims
-		}
-	}
-
-	return false, nil
 }
 
 func (auth *Auth) clientIDCheck(w http.ResponseWriter, r *http.Request) bool {
@@ -123,9 +50,9 @@ func (auth *Auth) clientIDCheck(w http.ResponseWriter, r *http.Request) bool {
 
 // NewAuth creates new auth handler
 func NewAuth(app *core.Application, config model.Config, logger *logs.Logger) *Auth {
-	coreAuth := NewCoreAuth(app, config)
+
 	internalAuth := newInternalAuth(config)
-	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth, logger: logger}
+	auth := Auth{internalAuth: internalAuth, logger: logger}
 	return &auth
 }
 

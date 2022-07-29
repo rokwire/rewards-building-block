@@ -139,7 +139,6 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 // @Security AdminUserAuth
 // @Router /user/claims [get]
 func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-
 	rewardType := getStringQueryParam(r, "reward_type")
 	status := getStringQueryParam(r, "status")
 	limitFilter := getInt64QueryParam(r, "limit")
