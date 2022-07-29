@@ -22,6 +22,7 @@ import (
 	"rewards/core/model"
 	"rewards/driver/web/rest"
 	"rewards/utils"
+	"strings"
 
 	"github.com/rokwire/logging-library-go/logs"
 
@@ -116,7 +117,7 @@ func (we Adapter) Start() {
 	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim)).Methods("PUT")
 
 	//log.Fatal(http.ListenAndServe(":"+we.port, router))
-	log.Fatal(http.ListenAndServe(":81", router))
+	log.Fatal(http.ListenAndServe(":", router))
 }
 
 func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
@@ -142,6 +143,12 @@ type apiKeysAuthFunc = func(http.ResponseWriter, *http.Request)
 func (we Adapter) apiKeyOrTokenWrapFunc(handler apiKeysAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
+		// apply core token check
+		coreAuth, _ := we.auth.coreAuth.Check(req)
+		if coreAuth {
+			handler(w, req)
+			return
+		}
 
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
@@ -152,6 +159,12 @@ type userAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 func (we Adapter) userAuthWrapFunc(handler userAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
+
+		coreAuth, claims := we.auth.coreAuth.Check(req)
+		if coreAuth && claims != nil && !claims.Anonymous {
+			handler(claims, w, req)
+			return
+		}
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 }
@@ -161,6 +174,28 @@ type adminAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 func (we Adapter) adminAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
+		obj := req.URL.Path // the resource that is going to be accessed.
+		act := req.Method   // the operation that the user performs on the resource.
+
+		coreAuth, claims := we.auth.coreAuth.Check(req)
+		if coreAuth {
+			permissions := strings.Split(claims.Permissions, ",")
+
+			HasAccess := false
+			for _, s := range permissions {
+				HasAccess = we.authorization.Enforce(s, obj, act)
+				if HasAccess {
+					break
+				}
+			}
+			if HasAccess {
+				handler(claims, w, req)
+				return
+			}
+			log.Printf("Access control error - Core Subject: %s is trying to apply %s operation for %s\n", claims.Subject, act, obj)
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
 
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
