@@ -15,13 +15,14 @@
 package web
 
 import (
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
-	"github.com/rokwire/logging-library-go/logs"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+
+	"github.com/rokwire/core-auth-library-go/authservice"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
+	"github.com/rokwire/logging-library-go/logs"
 )
 
 // CoreAuth implementation
@@ -38,7 +39,7 @@ func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
 	}
 
 	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core"}, logs.NewLogger("groupsbb", &logs.LoggerOpts{}))
-	authService, err := authservice.NewAuthService("rewards", config.ContentServiceURL, serviceLoader)
+	authService, err := authservice.NewAuthService("rewards", config.RewardsServiceURL, serviceLoader)
 	if err != nil {
 		log.Fatalf("Error initializing auth service: %v", err)
 	}
