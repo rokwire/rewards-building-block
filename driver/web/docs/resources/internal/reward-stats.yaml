@@ -1,17 +1,17 @@
-post:
+get:
   tags:
   - Internal
-  summary: Reward history
+  summary: Get Reward types
   description: |
-    Reward history
+    Get Reward types
   security:
     - bearerAuth: []
   requestBody:
-    description: create Reward history
+    description: get Reward type
     content:
       application/json:
         schema:
-          $ref: "../../schemas/apis/internal/reward-history/request/Request.yaml" 
+          $ref: "../../schemas/apis/internal/reward-stats/request/Request.yaml" 
     required: true    
   responses:
     200:
@@ -21,7 +21,7 @@ post:
           schema:
             type: array
             items:
-              $ref: "../../schemas/application/RewardQuantityState.yaml"
+              $ref: "../../schemas/application/RewardType.yaml"
     400:
       description: Bad request
     401:

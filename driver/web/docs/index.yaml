@@ -23,5 +23,7 @@ paths:
   #Internal
   /int/reward:
     $ref: "./resources/internal/reward-history.yaml"
+  /int/stats:
+    $ref: "./resources/internal/reward-stats.yaml"  
   #Client
   #Admin    
