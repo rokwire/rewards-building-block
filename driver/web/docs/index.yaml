@@ -21,5 +21,7 @@ tags:
     description: Client applications APIs.
 paths:
   #Internal
+  /int/reward:
+    $ref: "./resources/internal/reward-history.yaml"
   #Client
   #Admin    

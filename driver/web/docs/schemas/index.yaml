@@ -1,0 +1,15 @@
+# application
+Reward:
+  $ref: "./application/Reward.yaml"
+RewardClaim:
+  $ref: "./application/RewardClaim.yaml"
+RewardClaimItem:
+  $ref: "./application/RewardClaimItem.yaml"    
+RewardInventory:
+  $ref: "./application/RewardInventory.yaml"
+RewardOperation:
+  $ref: "./application/RewardOperation.yaml"
+RewardQuantityState:
+  $ref: "./application/RewardQuantityState.yaml"
+RewardType:
+  $ref: "./application/RewardType.yaml"
