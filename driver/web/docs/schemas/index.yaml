@@ -13,3 +13,5 @@ RewardQuantityState:
   $ref: "./application/RewardQuantityState.yaml"
 RewardType:
   $ref: "./application/RewardType.yaml"
+RewardTypeAmount:
+  $ref: "./application/RewardTypeAmount.yaml"

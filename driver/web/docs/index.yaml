@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Rokwire Rewards Building Block API
   description: Rewards Building Block API Documentation
-  version: 1.24.2
+  version: 1.0.8 
 servers:
   - url: 'https://api.rokwire.illinois.edu/rewards'
     description: Production server
@@ -26,4 +26,6 @@ paths:
   /int/stats:
     $ref: "./resources/internal/reward-stats.yaml"  
   #Client
+  /user/balance:
+    $ref: "./resources/client/user/balance.yaml" 
   #Admin    
