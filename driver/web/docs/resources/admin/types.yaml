@@ -1,4 +1,4 @@
-  get:
+get:
   tags:
   - Admin
   summary: Retrieves  all reward types
@@ -21,7 +21,7 @@
       description: Unauthorized
     500:
       description: Internal error
-  post:
+post:
    tags:
    - Admin
    summary: Create a new claim user claim

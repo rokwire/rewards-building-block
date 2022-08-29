@@ -31,7 +31,7 @@ paths:
   /user/history:
     $ref: "./resources/client/user-history.yaml"
   /user/claims:
-    $ref: "./resources/client/user-claims.yaml"    
+    $ref: "./resources/client/user-claims.yaml"   
   #Admin  
   /admin/types:
     $ref: "./resources/admin/types.yaml"  
