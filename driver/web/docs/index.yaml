@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Rokwire Rewards Building Block API
+  title: Rokwire Rewards BB API
   description: Rewards Building Block API Documentation
   version: 1.0.8 
 servers:
