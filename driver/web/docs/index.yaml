@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Rokwire Rewards BB API
+  title: Rokwire Rewards Building Block API
   description: Rewards Building Block API Documentation
   version: 1.0.8 
 servers:
@@ -33,3 +33,13 @@ paths:
   /user/claims:
     $ref: "./resources/client/user-claims.yaml"    
   #Admin    
+
+
+  components:
+  securitySchemes:
+      bearerAuth:            # arbitrary name for the security scheme
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  schemas:
+    $ref: "./schemas/index.yaml"
