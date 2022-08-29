@@ -283,6 +283,75 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /admin/types:
+    get: null
+    tags:
+      - Admin
+    summary: Retrieves  all reward types
+    description: |
+      Retrieves  all reward types
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/paths/schemas/RewardType'
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized
+      '500':
+        description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create a new claim user claim
+      description: |
+        Create a new claim user claim
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new claim user claim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                reward_type:
+                  type: string
+                display_name:
+                  type: string
+                active:
+                  type: boolean
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   components: null
   securitySchemes:
     bearerAuth:
