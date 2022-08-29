@@ -55,7 +55,7 @@
           schema:
             type: array
             items:
-              $ref: "../../../schemas/application/Reward.yaml"
+              $ref: "../../schemas/application/Reward.yaml"
     400:
       description: Bad request
     401:

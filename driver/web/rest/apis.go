@@ -16,12 +16,13 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb

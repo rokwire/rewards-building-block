@@ -27,7 +27,9 @@ paths:
     $ref: "./resources/internal/reward-stats.yaml"  
   #Client
   /user/balance:
-    $ref: "./resources/client/user/balance.yaml"
+    $ref: "./resources/client/user-balance.yaml"
   /user/history:
-    $ref: "./resources/client/user/history.yaml"  
+    $ref: "./resources/client/user-history.yaml"
+  /user/claims:
+    $ref: "./resources/client/user-claims.yaml"    
   #Admin    
