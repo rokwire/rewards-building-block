@@ -1,4 +1,4 @@
-  get:
+get:
   tags:
   - Client
   summary: Retrieves the wallet history

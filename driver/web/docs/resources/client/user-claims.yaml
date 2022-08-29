@@ -1,4 +1,4 @@
-  get:
+get:
   tags:
   - Client
   summary: Gets user claims
@@ -46,7 +46,7 @@
       description: Unauthorized
     500:
       description: Internal error
-  post:
+post:
    tags:
    - Client
    summary: Create a new claim user claim
