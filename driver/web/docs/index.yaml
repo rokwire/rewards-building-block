@@ -34,7 +34,9 @@ paths:
     $ref: "./resources/client/user-claims.yaml"   
   #Admin  
   /admin/types:
-    $ref: "./resources/admin/types.yaml"  
+    $ref: "./resources/admin/types.yaml"
+  /admin/types/{id}:
+    $ref: "./resources/admin/typesid.yaml"     
 
 
   components:
