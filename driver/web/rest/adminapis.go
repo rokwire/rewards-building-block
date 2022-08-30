@@ -16,14 +16,15 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 // AdminApisHandler handles the rest Admin APIs implementation

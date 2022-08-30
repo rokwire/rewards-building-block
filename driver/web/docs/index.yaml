@@ -36,7 +36,11 @@ paths:
   /admin/types:
     $ref: "./resources/admin/types.yaml"
   /admin/types/{id}:
-    $ref: "./resources/admin/typesid.yaml"     
+    $ref: "./resources/admin/typesid.yaml"
+  /admin/operations:
+    $ref: "./resources/admin/operations.yaml"
+  /admin/operations/{id}:
+    $ref: "./resources/admin/operationsid.yaml"       
 
 
   components:
