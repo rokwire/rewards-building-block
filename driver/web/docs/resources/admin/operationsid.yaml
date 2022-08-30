@@ -48,7 +48,7 @@ put:
       schema:
         type: string  
   requestBody:
-    description: get Reward type
+    description: update Reward type
     content:
       application/json:
         schema:

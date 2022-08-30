@@ -40,7 +40,11 @@ paths:
   /admin/operations:
     $ref: "./resources/admin/operations.yaml"
   /admin/operations/{id}:
-    $ref: "./resources/admin/operationsid.yaml"       
+    $ref: "./resources/admin/operationsid.yaml"
+  /admin/inventories:
+    $ref: "./resources/admin/inventories.yaml" 
+  /admin/inventories/{id}:
+    $ref: "./resources/admin/inventoriesid.yaml"          
 
 
   components:
