@@ -44,7 +44,11 @@ paths:
   /admin/inventories:
     $ref: "./resources/admin/inventories.yaml" 
   /admin/inventories/{id}:
-    $ref: "./resources/admin/inventoriesid.yaml"          
+    $ref: "./resources/admin/inventoriesid.yaml"
+  /admin/claims:
+    $ref: "./resources/admin/claims.yaml"
+  /admin/claims/{id}:
+    $ref: "./resources/admin/claimsid.yaml"              
 
 
   components:

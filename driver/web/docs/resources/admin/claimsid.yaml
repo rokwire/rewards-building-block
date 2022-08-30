@@ -1,0 +1,71 @@
+get:
+  tags:
+  - Admin
+  summary: Retrieves  all reward claims
+  description: |
+    Retrieves  all reward claims
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: the reward_claims id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/RewardClaim.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error
+put:
+  tags:
+  - Admin
+  summary: Updates a reward claim with the specified id
+  description: |
+    Updates a reward claim with the specified id
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: the reward_claim id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string  
+  requestBody:
+    description: update Reward inventory
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/apis/admin/claims/request/Request.yaml" 
+    required: true    
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/RewardClaim.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error              
