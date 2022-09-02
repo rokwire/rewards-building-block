@@ -1,0 +1,1155 @@
+openapi: 3.0.3
+info:
+  title: Rokwire Rewards Building Block API
+  description: Rewards Building Block API Documentation
+  version: 1.0.8
+servers:
+  - url: 'https://api.rokwire.illinois.edu/rewards'
+    description: Production server
+  - url: 'https://api-test.rokwire.illinois.edu/rewards'
+    description: Test server
+  - url: 'https://api-dev.rokwire.illinois.edu/rewards'
+    description: Development server
+  - url: 'http://localhost/rewards'
+    description: Local server
+tags:
+  - name: Admin
+    description: Clients administration applications APIs.
+  - name: Internal
+    description: Internal applications APIs.
+  - name: Client
+    description: Client applications APIs.
+paths:
+  /int/reward:
+    post:
+      tags:
+        - Internal
+      summary: Reward history
+      description: |
+        Reward history
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create Reward history
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                user_id:
+                  type: string
+                reward_type:
+                  type: string
+                code:
+                  type: string
+                building_block:
+                  type: string
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardQuantityState'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /int/stats:
+    get:
+      tags:
+        - Internal
+      summary: Get Reward types
+      description: |
+        Get Reward types
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: get Reward type
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /user/balance:
+    get:
+      tags:
+        - Client
+      summary: Retrieves balance for each user's wallet
+      description: |
+        Retrieves balance for each user's wallet
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardTypeAmount'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /user/history:
+    get:
+      tags:
+        - Client
+      summary: Retrieves the wallet history
+      description: |
+        Retrieves the wallet history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reward_type
+          in: query
+          description: reward_type - filter by reward_type
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: code - filter by code
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: building_block
+          in: query
+          description: building_block - filter by building_block
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: limit - limit the result
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/Reward'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /user/claims:
+    get:
+      tags:
+        - Client
+      summary: Gets user claims
+      description: |
+        Gets user claims
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: status
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: limit - limit the result
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Client
+      summary: Create a new claim user claim
+      description: |
+        Create a new claim user claim
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new claim user claim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                user_id:
+                  type: string
+                items:
+                  type: array
+                  $ref: '#/paths/schemas/RewardClaimItem'
+                status:
+                  type: string
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /admin/types:
+    get:
+      tags:
+        - Admin
+      summary: Retrieves  all reward types
+      description: |
+        Retrieves  all reward types
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create a new claim user claim
+      description: |
+        Create a new claim user claim
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new claim user claim
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                reward_type:
+                  type: string
+                display_name:
+                  type: string
+                active:
+                  type: boolean
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/admin/types/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Retrieves a reward type by id
+      description: |
+        Retrieves a reward type by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_type id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Updates a reward type with the specified id
+      description: |
+        Updates a reward type with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_type id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: get Reward type
+        content:
+          application/json:
+            schema:
+              $ref: '#/paths/~1admin~1types/post/requestBody/content/application~1json/schema'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardType'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    delete:
+      tags:
+        - Admin
+      summary: Deletes a reward type with the specified id
+      description: |
+        Deletes a reward type with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_type id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success"
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /admin/operations:
+    get:
+      tags:
+        - Admin
+      summary: Retrieves  all reward types
+      description: |
+        Retrieves  all reward types
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardOperation'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create a new operation type
+      description: |
+        Create a new operation type
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new operation type
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                reward_type:
+                  type: string
+                code:
+                  type: string
+                building_block:
+                  type: string
+                amount:
+                  type: integer
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardOperation'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/admin/operations/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Retrieves a reward operation by id
+      description: |
+        Retrieves a reward operation by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_operation id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardOperation'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Updates a reward operation with the specified id
+      description: |
+        Updates a reward operation with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_type id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: update Reward type
+        content:
+          application/json:
+            schema:
+              $ref: '#/paths/~1admin~1operations/post/requestBody/content/application~1json/schema'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardOperation'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    delete:
+      tags:
+        - Admin
+      summary: Deletes a reward operation with the specified id
+      description: |
+        Deletes a reward operation with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_operation id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success"
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /admin/inventories:
+    get:
+      tags:
+        - Admin
+      summary: Retrieves  all reward inventories
+      description: |
+        Retrieves  all reward inventories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ids
+          in: query
+          description: Coma separated IDs of the desired records
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: in_stock
+          in: query
+          description: in_stock
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: grant_depleted
+          in: query
+          description: grant_depleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: claim_depleted
+          in: query
+          description: claim_depleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: limit - limit the result
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardInventory'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create a new reward inventory
+      description: |
+        Create a new reward inventory
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new reward inventory
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                reward_type:
+                  type: string
+                in_stock:
+                  type: boolean
+                amount_total:
+                  type: integer
+                amount_granted:
+                  type: integer
+                amount_claimed:
+                  type: integer
+                grant_depleted:
+                  type: boolean
+                claim_depleted:
+                  type: boolean
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardInventory'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/admin/inventories/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Retrieves a reward inventory by id
+      description: |
+        Retrieves a reward inventory by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_inventory id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardInventory'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Updates a reward inventory with the specified id
+      description: |
+        Updates a reward inventory with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_inventory id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: update Reward inventory
+        content:
+          application/json:
+            schema:
+              $ref: '#/paths/~1admin~1inventories/post/requestBody/content/application~1json/schema'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardInventory'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /admin/claims:
+    get:
+      tags:
+        - Admin
+      summary: Retrieves  all reward claims
+      description: |
+        Retrieves  all reward claims
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ids
+          in: query
+          description: Coma separated IDs of the desired records
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: user_id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: status
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: limit - limit the result
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create a new claim inventory
+      description: |
+        Create a new claim inventory
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create a new claim inventory
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                user_id:
+                  type: string
+                items:
+                  type: array
+                  $ref: '#/paths/schemas/RewardClaimItem'
+                status:
+                  type: string
+                description:
+                  type: string
+                date_created:
+                  type: string
+                date_updated:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/admin/claims/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Retrieves  all reward claims
+      description: |
+        Retrieves  all reward claims
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_claims id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Updates a reward claim with the specified id
+      description: |
+        Updates a reward claim with the specified id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: the reward_claim id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: update Reward inventory
+        content:
+          application/json:
+            schema:
+              $ref: '#/paths/~1admin~1claims/post/requestBody/content/application~1json/schema'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/paths/schemas/RewardClaim'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  components: null
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Reward:
+      type: object
+      properties:
+        _id:
+          type: string
+        org_id:
+          type: string
+        user_id:
+          type: string
+        reward_type:
+          type: string
+        code:
+          type: string
+        building_block:
+          type: string
+        amount:
+          type: integer
+        description:
+          type: string
+        date_created:
+          type: string
+        date_updated:
+          type: string
+    RewardClaim:
+      type: object
+      properties:
+        _id:
+          type: string
+        org_id:
+          type: string
+        user_id:
+          type: string
+        items:
+          type: array
+          $ref: '#/paths/schemas/RewardClaimItem'
+        status:
+          type: string
+        description:
+          type: string
+        date_created:
+          type: string
+        date_updated:
+          type: string
+    RewardClaimItem:
+      type: object
+      properties:
+        reward_type:
+          type: string
+        inventory_id:
+          type: string
+    RewardInventory:
+      type: object
+      properties:
+        _id:
+          type: string
+        org_id:
+          type: string
+        reward_type:
+          type: string
+        in_stock:
+          type: boolean
+        amount_total:
+          type: integer
+        amount_granted:
+          type: integer
+        amount_claimed:
+          type: integer
+        grant_depleted:
+          type: boolean
+        claim_depleted:
+          type: boolean
+        description:
+          type: string
+        date_created:
+          type: string
+        date_updated:
+          type: string
+    RewardOperation:
+      type: object
+      properties:
+        _id:
+          type: string
+        org_id:
+          type: string
+        reward_type:
+          type: string
+        code:
+          type: string
+        building_block:
+          type: string
+        amount:
+          type: integer
+        description:
+          type: string
+        date_created:
+          type: string
+        date_updated:
+          type: string
+    RewardQuantityState:
+      type: object
+      properties:
+        reward_type:
+          type: string
+        grantable_quantity:
+          type: integer
+        claimable_quantity:
+          type: integer
+    RewardType:
+      type: object
+      properties:
+        _id:
+          type: string
+        org_id:
+          type: string
+        reward_type:
+          type: string
+        display_name:
+          type: string
+        active:
+          type: boolean
+        description:
+          type: string
+        date_created:
+          type: string
+        date_updated:
+          type: string
+    RewardTypeAmount:
+      type: object
+      properties:
+        reward_type:
+          type: string
+        amount:
+          type: integer

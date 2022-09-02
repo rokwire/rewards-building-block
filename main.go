@@ -66,7 +66,7 @@ func main() {
 	config := model.Config{
 		InternalAPIKey:    internalAPIKey,
 		CoreBBHost:        coreBBHost,
-		ContentServiceURL: rewardsServiceURL,
+		RewardsServiceURL: rewardsServiceURL,
 	}
 
 	webAdapter := driver.NewWebAdapter(host, port, application, config)

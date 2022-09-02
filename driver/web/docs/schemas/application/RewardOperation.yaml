@@ -1,0 +1,20 @@
+type: object
+properties:
+  _id:
+    type: string
+  org_id:
+    type: string
+  reward_type:
+    type: string
+  code:
+    type: string
+  building_block:
+    type: string  
+  amount:
+    type: integer
+  description:
+    type: string      
+  date_created:
+    type: string
+  date_updated:
+    type: string  

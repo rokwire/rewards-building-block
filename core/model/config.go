@@ -22,5 +22,5 @@ type Config struct {
 	AuthKeys          string
 	InternalAPIKey    string
 	CoreBBHost        string
-	ContentServiceURL string
+	RewardsServiceURL string
 }
