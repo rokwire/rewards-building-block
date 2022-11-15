@@ -34,6 +34,12 @@ const docTemplate = `{
                 "operationId": "AdminGetRewardClaims",
                 "parameters": [
                     {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
@@ -92,6 +98,12 @@ const docTemplate = `{
                 "operationId": "AdminCreateRewardClaim",
                 "parameters": [
                     {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
+                    {
                         "description": "body json",
                         "name": "data",
                         "in": "body",
@@ -129,6 +141,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardClaim",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -156,6 +176,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminUpdateRewardClaim",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -193,6 +219,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Coma separated IDs of the desired records",
                         "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -254,6 +286,12 @@ const docTemplate = `{
                 "operationId": "AdminCreateRewardInventory",
                 "parameters": [
                     {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
+                    {
                         "description": "body json",
                         "name": "data",
                         "in": "body",
@@ -291,6 +329,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardInventory",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -318,6 +364,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminUpdateRewardInventory",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -350,6 +402,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperations",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -377,6 +437,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminCreateRewardOperation",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -415,6 +481,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardOperation",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -442,6 +516,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminUpdateRewardOperation",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -472,6 +552,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardOperation",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -491,6 +579,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminGetRewardTypes",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -518,6 +614,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminCreateRewardType",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -556,6 +658,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminRewardTypes",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -583,6 +693,12 @@ const docTemplate = `{
                 ],
                 "operationId": "AdminUpdateRewardType",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    },
                     {
                         "description": "body json",
                         "name": "data",
@@ -613,6 +729,14 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "operationId": "AdminDeleteRewardType",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -635,6 +759,14 @@ const docTemplate = `{
                     "Internal"
                 ],
                 "operationId": "InternalGetRewardStats",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -682,6 +814,14 @@ const docTemplate = `{
                     "Client"
                 ],
                 "operationId": "CreateUserRewardClaim",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -718,6 +858,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "limit - limit the result",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -763,6 +909,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "code - filter by code",
                         "name": "code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default.",
+                        "name": "all-apps",
                         "in": "query"
                     },
                     {
@@ -816,6 +968,9 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
+                "app_id": {
+                    "type": "string"
+                },
                 "building_block": {
                     "type": "string"
                 },
@@ -848,6 +1003,9 @@ const docTemplate = `{
         "RewardClaim": {
             "type": "object",
             "properties": {
+                "app_id": {
+                    "type": "string"
+                },
                 "date_created": {
                     "type": "string"
                 },
@@ -902,6 +1060,9 @@ const docTemplate = `{
                 },
                 "amount_total": {
                     "type": "integer"
+                },
+                "app_id": {
+                    "type": "string"
                 },
                 "claim_depleted": {
                     "type": "boolean"
@@ -971,6 +1132,9 @@ const docTemplate = `{
             "properties": {
                 "active": {
                     "type": "boolean"
+                },
+                "app_id": {
+                    "type": "string"
                 },
                 "date_created": {
                     "type": "string"

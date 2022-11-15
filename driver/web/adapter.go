@@ -1,25 +1,21 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package web
 
 import (
 	"fmt"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -27,6 +23,8 @@ import (
 	"rewards/driver/web/rest"
 	"rewards/utils"
 	"strings"
+
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 
 	"github.com/casbin/casbin"
 	"github.com/gorilla/mux"
@@ -93,29 +91,30 @@ func (we Adapter) Start() {
 
 	// handle student guide admin apis
 	adminSubRouter := apiRouter.PathPrefix("/admin").Subrouter()
-	adminSubRouter.HandleFunc("/types", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardTypes)).Methods("GET")
-	adminSubRouter.HandleFunc("/types", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardType)).Methods("POST")
-	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardType)).Methods("GET")
-	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardType)).Methods("PUT")
-	adminSubRouter.HandleFunc("/types/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardType)).Methods("DELETE")
+	adminSubRouter.HandleFunc("/types", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardTypes, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/types", we.coreAuthWrapFunc(we.adminApisHandler.CreateRewardType, we.auth.coreAuth.standardAuth)).Methods("POST")
+	adminSubRouter.HandleFunc("/types/{id}", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardType, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/types/{id}", we.coreAuthWrapFunc(we.adminApisHandler.UpdateRewardType, we.auth.coreAuth.standardAuth)).Methods("PUT")
+	adminSubRouter.HandleFunc("/types/{id}", we.coreAuthWrapFunc(we.adminApisHandler.DeleteRewardType, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
-	adminSubRouter.HandleFunc("/operations", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperations)).Methods("GET")
-	adminSubRouter.HandleFunc("/operations", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardOperation)).Methods("POST")
-	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardOperation)).Methods("GET")
-	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardOperation)).Methods("PUT")
-	adminSubRouter.HandleFunc("/operations/{id}", we.adminAuthWrapFunc(we.adminApisHandler.DeleteRewardOperation)).Methods("DELETE")
+	adminSubRouter.HandleFunc("/operations", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardOperations, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/operations", we.coreAuthWrapFunc(we.adminApisHandler.CreateRewardOperation, we.auth.coreAuth.standardAuth)).Methods("POST")
+	adminSubRouter.HandleFunc("/operations/{id}", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardOperation, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/operations/{id}", we.coreAuthWrapFunc(we.adminApisHandler.UpdateRewardOperation, we.auth.coreAuth.standardAuth)).Methods("PUT")
+	adminSubRouter.HandleFunc("/operations/{id}", we.coreAuthWrapFunc(we.adminApisHandler.DeleteRewardOperation, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
-	adminSubRouter.HandleFunc("/inventories", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventories)).Methods("GET")
-	adminSubRouter.HandleFunc("/inventories", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardInventory)).Methods("POST")
-	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardInventory)).Methods("GET")
-	adminSubRouter.HandleFunc("/inventories/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardInventory)).Methods("PUT")
+	adminSubRouter.HandleFunc("/inventories", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardInventories, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/inventories", we.coreAuthWrapFunc(we.adminApisHandler.CreateRewardInventory, we.auth.coreAuth.standardAuth)).Methods("POST")
+	adminSubRouter.HandleFunc("/inventories/{id}", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardInventory, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/inventories/{id}", we.coreAuthWrapFunc(we.adminApisHandler.UpdateRewardInventory, we.auth.coreAuth.standardAuth)).Methods("PUT")
 
-	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaims)).Methods("GET")
-	adminSubRouter.HandleFunc("/claims", we.adminAuthWrapFunc(we.adminApisHandler.CreateRewardClaim)).Methods("POST")
-	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.GetRewardClaim)).Methods("GET")
-	adminSubRouter.HandleFunc("/claims/{id}", we.adminAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim)).Methods("PUT")
+	adminSubRouter.HandleFunc("/claims", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardClaims, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/claims", we.coreAuthWrapFunc(we.adminApisHandler.CreateRewardClaim, we.auth.coreAuth.standardAuth)).Methods("POST")
+	adminSubRouter.HandleFunc("/claims/{id}", we.coreAuthWrapFunc(we.adminApisHandler.GetRewardClaim, we.auth.coreAuth.standardAuth)).Methods("GET")
+	adminSubRouter.HandleFunc("/claims/{id}", we.coreAuthWrapFunc(we.adminApisHandler.UpdateRewardClaim, we.auth.coreAuth.standardAuth)).Methods("PUT")
 
-	log.Fatal(http.ListenAndServe(":"+we.port, router))
+	//log.Fatal(http.ListenAndServe(":"+we.port, router))
+	log.Fatal(http.ListenAndServe(":81", router))
 }
 
 func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +132,22 @@ func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 		utils.LogRequest(req)
 
 		handler(w, req)
+	}
+}
+
+type coreAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
+
+func (we Adapter) coreAuthWrapFunc(handler coreAuthFunc, authorization Authorization) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		utils.LogRequest(req)
+		responseStatus, claims, err := authorization.check(req)
+		if err != nil {
+			log.Printf("error authorization check - %s", err)
+			http.Error(w, http.StatusText(responseStatus), responseStatus)
+			return
+		}
+
+		handler(claims, w, req)
 	}
 }
 

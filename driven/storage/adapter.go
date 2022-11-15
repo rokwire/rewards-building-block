@@ -1,45 +1,83 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package storage
 
 import (
 	"context"
 	"fmt"
+	"log"
+	"rewards/core/model"
+	"strconv"
+	"time"
+
+	"github.com/rokwire/logging-library-go/logs"
+
+	"github.com/rokwire/logging-library-go/errors"
+	"github.com/rokwire/logging-library-go/logutils"
+
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"rewards/core/model"
-	"strconv"
-	"time"
 )
 
 // Adapter implements the Storage interface
 type Adapter struct {
-	db *database
+	db     *database
+	logger *logs.Logger
 }
 
 // Start starts the storage
 func (sa *Adapter) Start() error {
+
 	err := sa.db.start()
 	return err
+}
+
+//PerformTransaction performs a transaction
+func (sa *Adapter) PerformTransaction(transaction func(context TransactionContext) error) error {
+	// transaction
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionStart, logutils.TypeTransaction, nil, err)
+		}
+		err = transaction(sessionContext)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		}
+
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
+	err := sessionContext.AbortTransaction(sessionContext)
+	if err != nil {
+		sa.logger.Errorf("error aborting a transaction - %s", err)
+	}
 }
 
 // NewStorageAdapter creates a new storage adapter instance
@@ -55,8 +93,60 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 	return &Adapter{db: db}
 }
 
+//StoreMultiTenancyData stores multi-tenancy to already exisiting data in the collections
+func (sa *Adapter) StoreMultiTenancyData(context TransactionContext, appID string, orgID string) error {
+	//TODO
+
+	filter := bson.D{}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+		}},
+	}
+	//types
+	_, err := sa.db.rewardTypes.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//history
+	_, err = sa.db.rewardHistory.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//operations
+	_, err = sa.db.rewardOperations.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+	//inventories
+	_, err = sa.db.rewardInventories.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+
+	//claims
+	_, err = sa.db.rewardClaims.UpdateManyWithContext(context, filter, update, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FindAllContentItems  finds all content items
+func (sa *Adapter) FindAllRewardTypeItems(context TransactionContext) ([]model.RewardType, error) {
+	filter := bson.D{}
+	var result []model.RewardType
+	err := sa.db.rewardTypes.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // GetRewardTypes Gets all reward types
-func (sa *Adapter) GetRewardTypes(orgID string) ([]model.RewardType, error) {
+func (sa *Adapter) GetRewardTypes(appID *string, orgID string) ([]model.RewardType, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 	}
@@ -73,8 +163,9 @@ func (sa *Adapter) GetRewardTypes(orgID string) ([]model.RewardType, error) {
 }
 
 // GetRewardType Gets a reward type by id
-func (sa *Adapter) GetRewardType(orgID string, id string) (*model.RewardType, error) {
+func (sa *Adapter) GetRewardType(appID *string, orgID string, id string) (*model.RewardType, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -91,8 +182,9 @@ func (sa *Adapter) GetRewardType(orgID string, id string) (*model.RewardType, er
 }
 
 // GetRewardTypeByType Gets a reward type by type
-func (sa *Adapter) GetRewardTypeByType(orgID string, rewardType string) (*model.RewardType, error) {
+func (sa *Adapter) GetRewardTypeByType(appID *string, orgID string, rewardType string) (*model.RewardType, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "reward_type", Value: rewardType},
 	}
@@ -109,10 +201,11 @@ func (sa *Adapter) GetRewardTypeByType(orgID string, rewardType string) (*model.
 }
 
 // CreateRewardType creates a new reward type
-func (sa *Adapter) CreateRewardType(orgID string, item model.RewardType) (*model.RewardType, error) {
+func (sa *Adapter) CreateRewardType(appID *string, orgID string, item model.RewardType) (*model.RewardType, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 	_, err := sa.db.rewardTypes.InsertOne(&item)
@@ -124,7 +217,7 @@ func (sa *Adapter) CreateRewardType(orgID string, item model.RewardType) (*model
 }
 
 // UpdateRewardType updates a reward type
-func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardType) (*model.RewardType, error) {
+func (sa *Adapter) UpdateRewardType(appID *string, orgID string, id string, item model.RewardType) (*model.RewardType, error) {
 	jsonID := item.ID
 	if jsonID != id {
 		return nil, fmt.Errorf("storage.UpdateRewardType attempt to override another object")
@@ -134,6 +227,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
@@ -143,7 +237,7 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 			primitive.E{Key: "date_updated", Value: now},
 		}},
 	}
-	_, err := sa.db.rewardInventories.UpdateOne(filter, update, nil)
+	_, err := sa.db.rewardTypes.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("storage.UpdateRewardType error: %s", err)
 		return nil, fmt.Errorf("storage.UpdateRewardType error: %s", err)
@@ -155,11 +249,12 @@ func (sa *Adapter) UpdateRewardType(orgID string, id string, item model.RewardTy
 }
 
 // DeleteRewardType deletes a reward type
-func (sa *Adapter) DeleteRewardType(orgID string, id string) error {
+func (sa *Adapter) DeleteRewardType(appID *string, orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
-	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	_, err := sa.db.rewardInventories.DeleteOne(filter, nil)
+	filter := bson.D{primitive.E{Key: "_id", Value: id}, primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID}}
+	_, err := sa.db.rewardTypes.DeleteOne(filter, nil)
 	if err != nil {
 		log.Printf("storage.DeleteRewardType error: %s", err)
 		return fmt.Errorf("storage.DeleteRewardType error: %s", err)
@@ -169,9 +264,10 @@ func (sa *Adapter) DeleteRewardType(orgID string, id string) error {
 }
 
 // GetRewardOperations Gets all reward operations
-func (sa *Adapter) GetRewardOperations(orgID string) ([]model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperations(appID *string, orgID string) ([]model.RewardOperation, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 	var result []model.RewardOperation
 	err := sa.db.rewardOperations.Find(filter, &result, nil)
@@ -186,8 +282,9 @@ func (sa *Adapter) GetRewardOperations(orgID string) ([]model.RewardOperation, e
 }
 
 // GetRewardOperationByID Gets a reward operation by id
-func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperationByID(appID *string, orgID string, id string) (*model.RewardOperation, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -204,8 +301,9 @@ func (sa *Adapter) GetRewardOperationByID(orgID string, id string) (*model.Rewar
 }
 
 // GetRewardOperationByCode Gets a reward type by code
-func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.RewardOperation, error) {
+func (sa *Adapter) GetRewardOperationByCode(appID *string, orgID string, code string) (*model.RewardOperation, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "code", Value: code},
 	}
@@ -222,10 +320,11 @@ func (sa *Adapter) GetRewardOperationByCode(orgID string, code string) (*model.R
 }
 
 // CreateRewardOperation creates a new reward operation
-func (sa *Adapter) CreateRewardOperation(orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
+func (sa *Adapter) CreateRewardOperation(appID *string, orgID string, item model.RewardOperation) (*model.RewardOperation, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 	_, err := sa.db.rewardOperations.InsertOne(&item)
@@ -237,7 +336,7 @@ func (sa *Adapter) CreateRewardOperation(orgID string, item model.RewardOperatio
 }
 
 // UpdateRewardOperation updates a reward operation
-func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
+func (sa *Adapter) UpdateRewardOperation(appID *string, orgID string, id string, item model.RewardOperation) (*model.RewardOperation, error) {
 	jsonID := item.ID
 	if jsonID != id {
 		return nil, fmt.Errorf("storage.UpdateRewardOperation attempt to override another object")
@@ -245,6 +344,7 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 
 	now := time.Now().UTC()
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -268,10 +368,11 @@ func (sa *Adapter) UpdateRewardOperation(orgID string, id string, item model.Rew
 }
 
 // DeleteRewardOperation deletes a reward operation
-func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
+func (sa *Adapter) DeleteRewardOperation(appID *string, orgID string, id string) error {
 	// TBD check and deny if the reward type is in use!!!
 
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -285,9 +386,10 @@ func (sa *Adapter) DeleteRewardOperation(orgID string, id string) error {
 }
 
 // GetRewardInventories Gets all reward inventories
-func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventories(appID *string, orgID string, ids []string, rewardType *string, inStock *bool, grantDepleted *bool, claimDepleted *bool, limit *int64, offset *int64) ([]model.RewardInventory, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
 	}
 
 	if len(ids) > 0 {
@@ -331,8 +433,9 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 }
 
 // GetRewardInventory Gets a reward inventory by id
-func (sa *Adapter) GetRewardInventory(orgID string, id string) (*model.RewardInventory, error) {
+func (sa *Adapter) GetRewardInventory(appID *string, orgID string, id string) (*model.RewardInventory, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
 	}
@@ -349,12 +452,13 @@ func (sa *Adapter) GetRewardInventory(orgID string, id string) (*model.RewardInv
 }
 
 // CreateRewardInventory creates a new reward inventory
-func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
+func (sa *Adapter) CreateRewardInventory(appID *string, orgID string, item model.RewardInventory) (*model.RewardInventory, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	item.OrgID = orgID
+	item.AppID = *appID
 
 	if err := sa.validateInventoryCreateOrUpdate(item); err != nil {
 		return nil, err
@@ -369,12 +473,12 @@ func (sa *Adapter) CreateRewardInventory(orgID string, item model.RewardInventor
 }
 
 // UpdateRewardInventory updates a reward pool
-func (sa *Adapter) UpdateRewardInventory(orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
-	return sa.UpdateRewardInventoryWithContext(nil, orgID, id, item)
+func (sa *Adapter) UpdateRewardInventory(appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+	return sa.UpdateRewardInventoryWithContext(nil, appID, orgID, id, item)
 }
 
 // UpdateRewardInventoryWithContext updates a reward inventory with a context
-func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
+func (sa *Adapter) UpdateRewardInventoryWithContext(ctx context.Context, appID *string, orgID string, id string, item model.RewardInventory) (*model.RewardInventory, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -446,8 +550,9 @@ func (sa *Adapter) DeleteRewardInventory(orgID string, id string) error {
 }
 
 // GetUserRewardsHistory Gets all reward history entries
-func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
+func (sa *Adapter) GetUserRewardsHistory(appID *string, orgID string, userID string, rewardType *string, code *string, buildingBlock *string, limit *int64, offset *int64) ([]model.Reward, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 	}
@@ -487,7 +592,7 @@ func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType
 }
 
 // GetUserRewardByID Gets a reward history entry by id
-func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Reward, error) {
+func (sa *Adapter) GetUserRewardByID(appID *string, orgID string, userID, id string) (*model.Reward, error) {
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
 		primitive.E{Key: "user_id", Value: userID},
@@ -505,13 +610,14 @@ func (sa *Adapter) GetUserRewardByID(orgID string, userID, id string) (*model.Re
 }
 
 // CreateUserReward creates a new reward history entry
-func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Reward, error) {
+func (sa *Adapter) CreateUserReward(appID *string, orgID string, item model.Reward) (*model.Reward, error) {
 
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.DateCreated = now
 	item.DateUpdated = now
 	item.OrgID = orgID
+	item.AppID = *appID
 
 	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
 		err := sessionContext.StartTransaction()
@@ -521,7 +627,7 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 		}
 
 		grantDepleted := false
-		inventories, err := sa.GetRewardInventories(orgID, nil, &item.RewardType, nil, &grantDepleted, nil, nil, nil)
+		inventories, err := sa.GetRewardInventories(appID, orgID, nil, &item.RewardType, nil, &grantDepleted, nil, nil, nil)
 		if err != nil {
 			log.Printf("storage.CreateUserReward error: %s", err)
 			return fmt.Errorf("storage.CreateUserReward error: %s", err)
@@ -542,7 +648,7 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 						accumulatedAmount += remaingAmnount
 						remaingAmnount -= remaingAmnount
 					}
-					_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+					_, err = sa.UpdateRewardInventoryWithContext(sessionContext, appID, orgID, inventory.ID, inventory)
 					if err != nil {
 						abortTransaction(sessionContext)
 						log.Printf("storage.CreateUserReward error: %s", err)
@@ -587,9 +693,9 @@ func (sa *Adapter) CreateUserReward(orgID string, item model.Reward) (*model.Rew
 }
 
 // GetUserRewardsAmount Gets user's rewards amount
-func (sa *Adapter) GetUserRewardsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
+func (sa *Adapter) GetUserRewardsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
+		{"$match": bson.M{"app_id": appID, "org_id": orgID, "user_id": userID}},
 	}
 	if rewardType != nil {
 		pipeline = append(pipeline, bson.M{"$match": bson.M{"reward_type": *rewardType}})
@@ -607,9 +713,9 @@ func (sa *Adapter) GetUserRewardsAmount(orgID string, userID string, rewardType 
 }
 
 // GetUserClaimsAmount Gets user's claims amount
-func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
+func (sa *Adapter) GetUserClaimsAmount(appID *string, orgID string, userID string, rewardType *string) ([]model.RewardTypeAmount, error) {
 	pipeline := []bson.M{
-		{"$match": bson.M{"org_id": orgID, "user_id": userID}},
+		{"$match": bson.M{"app_id": appID, "org_id": orgID, "user_id": userID}},
 		{"$unwind": bson.M{"path": "$items"}},
 	}
 
@@ -629,9 +735,9 @@ func (sa *Adapter) GetUserClaimsAmount(orgID string, userID string, rewardType *
 }
 
 // GetRewardQuantityState Gets reward quantities state for the current moment
-func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error) {
+func (sa *Adapter) GetRewardQuantityState(appID *string, orgID string, rewardType string, inStock *bool) (*model.RewardQuantityState, error) {
 
-	inventories, err := sa.GetRewardInventories(orgID, nil, &rewardType, inStock, nil, nil, nil, nil)
+	inventories, err := sa.GetRewardInventories(appID, orgID, nil, &rewardType, inStock, nil, nil, nil, nil)
 	if err != nil {
 		log.Printf("storage.GetRewardQuantityState error: %s", err)
 		return nil, fmt.Errorf("storage.GetRewardQuantityState error: %s", err)
@@ -662,8 +768,9 @@ func (sa *Adapter) GetRewardQuantityState(orgID string, rewardType string, inSto
 }
 
 // GetRewardClaims Gets all reward claims
-func (sa *Adapter) GetRewardClaims(orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaims(appID *string, orgID string, ids []string, userID *string, rewardType *string, status *string, limit *int64, offset *int64) ([]model.RewardClaim, error) {
 	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 	}
 	var result []model.RewardClaim
@@ -679,7 +786,7 @@ func (sa *Adapter) GetRewardClaims(orgID string, ids []string, userID *string, r
 }
 
 // GetRewardClaim Gets a reward claim by id
-func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, error) {
+func (sa *Adapter) GetRewardClaim(appID *string, orgID string, id string) (*model.RewardClaim, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "_id", Value: id},
@@ -697,10 +804,11 @@ func (sa *Adapter) GetRewardClaim(orgID string, id string) (*model.RewardClaim, 
 }
 
 // CreateRewardClaim creates a new reward claim
-func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (sa *Adapter) CreateRewardClaim(appID *string, orgID string, item model.RewardClaim) (*model.RewardClaim, error) {
 	now := time.Now().UTC()
 	item.ID = uuid.NewString()
 	item.OrgID = orgID
+	item.AppID = *appID
 	item.DateCreated = now
 	item.DateUpdated = now
 
@@ -713,7 +821,7 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 
 		for _, claimEntry := range item.Items {
 			claimDepleted := false
-			inventories, err := sa.GetRewardInventories(orgID, nil, &claimEntry.RewardType, nil, nil, &claimDepleted, nil, nil)
+			inventories, err := sa.GetRewardInventories(appID, orgID, nil, &claimEntry.RewardType, nil, nil, &claimDepleted, nil, nil)
 			if err != nil {
 				log.Printf("storage.CreateUserReward error: %s", err)
 				return fmt.Errorf("storage.CreateRewardClaim error: %s", err)
@@ -734,7 +842,7 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 							accumulatedAmount += remaingAmnount
 							remaingAmnount -= remaingAmnount
 						}
-						_, err = sa.UpdateRewardInventoryWithContext(sessionContext, orgID, inventory.ID, inventory)
+						_, err = sa.UpdateRewardInventoryWithContext(sessionContext, appID, orgID, inventory.ID, inventory)
 						if err != nil {
 							abortTransaction(sessionContext)
 							log.Printf("storage.CreateUserReward error: %s", err)
@@ -780,12 +888,12 @@ func (sa *Adapter) CreateRewardClaim(orgID string, item model.RewardClaim) (*mod
 }
 
 // UpdateRewardClaim updates a reward claim
-func (sa *Adapter) UpdateRewardClaim(orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
-	return sa.UpdateRewardClaimWithContext(nil, orgID, id, item)
+func (sa *Adapter) UpdateRewardClaim(appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+	return sa.UpdateRewardClaimWithContext(nil, appID, orgID, id, item)
 }
 
 // UpdateRewardClaimWithContext updates a reward claim with a context
-func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
+func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, appID *string, orgID string, id string, item model.RewardClaim) (*model.RewardClaim, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -798,6 +906,7 @@ func (sa *Adapter) UpdateRewardClaimWithContext(ctx context.Context, orgID strin
 	now := time.Now().UTC()
 	filter := bson.D{
 		primitive.E{Key: "_id", Value: id},
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 	}
 	update := bson.D{
@@ -861,4 +970,9 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 			m.listener.OnRewardTypesChanged()
 		}
 	}
+}
+
+//TransactionContext wraps mongo.SessionContext for use by external packages
+type TransactionContext interface {
+	mongo.SessionContext
 }

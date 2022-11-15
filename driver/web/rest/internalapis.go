@@ -1,3 +1,17 @@
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rest
 
 import (
@@ -7,6 +21,7 @@ import (
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+	"strconv"
 )
 
 // InternalApisHandler handles the rest internal APIs implementation
@@ -17,6 +32,7 @@ type InternalApisHandler struct {
 // createRewardHistoryEntryBody wrapper
 type createRewardHistoryEntryBody struct {
 	OrgID         string `json:"org_id"`
+	AppID         string `json:"app_id"`
 	UserID        string `json:"user_id"`
 	RewardType    string `json:"reward_type"`
 	RewardCode    string `json:"code"`
@@ -49,7 +65,7 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	operation, err := h.app.Services.GetRewardOperationByCode(item.OrgID, item.RewardCode)
+	operation, err := h.app.Services.GetRewardOperationByCode(&item.AppID, item.OrgID, item.RewardCode)
 	if err != nil {
 		log.Printf("Error on internalapis.CreateReward: Reward operation not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -57,7 +73,7 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 	}
 
 	if operation != nil && item.BuildingBlock == operation.BuildingBlock && item.RewardCode == operation.Code && operation.Amount > 0 {
-		createdItem, err := h.app.Services.CreateReward(item.OrgID, model.Reward{
+		createdItem, err := h.app.Services.CreateReward(&item.AppID, item.OrgID, model.Reward{
 			UserID:        item.UserID,
 			RewardType:    operation.RewardType,
 			Code:          operation.Code,
@@ -91,12 +107,14 @@ func (h InternalApisHandler) CreateReward(w http.ResponseWriter, r *http.Request
 // getRewardStatsBody wrapper
 type getRewardStatsBody struct {
 	OrgID string `json:"org_id"`
+	AppID string `json:"app_id"`
 } //@name getRewardStatsBody
 
 // GetRewardStats Gets reward quantity stats for the current moment
 // @Description Gets reward quantity stats for the current moment
 // @Tags Internal
 // @ID InternalGetRewardStats
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Success 200 {array} model.RewardQuantityState
 // @Security InternalApiAuth
@@ -110,6 +128,13 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item getRewardStatsBody
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -118,7 +143,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	types, err := h.app.Services.GetRewardTypes(item.OrgID)
+	types, err := h.app.Services.GetRewardTypes(allApps, &item.AppID, item.OrgID)
 	if err != nil {
 		log.Printf("Error on internalapis.GetRewardStats: Reward types not found. Error: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -128,7 +153,7 @@ func (h InternalApisHandler) GetRewardStats(w http.ResponseWriter, r *http.Reque
 	result := []model.RewardQuantityState{}
 	if len(types) > 0 {
 		for _, rewardType := range types {
-			quantity, err := h.app.Services.GetRewardQuantity(item.OrgID, rewardType.RewardType)
+			quantity, err := h.app.Services.GetRewardQuantity(&item.AppID, item.OrgID, rewardType.RewardType)
 			if err != nil {
 				log.Printf("Error on internalapis.GetRewardStats: %s", err)
 				http.Error(w, err.Error(), http.StatusBadRequest)

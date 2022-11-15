@@ -1,3 +1,19 @@
+schemes:
+- https
+securityDefinitions:
+  AdminGroupAuth:
+    in: header
+    name: GROUP
+    type: apiKey
+  AdminUserAuth:
+    in: header (add Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+  InternalApiAuth:
+    in: header (add INTERNAL-API-KEY with correct value as a header)
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
 basePath: /content
 definitions:
   Reward:

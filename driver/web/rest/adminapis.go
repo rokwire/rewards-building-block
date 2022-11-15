@@ -1,15 +1,31 @@
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rest
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 // AdminApisHandler handles the rest Admin APIs implementation
@@ -21,11 +37,19 @@ type AdminApisHandler struct {
 // @Description Retrieves  all reward types
 // @Tags Admin
 // @ID AdminGetRewardTypes
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Success 200 {array} model.RewardType
 // @Security AdminUserAuth
 // @Router /admin/types [get]
 func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardTypes(allApps, &claims.AppID, claims.OrgID)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -52,6 +76,7 @@ func (h AdminApisHandler) GetRewardTypes(claims *tokenauth.Claims, w http.Respon
 // @Description Retrieves a reward type by id
 // @Tags Admin
 // @ID AdminRewardTypes
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardType
@@ -61,7 +86,14 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardType(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -84,6 +116,7 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 // @Description Updates a reward type with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardType
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardType true "body json"
 // @Accept json
 // @Produce json
@@ -93,6 +126,13 @@ func (h AdminApisHandler) GetRewardType(claims *tokenauth.Claims, w http.Respons
 func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -109,7 +149,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,6 +172,7 @@ func (h AdminApisHandler) UpdateRewardType(claims *tokenauth.Claims, w http.Resp
 // @Description Create a new reward type
 // @Tags Admin
 // @ID AdminCreateRewardType
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardType true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardType
@@ -146,6 +187,13 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -154,7 +202,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -176,6 +224,7 @@ func (h AdminApisHandler) CreateRewardType(claims *tokenauth.Claims, w http.Resp
 // DeleteRewardType Deletes a reward type with the specified id
 // @Description Deletes a reward type with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminDeleteRewardType
 // @Success 200
 // @Security AdminUserAuth
@@ -184,7 +233,14 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	err := h.app.Services.DeleteRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -199,11 +255,19 @@ func (h AdminApisHandler) DeleteRewardType(claims *tokenauth.Claims, w http.Resp
 // @Description Retrieves  all reward types
 // @Tags Admin
 // @ID AdminGetRewardOperations
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Success 200 {array} model.RewardOperation
 // @Security AdminUserAuth
 // @Router /admin/operations [get]
 func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetRewardTypes(claims.OrgID)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardTypes(allApps, &claims.AppID, claims.OrgID)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardTypes(): %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -230,6 +294,7 @@ func (h AdminApisHandler) GetRewardOperations(claims *tokenauth.Claims, w http.R
 // @Description Retrieves a reward operation by id
 // @Tags Admin
 // @ID AdminGetRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Produce json
 // @Success 200 {object} model.RewardOperation
@@ -239,7 +304,14 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardType(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -262,6 +334,7 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 // @Description Updates a reward operation with the specified id
 // @Tags Admin
 // @ID AdminUpdateRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Produce json
@@ -271,6 +344,13 @@ func (h AdminApisHandler) GetRewardOperation(claims *tokenauth.Claims, w http.Re
 func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -287,7 +367,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardType(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardType(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardType(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -310,6 +390,7 @@ func (h AdminApisHandler) UpdateRewardOperation(claims *tokenauth.Claims, w http
 // @Description Create a new operation type
 // @Tags Admin
 // @ID AdminCreateRewardOperation
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardOperation true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardOperation
@@ -324,6 +405,13 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardType
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -332,7 +420,7 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardType(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardType(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardType: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -354,6 +442,7 @@ func (h AdminApisHandler) CreateRewardOperation(claims *tokenauth.Claims, w http
 // DeleteRewardOperation Deletes a reward operation with the specified id
 // @Description Deletes a reward operation with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminDeleteRewardOperation
 // @Success 200
 // @Security AdminUserAuth
@@ -362,7 +451,14 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	err := h.app.Services.DeleteRewardType(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	err := h.app.Services.DeleteRewardType(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.DeleteRewardType(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -376,6 +472,7 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // GetRewardInventories Retrieves  all reward inventories
 // @Description Retrieves  all reward types
 // @Param ids query string false "Coma separated IDs of the desired records"
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param in_stock query string false "in_stock - possible values: missing (e.g no filter), 0- false, 1- true"
 // @Param grant_depleted query string false "grant_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
 // @Param claim_depleted query string false "claim_depleted - possible values: missing (e.g no filter), 0- false, 1- true"
@@ -387,6 +484,12 @@ func (h AdminApisHandler) DeleteRewardOperation(claims *tokenauth.Claims, w http
 // @Security AdminUserAuth
 // @Router /admin/inventories [get]
 func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	rewardType := getStringQueryParam(r, "reward_type")
 	inStock := getBoolQueryParam(r, "in_stock", nil)
@@ -402,7 +505,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardInventories(claims.OrgID, IDs, rewardType, inStock, grantDepleted, claimDepleted, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetRewardInventories(allApps, &claims.AppID, claims.OrgID, IDs, rewardType, inStock, grantDepleted, claimDepleted, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventories: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -427,6 +530,7 @@ func (h AdminApisHandler) GetRewardInventories(claims *tokenauth.Claims, w http.
 
 // GetRewardInventory Retrieves a reward inventory by id
 // @Description Retrieves a reward inventory by id
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Tags Admin
 // @ID AdminGetRewardInventory
 // @Accept json
@@ -438,7 +542,14 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardInventory(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardInventory(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.GetRewardInventory(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -460,6 +571,7 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 // UpdateRewardInventory Updates a reward inventory with the specified id
 // @Description Updates a reward inventory with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminUpdateRewardInventory
 // @Param data body model.RewardInventory true "body json"
 // @Accept json
@@ -470,6 +582,13 @@ func (h AdminApisHandler) GetRewardInventory(claims *tokenauth.Claims, w http.Re
 func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -486,7 +605,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardInventory(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardInventory(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.UpdateRewardInventory(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -508,6 +627,7 @@ func (h AdminApisHandler) UpdateRewardInventory(claims *tokenauth.Claims, w http
 // CreateRewardInventory Create a new reward inventory
 // @Description Create a new reward inventory
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminCreateRewardInventory
 // @Param data body model.RewardInventory true "body json"
 // @Accept json
@@ -523,6 +643,13 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardInventory
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -531,7 +658,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardInventory(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardInventory(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.CreateRewardInventory: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -552,6 +679,7 @@ func (h AdminApisHandler) CreateRewardInventory(claims *tokenauth.Claims, w http
 
 // GetRewardClaims Retrieves  all reward claims
 // @Description Retrieves  all reward claims
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param ids query string false "Coma separated IDs of the desired records"
 // @Param user_id query string false "user_id"
 // @Param status query string false "status"
@@ -577,7 +705,14 @@ func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.Respo
 		IDs = strings.Split(extIDs, ",")
 	}
 
-	resData, err := h.app.Services.GetRewardClaims(claims.OrgID, IDs, userID, rewardType, status, limitFilter, offsetFilter)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardClaims(allApps, &claims.AppID, claims.OrgID, IDs, userID, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on adminapis.getRewardClaims: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -603,6 +738,7 @@ func (h AdminApisHandler) GetRewardClaims(claims *tokenauth.Claims, w http.Respo
 // GetRewardClaim Retrieves a reward claim by id
 // @Description Retrieves a claim inventory by id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminGetRewardClaim
 // @Accept json
 // @Produce json
@@ -613,7 +749,14 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRewardClaim(claims.OrgID, id)
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
+	resData, err := h.app.Services.GetRewardClaim(allApps, &claims.AppID, claims.OrgID, id)
 	if err != nil {
 		log.Printf("Error on adminapis.getRewardClaim(%s): %s", id, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -635,6 +778,7 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 // UpdateRewardClaim Updates a reward claim with the specified id
 // @Description Updates a reward claim with the specified id
 // @Tags Admin
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @ID AdminUpdateRewardClaim
 // @Param data body model.RewardClaim true "body json"
 // @Accept json
@@ -645,6 +789,13 @@ func (h AdminApisHandler) GetRewardClaim(claims *tokenauth.Claims, w http.Respon
 func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -661,7 +812,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	resData, err := h.app.Services.UpdateRewardClaim(claims.OrgID, id, item)
+	resData, err := h.app.Services.UpdateRewardClaim(allApps, &claims.AppID, claims.OrgID, id, item)
 	if err != nil {
 		log.Printf("Error on adminapis.updateRewardClaim(%s): %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -684,6 +835,7 @@ func (h AdminApisHandler) UpdateRewardClaim(claims *tokenauth.Claims, w http.Res
 // @Description Create a new claim inventory
 // @Tags Admin
 // @ID AdminCreateRewardClaim
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param data body model.RewardClaim true "body json"
 // @Accept json
 // @Success 200 {object} model.RewardInventory
@@ -698,6 +850,13 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	var item model.RewardClaim
 	err = json.Unmarshal(data, &item)
 	if err != nil {
@@ -706,7 +865,7 @@ func (h AdminApisHandler) CreateRewardClaim(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateRewardClaim(claims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(allApps, &claims.AppID, claims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on adminapis.createRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

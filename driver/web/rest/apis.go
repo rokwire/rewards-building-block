@@ -1,30 +1,29 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package rest
 
 import (
 	"encoding/json"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"rewards/core"
 	"rewards/core/model"
+	"strconv"
+
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb
@@ -68,7 +67,7 @@ func NewInternalApisHandler(app *core.Application) InternalApisHandler {
 // @Security UserAuth
 // @Router /user/balance [get]
 func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	resData, err := h.app.Services.GetUserBalance(userClaims.OrgID, userClaims.Subject)
+	resData, err := h.app.Services.GetUserBalance(&userClaims.AppID, userClaims.OrgID, userClaims.Subject)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardsAmount(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -97,6 +96,7 @@ func (h *ApisHandler) GetUserBalance(userClaims *tokenauth.Claims, w http.Respon
 // @ID GetUserRewardsHistory
 // @Param reward_type query string false "reward_type - filter by reward_type"
 // @Param code  query string false "code - filter by code"
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param building_block query string false "filter by building_block"
 // @Param limit query integer false "limit - limit the result"
 // @Param offset query integer false "offset"
@@ -110,7 +110,7 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	resData, err := h.app.Services.GetUserRewardsHistory(userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
+	resData, err := h.app.Services.GetUserRewardsHistory(&userClaims.AppID, userClaims.OrgID, userClaims.Subject, rewardType, code, buildingBlock, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.getUserRewardsHistory(%s): %s", userClaims.Subject, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -135,18 +135,26 @@ func (h *ApisHandler) GetUserRewardsHistory(userClaims *tokenauth.Claims, w http
 // @ID GetUserRewardClaim
 // @Param status query string false "status"
 // @Param limit query string false "limit - limit the result"
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Param offset query string false "offset"
 // @Accept json
 // @Success 200 {array} model.RewardClaim
 // @Security AdminUserAuth
 // @Router /user/claims [get]
 func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
+
 	rewardType := getStringQueryParam(r, "reward_type")
 	status := getStringQueryParam(r, "status")
 	limitFilter := getInt64QueryParam(r, "limit")
 	offsetFilter := getInt64QueryParam(r, "offset")
 
-	rewardClaims, err := h.app.Services.GetRewardClaims(userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
+	rewardClaims, err := h.app.Services.GetRewardClaims(allApps, &userClaims.AppID, userClaims.OrgID, nil, &userClaims.Subject, rewardType, status, limitFilter, offsetFilter)
 	if err != nil {
 		log.Printf("Error on apis.GetUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -169,6 +177,7 @@ func (h ApisHandler) GetUserRewardClaim(userClaims *tokenauth.Claims, w http.Res
 // @Description Create a new claim user claim
 // @Tags Client
 // @ID CreateUserRewardClaim
+// @Param all-apps query boolean false "It says if the data is associated with the current app or it is for all the apps within the organization. It is 'false' by default."
 // @Accept json
 // @Success 200 {object} model.RewardClaim
 // @Security AdminUserAuth
@@ -181,6 +190,12 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	//get all-apps param value
+	allApps := false //false by defautl
+	allAppsParam := r.URL.Query().Get("all-apps")
+	if allAppsParam != "" {
+		allApps, _ = strconv.ParseBool(allAppsParam)
+	}
 
 	var item model.RewardClaim
 	err = json.Unmarshal(data, &item)
@@ -191,7 +206,7 @@ func (h ApisHandler) CreateUserRewardClaim(userClaims *tokenauth.Claims, w http.
 	}
 
 	item.UserID = userClaims.Subject
-	createdItem, err := h.app.Services.CreateRewardClaim(userClaims.OrgID, item)
+	createdItem, err := h.app.Services.CreateRewardClaim(allApps, &userClaims.AppID, userClaims.OrgID, item)
 	if err != nil {
 		log.Printf("Error on apis.CreateUserRewardClaim: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

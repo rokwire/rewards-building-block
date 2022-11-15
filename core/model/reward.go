@@ -1,3 +1,17 @@
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package model
 
 import "time"
@@ -6,6 +20,7 @@ import "time"
 type RewardType struct {
 	ID          string    `json:"id" bson:"_id"`
 	OrgID       string    `json:"org_id" bson:"org_id"`
+	AppID       string    `json:"app_id" bson:"app_id"`
 	RewardType  string    `json:"reward_type" bson:"reward_type"`   // tshirt
 	DisplayName string    `json:"display_name" bson:"display_name"` //
 	Active      bool      `json:"active" bson:"active"`
@@ -18,6 +33,7 @@ type RewardType struct {
 type RewardOperation struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"org_id" bson:"org_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // tshirt
 	Code          string    `json:"code" bson:"code"`               //
 	BuildingBlock string    `json:"building_block" bson:"building_block"`
@@ -31,6 +47,7 @@ type RewardOperation struct {
 type RewardInventory struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"app_id" bson:"app_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"` // t-shirt
 	InStock       bool      `json:"in_stock" bson:"in_stock"`
 	AmountTotal   int       `json:"amount_total" bson:"amount_total"`
@@ -57,6 +74,7 @@ func (ri *RewardInventory) GetClaimableAmount() int {
 type Reward struct {
 	ID            string    `json:"id" bson:"_id"`
 	OrgID         string    `json:"org_id" bson:"org_id"`
+	AppID         string    `json:"app_id" bson:"app_id"`
 	UserID        string    `json:"user_id" bson:"user_id"`
 	RewardType    string    `json:"reward_type" bson:"reward_type"`
 	Code          string    `json:"code" bson:"code"`
@@ -78,6 +96,7 @@ type RewardQuantityState struct {
 type RewardClaim struct {
 	ID          string            `json:"id" bson:"_id"`
 	OrgID       string            `json:"org_id" bson:"org_id"`
+	AppID       string            `json:"app_id" bson:"app_id"`
 	UserID      string            `json:"user_id" bson:"user_id"`
 	Items       []RewardClaimItem `json:"items" bson:"items"`
 	Status      string            `json:"status" bson:"status"`
