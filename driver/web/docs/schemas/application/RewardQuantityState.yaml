@@ -1,0 +1,9 @@
+type: object
+properties:
+  reward_type:
+    type: string
+  grantable_quantity:
+    type: integer  
+  claimable_quantity:
+    type: integer
+ 

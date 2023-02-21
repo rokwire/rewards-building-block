@@ -1,25 +1,21 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package web
 
 import (
 	"fmt"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"log"
 	"net/http"
 	"rewards/core"
@@ -28,6 +24,8 @@ import (
 	"rewards/utils"
 	"strings"
 
+	"github.com/rokwire/core-auth-library-go/tokenauth"
+
 	"github.com/casbin/casbin"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -35,10 +33,11 @@ import (
 
 //Adapter entity
 type Adapter struct {
-	host          string
-	port          string
-	auth          *Auth
-	authorization *casbin.Enforcer
+	host              string
+	port              string
+	rewardsServiceURL string
+	auth              *Auth
+	authorization     *casbin.Enforcer
 
 	apisHandler         rest.ApisHandler
 	adminApisHandler    rest.AdminApisHandler
@@ -120,11 +119,11 @@ func (we Adapter) Start() {
 
 func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("access-control-allow-origin", "*")
-	http.ServeFile(w, r, "./docs/swagger.yaml")
+	http.ServeFile(w, r, "./driver/web/docs/gen/def.yaml")
 }
 
 func (we Adapter) serveDocUI() http.Handler {
-	url := fmt.Sprintf("%s/rewards/doc", we.host)
+	url := fmt.Sprintf("%s/rewards/doc", we.rewardsServiceURL)
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 
@@ -228,6 +227,7 @@ func NewWebAdapter(host string, port string, app *core.Application, config model
 	return Adapter{
 		host:                host,
 		port:                port,
+		rewardsServiceURL:   config.RewardsServiceURL,
 		auth:                auth,
 		authorization:       authorization,
 		apisHandler:         apisHandler,

@@ -1,0 +1,71 @@
+get:
+  tags:
+  - Admin
+  summary: Retrieves a reward inventory by id
+  description: |
+    Retrieves a reward inventory by id
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: the reward_inventory id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/RewardInventory.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error
+put:
+  tags:
+  - Admin
+  summary: Updates a reward inventory with the specified id
+  description: |
+    Updates a reward inventory with the specified id
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: the reward_inventory id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string  
+  requestBody:
+    description: update Reward inventory
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/apis/admin/inventories/request/Request.yaml" 
+    required: true    
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/RewardInventory.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error          

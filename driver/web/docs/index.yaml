@@ -1,0 +1,61 @@
+openapi: 3.0.3
+info:
+  title: Rokwire Rewards Building Block API
+  description: Rewards Building Block API Documentation
+  version: 1.0.9
+servers:
+  - url: 'https://api.rokwire.illinois.edu/rewards'
+    description: Production server
+  - url: 'https://api-test.rokwire.illinois.edu/rewards'
+    description: Test server
+  - url: 'https://api-dev.rokwire.illinois.edu/rewards'
+    description: Development server
+  - url: 'http://localhost/rewards'
+    description: Local server
+tags:
+  - name: Admin
+    description: Clients administration applications APIs.
+  - name: Internal
+    description: Internal applications APIs.
+  - name: Client
+    description: Client applications APIs.
+paths:
+  #Internal
+  /int/reward:
+    $ref: "./resources/internal/reward-history.yaml"
+  /int/stats:
+    $ref: "./resources/internal/reward-stats.yaml"  
+  #Client
+  /user/balance:
+    $ref: "./resources/client/user-balance.yaml"
+  /user/history:
+    $ref: "./resources/client/user-history.yaml"
+  /user/claims:
+    $ref: "./resources/client/user-claims.yaml"   
+  #Admin  
+  /admin/types:
+    $ref: "./resources/admin/types.yaml"
+  /admin/types/{id}:
+    $ref: "./resources/admin/typesid.yaml"
+  /admin/operations:
+    $ref: "./resources/admin/operations.yaml"
+  /admin/operations/{id}:
+    $ref: "./resources/admin/operationsid.yaml"
+  /admin/inventories:
+    $ref: "./resources/admin/inventories.yaml" 
+  /admin/inventories/{id}:
+    $ref: "./resources/admin/inventoriesid.yaml"
+  /admin/claims:
+    $ref: "./resources/admin/claims.yaml"
+  /admin/claims/{id}:
+    $ref: "./resources/admin/claimsid.yaml"              
+
+
+  components:
+  securitySchemes:
+      bearerAuth:            # arbitrary name for the security scheme
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  schemas:
+    $ref: "./schemas/index.yaml"

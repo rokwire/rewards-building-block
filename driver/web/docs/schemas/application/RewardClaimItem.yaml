@@ -1,0 +1,6 @@
+type: object
+properties:
+  reward_type:
+    type: string
+  inventory_id:
+    type: string

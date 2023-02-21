@@ -1,0 +1,16 @@
+type: object
+properties:
+  org_id:
+    type: string
+  reward_type:
+    type: string
+  display_name:
+    type: string
+  active:
+    type: boolean  
+  description:
+    type: string      
+  date_created:
+    type: string
+  date_updated:
+    type: string  

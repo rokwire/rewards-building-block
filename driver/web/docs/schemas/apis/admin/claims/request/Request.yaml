@@ -1,0 +1,17 @@
+type: object
+properties:
+  org_id:
+    type: string
+  user_id:
+    type: string  
+  items:
+    type: array
+    $ref: "../../../../../schemas/application/RewardClaimItem.yaml"
+  status:
+    type: string
+  description:
+    type: string      
+  date_created:
+    type: string
+  date_updated:
+    type: string  
