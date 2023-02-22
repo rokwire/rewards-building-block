@@ -17,15 +17,16 @@ package storage
 import (
 	"context"
 	"fmt"
+	"log"
+	"rewards/core/model"
+	"strconv"
+	"time"
+
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"rewards/core/model"
-	"strconv"
-	"time"
 )
 
 // Adapter implements the Storage interface
@@ -308,7 +309,7 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 	}
 
 	findOptions := options.FindOptions{
-		Sort: bson.D{{"date_created", -1}},
+		Sort: bson.D{{Key: "date_created", Value: -1}},
 	}
 	if limit != nil {
 		findOptions.SetLimit(*limit)
@@ -318,7 +319,7 @@ func (sa *Adapter) GetRewardInventories(orgID string, ids []string, rewardType *
 	}
 	var result []model.RewardInventory
 	err := sa.db.rewardInventories.Find(filter, &result, &options.FindOptions{
-		Sort: bson.D{{"date_created", 1}},
+		Sort: bson.D{{Key: "date_created", Value: 1}},
 	})
 	if err != nil {
 		log.Printf("storage.GetRewardInventories error: %s", err)
@@ -462,7 +463,7 @@ func (sa *Adapter) GetUserRewardsHistory(orgID string, userID string, rewardType
 	}
 
 	findOptions := options.FindOptions{
-		Sort: bson.D{{"date_created", -1}},
+		Sort: bson.D{{Key: "date_created", Value: -1}},
 	}
 	if limit != nil {
 		findOptions.SetLimit(*limit)
