@@ -49,7 +49,7 @@ $(BIN)/%: | $(BIN) $(BASE) ; $(info $(M) building $(REPOSITORY)…)
 		rm -rf $$tmp ; exit $$ret
 
 GOLINT = $(BIN)/golint
-$(GOLINT): REPOSITORY=golang.org/x/lint/golint@latest
+$(GOLINT): REPOSITORY=golang.org/x/lint/golint
 
 # Tests
 
