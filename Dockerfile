@@ -1,4 +1,4 @@
-FROM golang:1.19-bullseye as builder
+FROM golang:1.18-buster as builder
 
 ENV CGO_ENABLED=0
 
@@ -8,7 +8,7 @@ WORKDIR /rewards-app
 COPY . .
 RUN make
 
-FROM alpine:3.17
+FROM alpine:3.16.2
 
 #we need timezone database
 RUN apk --no-cache add tzdata
