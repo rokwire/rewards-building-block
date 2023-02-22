@@ -1,0 +1,649 @@
+basePath: /content
+definitions:
+  Reward:
+    properties:
+      amount:
+        type: integer
+      building_block:
+        type: string
+      code:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      org_id:
+        type: string
+      reward_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  RewardClaim:
+    properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/RewardClaimItem'
+        type: array
+      org_id:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  RewardClaimItem:
+    properties:
+      amount:
+        type: integer
+      inventory_id:
+        type: string
+      reward_type:
+        type: string
+    type: object
+  RewardInventory:
+    properties:
+      amount_claimed:
+        type: integer
+      amount_granted:
+        type: integer
+      amount_total:
+        type: integer
+      claim_depleted:
+        type: boolean
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      grant_depleted:
+        type: boolean
+      id:
+        type: string
+      in_stock:
+        type: boolean
+      org_id:
+        type: string
+      reward_type:
+        description: t-shirt
+        type: string
+    type: object
+  RewardOperation:
+    properties:
+      amount:
+        type: integer
+      building_block:
+        type: string
+      code:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      org_id:
+        type: string
+      reward_type:
+        description: tshirt
+        type: string
+    type: object
+  RewardType:
+    properties:
+      active:
+        type: boolean
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: string
+      org_id:
+        type: string
+      reward_type:
+        description: tshirt
+        type: string
+    type: object
+  model.RewardQuantityState:
+    properties:
+      claimable_quantity:
+        type: integer
+      grantable_quantity:
+        type: integer
+      reward_type:
+        type: string
+    type: object
+host: localhost
+info:
+  contact: {}
+  description: RoRewards Building Block API Documentation.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Rewards Building Block API
+  version: 1.0.6
+paths:
+  /admin/claims:
+    get:
+      description: Retrieves  all reward claims
+      operationId: AdminGetRewardClaims
+      parameters:
+      - description: Coma separated IDs of the desired records
+        in: query
+        name: ids
+        type: string
+      - description: user_id
+        in: query
+        name: user_id
+        type: string
+      - description: status
+        in: query
+        name: status
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardClaim'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new claim inventory
+      operationId: AdminCreateRewardClaim
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardClaim'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/claims/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a claim inventory by id
+      operationId: AdminGetRewardClaim
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward claim with the specified id
+      operationId: AdminUpdateRewardClaim
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardClaim'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/inventories:
+    get:
+      description: Retrieves  all reward types
+      operationId: AdminGetRewardInventories
+      parameters:
+      - description: Coma separated IDs of the desired records
+        in: query
+        name: ids
+        type: string
+      - description: 'in_stock - possible values: missing (e.g no filter), 0- false,
+          1- true'
+        in: query
+        name: in_stock
+        type: string
+      - description: 'grant_depleted - possible values: missing (e.g no filter), 0-
+          false, 1- true'
+        in: query
+        name: grant_depleted
+        type: string
+      - description: 'claim_depleted - possible values: missing (e.g no filter), 0-
+          false, 1- true'
+        in: query
+        name: claim_depleted
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardInventory'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new reward inventory
+      operationId: AdminCreateRewardInventory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardInventory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/inventories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a reward inventory by id
+      operationId: AdminGetRewardInventory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward inventory with the specified id
+      operationId: AdminUpdateRewardInventory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardInventory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardInventory'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/operations:
+    get:
+      description: Retrieves  all reward types
+      operationId: AdminGetRewardOperations
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardOperation'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new operation type
+      operationId: AdminCreateRewardOperation
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardOperation'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardOperation'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/operations/{id}:
+    delete:
+      description: Deletes a reward operation with the specified id
+      operationId: AdminDeleteRewardOperation
+      responses:
+        "200":
+          description: ""
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a reward operation by id
+      operationId: AdminGetRewardOperation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardOperation'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward operation with the specified id
+      operationId: AdminUpdateRewardOperation
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardOperation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardOperation'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/types:
+    get:
+      description: Retrieves  all reward types
+      operationId: AdminGetRewardTypes
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardType'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new reward type
+      operationId: AdminCreateRewardType
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardType'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /admin/types/{id}:
+    delete:
+      description: Deletes a reward type with the specified id
+      operationId: AdminDeleteRewardType
+      responses:
+        "200":
+          description: ""
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a reward type by id
+      operationId: AdminRewardTypes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Updates a reward type with the specified id
+      operationId: AdminUpdateRewardType
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RewardType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardType'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Admin
+  /int/reward_history:
+    post:
+      consumes:
+      - application/json
+      description: Gets reward quantity stats for the current moment
+      operationId: InternalGetRewardStats
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.RewardQuantityState'
+            type: array
+      security:
+      - InternalApiAuth: []
+      tags:
+      - Internal
+  /user/balance:
+    get:
+      description: Retrieves balance for each user's wallet
+      operationId: GetUserBalance
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /user/claim:
+    post:
+      consumes:
+      - application/json
+      description: Create a new claim user claim
+      operationId: CreateUserRewardClaim
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RewardClaim'
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Client
+  /user/claims:
+    get:
+      consumes:
+      - application/json
+      description: Gets user claims
+      operationId: GetUserRewardClaim
+      parameters:
+      - description: status
+        in: query
+        name: status
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RewardClaim'
+            type: array
+      security:
+      - AdminUserAuth: []
+      tags:
+      - Client
+  /user/history:
+    get:
+      description: Retrieves the wallet history
+      operationId: GetUserRewardsHistory
+      parameters:
+      - description: reward_type - filter by reward_type
+        in: query
+        name: reward_type
+        type: string
+      - description: code - filter by code
+        in: query
+        name: code
+        type: string
+      - description: filter by building_block
+        in: query
+        name: building_block
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /version:
+    get:
+      description: Gives the service version.
+      operationId: Version
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: ""
+      tags:
+      - Client
+schemes:
+- https
+securityDefinitions:
+  AdminGroupAuth:
+    in: header
+    name: GROUP
+    type: apiKey
+  AdminUserAuth:
+    in: header (add Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+  InternalApiAuth:
+    in: header (add INTERNAL-API-KEY with correct value as a header)
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
