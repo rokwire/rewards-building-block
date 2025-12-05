@@ -1,6 +1,6 @@
 module rewards
 
-go 1.20
+go 1.24.11
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
@@ -11,6 +11,7 @@ require (
 	github.com/rokwire/core-auth-library-go v1.0.9
 	github.com/rokwire/logging-library-go v1.0.3
 	github.com/swaggo/http-swagger v1.3.3
+	github.com/swaggo/swag v1.8.1
 	go.mongodb.org/mongo-driver v1.11.2
 )
 
@@ -33,9 +34,8 @@ require (
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.8.3 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
-	github.com/swaggo/swag v1.8.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect

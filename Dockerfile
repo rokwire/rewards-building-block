@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye as builder
+FROM golang:1.24.11-alpine AS builder
 
 ENV CGO_ENABLED=0
 
