@@ -92,9 +92,9 @@ func getEnvKey(key string, required bool) string {
 	value, exist := os.LookupEnv(key)
 	if !exist {
 		if required {
-			log.Printf("No provided environment variable for %s", key)
+			log.Fatal("No provided environment variable for " + key)
 		} else {
-			log.Printf("No provided environment variable for %s", key)
+			log.Fatal("No provided environment variable for " + key)
 		}
 	}
 	return value
