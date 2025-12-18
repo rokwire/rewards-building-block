@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Fix vuln [#22](https://github.com/rokwire/rewards-building-block/issues/22)
+
+### Fixed
 - Fix docs [#14](https://github.com/rokwire/rewards-building-block/issues/14)
 
 ### Added
