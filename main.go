@@ -17,6 +17,7 @@ package main
 import (
 	"log"
 	"os"
+
 	"rewards/core"
 	"rewards/core/model"
 	cacheadapter "rewards/driven/cache"
@@ -93,7 +94,7 @@ func getEnvKey(key string, required bool) string {
 		if required {
 			log.Fatal("No provided environment variable for " + key)
 		} else {
-			log.Printf("No provided environment variable for " + key)
+			log.Printf("No provided environment variable for %s", key)
 		}
 	}
 	return value
